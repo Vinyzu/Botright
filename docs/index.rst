@@ -1,8 +1,9 @@
 Welcome to Botright!
 ====================
+.. include:: botright.rst
 
 For full documentation of changes visit
-`BotrightDocumentation <botright.md>`__. Except of these changes, you
+:doc:`BotrightDocumentation <botright.rst>`__. Except of these changes, you
 can use Botright after the
 `PlaywrightDocs <https://playwright.dev/python/docs/api/class-playwright>`__
 

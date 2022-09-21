@@ -2,7 +2,7 @@ Welcome to Botright!
 ====================
 
 For full documentation of changes visit
-`BotrightDocumentation <https://botright.readthedocs.io/en/latest/#welcome-to-botright>`__. Except of these changes, you
+`BotrightDocumentation <https://botright.readthedocs.io/en/latest/#initialization>`__. Except of these changes, you
 can use Botright after the
 `PlaywrightDocs <https://playwright.dev/python/docs/api/class-playwright>`__
 

@@ -1,138 +1,161 @@
-# Welcome to Botright!
+Welcome to Botright!
+====================
 
-For full documentation of changes visit [BotrightDocumentation](botright.md).
-Except of these changes, you can use Botright after the [PlaywrightDocs](https://playwright.dev/python/docs/api/class-playwright)
+For full documentation of changes visit
+`BotrightDocumentation <botright.md>`__. Except of these changes, you
+can use Botright after the
+`PlaywrightDocs <https://playwright.dev/python/docs/api/class-playwright>`__
 
-## Installation
+Installation
+------------
 
-### Pip
+Pip
+~~~
 
-[![PyPI version](https://badge.fury.io/py/botright.svg)](https://pypi.python.org/pypi/botright/)
+|PyPI version|
 
-```bash
-pip install --upgrade pip
-pip install botright
-playwright install
-```
+.. code:: bash
 
-## Usage
+   pip install --upgrade pip
+   pip install botright
+   playwright install
 
-Once installed, you can `import` Botright in a Python script, and launch a firefox browser.
+Usage
+-----
 
-```py
-import asyncio
-import botright
+Once installed, you can ``import`` Botright in a Python script, and
+launch a firefox browser.
 
+.. code:: py
 
-async def main():
-    botright_client = await botright.Botright()
-    browser = await botright_client.new_browser()
-    page = await browser.new_page()
-
-    await page.goto("http://playwright.dev")
-    print(await page.title())
-
-    await botright_client.close()
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-## First script
-
-In our first script, we will navigate to `whatsmyuseragent.org` and take a screenshot in WebKit.
-
-```py
-import asyncio
-import botright
+   import asyncio
+   import botright
 
 
-async def main():
-    botright_client = await botright.Botright()
-    browser = await botright_client.new_browser()
-    page = await browser.new_page()
+   async def main():
+       botright_client = await botright.Botright()
+       browser = await botright_client.new_browser()
+       page = await browser.new_page()
 
-    page.goto("http://whatsmyuseragent.org/")
-    page.screenshot(path="example.png")
+       await page.goto("http://playwright.dev")
+       print(await page.title())
 
-    await botright_client.close()
+       await botright_client.close()
 
-if __name__ == "__main__":
-    asyncio.run(main())
-```
+   if __name__ == "__main__":
+       asyncio.run(main())
 
-By default, Botright runs the browsers in headless mode. To see the browser UI, pass the `headless=False` flag while launching botright/the browser.
+First script
+------------
 
-```py
-await botright.Botright(headless=False)
-```
+In our first script, we will navigate to ``whatsmyuseragent.org`` and
+take a screenshot in WebKit.
 
-## Interactive mode (REPL)
+.. code:: py
+
+   import asyncio
+   import botright
+
+
+   async def main():
+       botright_client = await botright.Botright()
+       browser = await botright_client.new_browser()
+       page = await browser.new_page()
+
+       page.goto("http://whatsmyuseragent.org/")
+       page.screenshot(path="example.png")
+
+       await botright_client.close()
+
+   if __name__ == "__main__":
+       asyncio.run(main())
+
+By default, Botright runs the browsers in headless mode. To see the
+browser UI, pass the ``headless=False`` flag while launching
+botright/the browser.
+
+.. code:: py
+
+   await botright.Botright(headless=False)
+
+Interactive mode (REPL)
+-----------------------
 
 You can launch the interactive python REPL:
 
-```bash
-python -m asyncio
-```
+.. code:: bash
+
+   python -m asyncio
 
 and then launch Botright within it for quick experimentation:
 
-```py
->>> import botright
->>> botright_client = await botright.Botright()
-# Pass headless=False to botright.Botright() to see the browser UI
->>> browser = await botright_client.new_browser()
->>> page = await browser.new_page()
->>> await page.goto("http://whatsmyuseragent.org/")
->>> await page.screenshot(path="example.png")
->>> await botright_client.stop()
-```
+.. code:: py
 
-## Pyinstaller
+   >>> import botright
+   >>> botright_client = await botright.Botright()
+   # Pass headless=False to botright.Botright() to see the browser UI
+   >>> browser = await botright_client.new_browser()
+   >>> page = await browser.new_page()
+   >>> await page.goto("http://whatsmyuseragent.org/")
+   >>> await page.screenshot(path="example.png")
+   >>> await botright_client.stop()
 
-You can use Botright with [Pyinstaller](https://www.pyinstaller.org/) to create standalone executables.
+Pyinstaller
+-----------
 
-```py
-# main.py
-import asyncio
-import botright
+You can use Botright with `Pyinstaller <https://www.pyinstaller.org/>`__
+to create standalone executables.
+
+.. code:: py
+
+   # main.py
+   import asyncio
+   import botright
 
 
-async def main():
-    botright_client = await botright.Botright()
-    browser = await botright_client.new_browser()
-    page = await browser.new_page()
+   async def main():
+       botright_client = await botright.Botright()
+       browser = await botright_client.new_browser()
+       page = await browser.new_page()
 
-    page.goto("http://whatsmyuseragent.org/")
-    page.screenshot(path="example.png")
+       page.goto("http://whatsmyuseragent.org/")
+       page.screenshot(path="example.png")
 
-    await botright_client.close()
+       await botright_client.close()
 
-if __name__ == "__main__":
-    asyncio.run(main())
-```
+   if __name__ == "__main__":
+       asyncio.run(main())
 
 If you want to bundle browsers with the executables:
 
-```bash
-PLAYWRIGHT_BROWSERS_PATH=0 playwright install firefox
-pyinstaller -F main.py
-```
+.. code:: bash
 
-```batch
-set PLAYWRIGHT_BROWSERS_PATH=0
-playwright install firefox
-pyinstaller -F main.py
-```
+   PLAYWRIGHT_BROWSERS_PATH=0 playwright install firefox
+   pyinstaller -F main.py
 
-```powershell
-$env:PLAYWRIGHT_BROWSERS_PATH="0"
-playwright install firefox
-pyinstaller -F main.py
-```
+.. code:: batch
 
-## Known issues
+   set PLAYWRIGHT_BROWSERS_PATH=0
+   playwright install firefox
+   pyinstaller -F main.py
 
-### Threading
+.. code:: powershell
 
-Botright's API is not thread-safe. If you are using Botright in a multi-threaded environment, you should create a botright instance per thread. See [threading issue](https://github.com/microsoft/playwright-python/issues/623) for more details.
+   $env:PLAYWRIGHT_BROWSERS_PATH="0"
+   playwright install firefox
+   pyinstaller -F main.py
+
+Known issues
+------------
+
+Threading
+~~~~~~~~~
+
+Botright’s API is not thread-safe. If you are using Botright in a
+multi-threaded environment, you should create a botright instance per
+thread. See `threading
+issue <https://github.com/microsoft/playwright-python/issues/623>`__ for
+more details.
+
+.. |PyPI version| image:: https://badge.fury.io/py/botright.svg
+   :target: https://pypi.python.org/pypi/botright/

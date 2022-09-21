@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>botright</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Welcome to Botright!";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> botright
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Welcome to Botright!</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pip">Pip</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#first-script">First script</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#interactive-mode-repl">Interactive mode (REPL)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pyinstaller">Pyinstaller</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#known-issues">Known issues</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#threading">Threading</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="botright/">Botright</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">botright</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Welcome to Botright!</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="welcome-to-botright">Welcome to Botright!</h1>
+<p>For full documentation of changes visit <a href="botright/">BotrightDocumentation</a>.
+Except of these changes, you can use Botright after the <a href="https://playwright.dev/python/docs/api/class-playwright">PlaywrightDocs</a></p>
+<h2 id="installation">Installation</h2>
+<h3 id="pip">Pip</h3>
+<p><a href="https://pypi.python.org/pypi/botright/"><img alt="PyPI version" src="https://badge.fury.io/py/botright.svg" /></a></p>
+<pre><code class="language-bash">pip install --upgrade pip
+pip install botright
+playwright install
+</code></pre>
+<h2 id="usage">Usage</h2>
+<p>Once installed, you can <code>import</code> Botright in a Python script, and launch a firefox browser.</p>
+<pre><code class="language-py">import asyncio
+import botright
+
+
+async def main():
+    botright_client = await botright.Botright()
+    browser = await botright_client.new_browser()
+    page = await browser.new_page()
+
+    await page.goto(&quot;http://playwright.dev&quot;)
+    print(await page.title())
+
+    await botright_client.close()
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</code></pre>
+<h2 id="first-script">First script</h2>
+<p>In our first script, we will navigate to <code>whatsmyuseragent.org</code> and take a screenshot in WebKit.</p>
+<pre><code class="language-py">import asyncio
+import botright
+
+
+async def main():
+    botright_client = await botright.Botright()
+    browser = await botright_client.new_browser()
+    page = await browser.new_page()
+
+    page.goto(&quot;http://whatsmyuseragent.org/&quot;)
+    page.screenshot(path=&quot;example.png&quot;)
+
+    await botright_client.close()
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</code></pre>
+<p>By default, Botright runs the browsers in headless mode. To see the browser UI, pass the <code>headless=False</code> flag while launching botright/the browser.</p>
+<pre><code class="language-py">await botright.Botright(headless=False)
+</code></pre>
+<h2 id="interactive-mode-repl">Interactive mode (REPL)</h2>
+<p>You can launch the interactive python REPL:</p>
+<pre><code class="language-bash">python -m asyncio
+</code></pre>
+<p>and then launch Botright within it for quick experimentation:</p>
+<pre><code class="language-py">&gt;&gt;&gt; import botright
+&gt;&gt;&gt; botright_client = await botright.Botright()
+# Pass headless=False to botright.Botright() to see the browser UI
+&gt;&gt;&gt; browser = await botright_client.new_browser()
+&gt;&gt;&gt; page = await browser.new_page()
+&gt;&gt;&gt; await page.goto(&quot;http://whatsmyuseragent.org/&quot;)
+&gt;&gt;&gt; await page.screenshot(path=&quot;example.png&quot;)
+&gt;&gt;&gt; await botright_client.stop()
+</code></pre>
+<h2 id="pyinstaller">Pyinstaller</h2>
+<p>You can use Botright with <a href="https://www.pyinstaller.org/">Pyinstaller</a> to create standalone executables.</p>
+<pre><code class="language-py"># main.py
+import asyncio
+import botright
+
+
+async def main():
+    botright_client = await botright.Botright()
+    browser = await botright_client.new_browser()
+    page = await browser.new_page()
+
+    page.goto(&quot;http://whatsmyuseragent.org/&quot;)
+    page.screenshot(path=&quot;example.png&quot;)
+
+    await botright_client.close()
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</code></pre>
+<p>If you want to bundle browsers with the executables:</p>
+<pre><code class="language-bash">PLAYWRIGHT_BROWSERS_PATH=0 playwright install firefox
+pyinstaller -F main.py
+</code></pre>
+<pre><code class="language-batch">set PLAYWRIGHT_BROWSERS_PATH=0
+playwright install firefox
+pyinstaller -F main.py
+</code></pre>
+<pre><code class="language-powershell">$env:PLAYWRIGHT_BROWSERS_PATH=&quot;0&quot;
+playwright install firefox
+pyinstaller -F main.py
+</code></pre>
+<h2 id="known-issues">Known issues</h2>
+<h3 id="threading">Threading</h3>
+<p>Botright's API is not thread-safe. If you are using Botright in a multi-threaded environment, you should create a botright instance per thread. See <a href="https://github.com/microsoft/playwright-python/issues/623">threading issue</a> for more details.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="botright/" class="btn btn-neutral float-right" title="Botright">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="botright/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2022-09-21 15:28:52.279863+00:00
+-->

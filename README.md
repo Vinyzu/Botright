@@ -52,7 +52,7 @@ Also, i coded a MouseMovement Generator, to get more realistic MotionData. It us
 
 ## Development
 
-Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+Read the [CONTRIBUTING.md](https://github.com/Vinyzu/Botright/blob/main/CONTRIBUTING.md) file.
 
 ---
 

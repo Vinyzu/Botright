@@ -32,15 +32,13 @@ def read_requirements(path):
 setup(
     name="botright",
     version=read("botright", "VERSION"),
-    description="Awesome botright created by Vinyzu",
+    description="Botright, the next level automation studio for Python. Based on Playwright.",
     url="https://github.com/Vinyzu/botright/",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     author="Vinyzu",
     packages=find_packages(exclude=["tests", ".github"]),
+    package_data={'': ['names.txt', "passwords.txt"]},
     install_requires=read_requirements("requirements.txt"),
-    entry_points={
-        "console_scripts": ["botright = botright.__main__:main"]
-    },
     extras_require={"test": read_requirements("requirements-test.txt")},
 )

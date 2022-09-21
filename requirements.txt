@@ -1,5 +1,11 @@
-# This template is a low-dependency template. 
-# By default there is no requirements added here.
-# Add the requirements you need to this file.
-# or run `make init` to create this file automatically based on the template.
-# You can also run `make switch-to-poetry` to use the poetry package manager.
+httpx~=0.23.0
+playwright~=1.25.2
+playwright-stealth~=1.0.5
+numpy~=1.23.3
+scipy~=1.9.1
+async_class~=0.5.0
+
+# AI Requirements
+pyyaml~=6.0
+scikit-image~=0.19.2
+opencv-python~=4.5.5.62

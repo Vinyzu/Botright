@@ -1,85 +1,81 @@
-
-# Python Project Template
-
-A low dependency and really simple to start project template for Python Projects.
-
-See also 
-- [Flask-Project-Template](https://github.com/rochacbruno/flask-project-template/) for a full feature Flask project including database, API, admin interface, etc.
-- [FastAPI-Project-Template](https://github.com/rochacbruno/fastapi-project-template/) The base to start an openapi project featuring: SQLModel, Typer, FastAPI, JWT Token Auth, Interactive Shell, Management Commands.
-
-### HOW TO USE THIS TEMPLATE
-
-> **DO NOT FORK** this is meant to be used from **[Use this template](https://github.com/rochacbruno/python-project-template/generate)** feature.
-
-1. Click on **[Use this template](https://github.com/rochacbruno/python-project-template/generate)**
-3. Give a name to your project  
-   (e.g. `my_awesome_project` recommendation is to use all lowercase and underscores separation for repo names.)
-3. Wait until the first run of CI finishes  
-   (Github Actions will process the template and commit to your new repo)
-4. If you want [codecov](https://about.codecov.io/sign-up/) Reports and Automatic Release to [PyPI](https://pypi.org)  
-  On the new repository `settings->secrets` add your `PYPI_API_TOKEN` and `CODECOV_TOKEN` (get the tokens on respective websites)
-4. Read the file [CONTRIBUTING.md](CONTRIBUTING.md)
-5. Then clone your new project and happy coding!
-
-> **NOTE**: **WAIT** until first CI run on github actions before cloning your new project.
-
-### What is included on this template?
-
-- 🖼️ Templates for starting multiple application types:
-  * **Basic low dependency** Python program (default) [use this template](https://github.com/rochacbruno/python-project-template/generate)
-  * **Flask** with database, admin interface, restapi and authentication [use this template](https://github.com/rochacbruno/flask-project-template/generate).
-  **or Run `make init` after cloning to generate a new project based on a template.**
-- 📦 A basic [setup.py](setup.py) file to provide installation, packaging and distribution for your project.  
-  Template uses setuptools because it's the de-facto standard for Python packages, you can run `make switch-to-poetry` later if you want.
-- 🤖 A [Makefile](Makefile) with the most useful commands to install, test, lint, format and release your project.
-- 📃 Documentation structure using [mkdocs](http://www.mkdocs.org)
-- 💬 Auto generation of change log using **gitchangelog** to keep a HISTORY.md file automatically based on your commit history on every release.
-- 🐋 A simple [Containerfile](Containerfile) to build a container image for your project.  
-  `Containerfile` is a more open standard for building container images than Dockerfile, you can use buildah or docker with this file.
-- 🧪 Testing structure using [pytest](https://docs.pytest.org/en/latest/)
-- ✅ Code linting using [flake8](https://flake8.pycqa.org/en/latest/)
-- 📊 Code coverage reports using [codecov](https://about.codecov.io/sign-up/)
-- 🛳️ Automatic release to [PyPI](https://pypi.org) using [twine](https://twine.readthedocs.io/en/latest/) and github actions.
-- 🎯 Entry points to execute your program using `python -m <botright>` or `$ botright` with basic CLI argument parsing.
-- 🔄 Continuous integration using [Github Actions](.github/workflows/) with jobs to lint, test and release your project on Linux, Mac and Windows environments.
-
-> Curious about architectural decisions on this template? read [ABOUT_THIS_TEMPLATE.md](ABOUT_THIS_TEMPLATE.md)  
-> If you want to contribute to this template please open an [issue](https://github.com/rochacbruno/python-project-template/issues) or fork and send a PULL REQUEST.
-
-[❤️ Sponsor this project](https://github.com/sponsors/rochacbruno/)
-
-<!--  DELETE THE LINES ABOVE THIS AND WRITE YOUR PROJECT README BELOW -->
-
----
-# botright
-
-[![codecov](https://codecov.io/gh/Vinyzu/botright/branch/main/graph/badge.svg?token=botright_token_here)](https://codecov.io/gh/Vinyzu/botright)
-[![CI](https://github.com/Vinyzu/botright/actions/workflows/main.yml/badge.svg)](https://github.com/Vinyzu/botright/actions/workflows/main.yml)
-
-Awesome botright created by Vinyzu
+# Botright v1.0
 
 ## Install it from PyPI
 
 ```bash
 pip install botright
+playwright install
 ```
+
+---
 
 ## Usage
 
+### Botright is only available in async mode.
+### It is fully plugable with your existing playwright code. You only have to change your browser initialization!
+
 ```py
-from botright import BaseClass
-from botright import base_function
+import asyncio
 
-BaseClass().base_method()
-base_function()
+import botright
+
+
+async def main():
+    botright_client = await botright.Botright(headless=False)
+    browser = await botright_client.new_browser()
+    page = await browser.new_page()
+
+    # Continue by using the Page
+
+    await botright_client.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
-```bash
-$ python -m botright
-#or
-$ botright
-```
+---
+
+## Documentation
+Read the [Documentation](docs/index.md)
+
+---
+
+## Artificial Intelligence
+
+The AI of this bot is not mine and i dont take any credits for it.
+
+It was created by QIN2DIM and can be found [here](https://github.com/QIN2DIM/hcaptcha-challenger).
+
+However, i edited out some code/files, to make Botright lightweighter and to use less imports.
+
+Also, i coded a MouseMovement Generator, to get more realistic MotionData. It uses Interpolation between CaptchaImage-Coordinates to do so.
 
 ## Development
 
 Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+---
+
+## Copyright and License
+© [Vinyzu](https://github.com/Vinyzu/)
+
+[GNU GPL](https://choosealicense.com/licenses/gpl-3.0/)
+
+(Commercial Usage is allowed, but source, license and copyright has to made available. Botright does not provide and Liability or Warranty)
+
+---
+
+## Thanks to
+
+[QIN2DIM](https://github.com/QIN2DIM/) (For his great AI work.)
+
+[MaxAndolini](https://github.com/MaxAndolini) (For shared knowledge of hCaptcha bypassing.)
+
+---
+
+![Version](https://img.shields.io/badge/Botright-v1.0.0-blue)
+![License](https://img.shields.io/badge/License-GNU%20GPL-green)
+![Python](https://img.shields.io/badge/Python-v3.x-lightgrey)
+
+[![my-discord](https://img.shields.io/badge/My_Discord-000?style=for-the-badge&logo=google-chat&logoColor=blue)](https://discordapp.com/users/935224495126487150)
+[![buy-me-a-coffee](https://img.shields.io/badge/Buy_Me_A_Coffee-000?style=for-the-badge&logo=ko-fi&logoColor=brown)](https://ko-fi.com/vinyzu)

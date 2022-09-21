@@ -36,7 +36,7 @@ if __name__ == "__main__":
 ---
 
 ## Documentation
-Read the [Documentation](docs/index.md)
+Read the [Documentation](https://botright.readthedocs.io/en/latest)
 
 ---
 

@@ -1,9 +1,8 @@
 Welcome to Botright!
 ====================
-.. include:: botright.rst
 
 For full documentation of changes visit
-:doc:`BotrightDocumentation <botright.rst>`__. Except of these changes, you
+`BotrightDocumentation <https://botright.readthedocs.io/en/latest/#welcome-to-botright>`__. Except of these changes, you
 can use Botright after the
 `PlaywrightDocs <https://playwright.dev/python/docs/api/class-playwright>`__
 
@@ -160,3 +159,6 @@ more details.
 
 .. |PyPI version| image:: https://badge.fury.io/py/botright.svg
    :target: https://pypi.python.org/pypi/botright/
+
+
+.. include:: botright.rst

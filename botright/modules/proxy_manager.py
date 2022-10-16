@@ -22,6 +22,7 @@ class ProxyManager(AsyncObject):
         self.password = None
         self.browser_proxy = None
         self.plain_proxy = None
+        self.timeout = httpx.Timeout(20.0, read=None)
 
         if self.proxy:
             self.split_proxy()
@@ -75,9 +76,9 @@ class ProxyManager(AsyncObject):
 
     async def check_proxy(self) -> None:
         try:
-            ip_request = await self.phttpx.get('https://jsonip.com')
+            ip_request = await self.phttpx.get('https://jsonip.com', timeout=self.timeout)
             ip = ip_request.json().get("ip")
-            r = await self.httpx.get(f"http://ip-api.com/json/{ip}")
+            r = await self.httpx.get(f"http://ip-api.com/json/{ip}", timeout=self.timeout)
             data = r.json()
             self.country = data.get("country")
             self.country_code = data.get("countryCode")

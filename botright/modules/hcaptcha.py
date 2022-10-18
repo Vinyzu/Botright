@@ -62,23 +62,36 @@ class hCaptcha:
 
         await page.route("https://hcaptcha.com/getcaptcha/**", mock_json)
 
-    async def solve_captcha(page, checkbox):
+        
+    
+    async def captcha_solver(self):
         # Getting Challenge Frame
         try:
-            captcha_frames = page.frame_locator(
-                "//iframe[contains(@title,'content')]")
+            captcha_frames = self.page.frame_locator("//iframe[contains(@title,'content')]")
             captcha_frame = captcha_frames.first
+            
         except Exception:
             return hCaptcha.captcha_token
+
         # Getting Question and Label of the Captcha
         try:
-            question_locator = captcha_frame.locator(
-                "//h2[@class='prompt-text']")
+            question_locator = captcha_frame.locator("//h2[@class='prompt-text']") # maybe sometimes timeout error?
             question = await question_locator.text_content()
-        except Exception:
-            if hCaptcha.captcha_token:
-                return hCaptcha.captcha_token
-            raise RuntimeError("Captcha Question didnt load")
+ 
+        except playwright._impl._api_types.TimeoutError: 
+            self.logger.error("Timeout exceeded while selecting hidden element, restarting Browser...")
+            for _ in range(2): await self.close()
+            return
+            # return False
+            await self.close()
+ 
+        except Exception as e:
+            if hCaptcha.captcha_token: return Captcha.captcha_token
+            self.logger.error("Captcha Question didnt load")
+            for _ in range(2): await self.close()
+            return
+            # return False
+            
 
         label = re.split(r"containing a", question)[-1][1:].strip() if "containing" in question else question
         label = label.replace(".", "")
@@ -94,6 +107,7 @@ class hCaptcha:
         image_locator = captcha_frame.locator("//div[@class='task-image']")
         # Define Captcha Points and Used Captha points
         captcha_points, used_captcha_points = [], []
+        
         # Getting Random Coordinate from Image if Image is Correct
         for i in range(await image_locator.count()):
             element = image_locator.nth(i)

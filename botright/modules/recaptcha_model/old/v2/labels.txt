@@ -1,0 +1,9 @@
+bridges
+chimneys
+crosswalks
+mountains or hills
+palm trees
+stairs
+taxis
+tractors
+traffic lights

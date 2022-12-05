@@ -7,6 +7,7 @@
 | Kwargs           | Usage |
 |:--------------:|:--------------:|
 | `headless` (bool) | Whether to run browser in headless mode. Defaults to `False` |
+| `scroll_into_view` (bool) | Whether to scroll every Element into View. Defaults to `True` |
 
 - returns: `BotrightObject`
 
@@ -44,10 +45,39 @@
 
 ### Solve hCaptcha
 - `await page.solve_hcaptcha()`
-- Spawns a new Page
+- Solves a hCaptcha on the given Page
+
+| Args           | Usage |
+|:--------------:|--------------|
+| `page`  | Specify the Page to solve a hCaptcha Challenge on |
 
 | Kwargs           | Usage |
 |:--------------:|--------------|
 | `rqdata` (str) | Specify rqData to mock the Captcha with. Defaults to `None` |
 
 - returns: `hCaptchaKey`
+
+### Solve geeTest
+- `await page.solve_geetest()`
+- Solves a geeTest (v3 or v4) on the given Page
+
+| Args           | Usage |
+|:--------------:|--------------|
+| `page`  | Specify the Page to solve a hCaptcha Challenge on |
+
+| Kwargs           | Usage |
+|:--------------:|--------------|
+| `mode` (str) | Specify Mode to solve IconCaptchas with. Defaults to `"canny"`. Supported Modes: "canny", "clip", "ssim", "random" |
+
+- returns: `geeTestKey`
+
+### Solve reCaptcha
+- `await page.solve_recaptcha()`
+- Solves a reCaptcha on the given Page
+- Note: Use `await page.audio_recaptcha()` for solving via Audio Challenge and `await page.visual_recaptcha()` (alias to `await page.solve_recaptcha()`)
+
+| Args           | Usage |
+|:--------------:|--------------|
+| `page`  | Specify the Page to solve a reCaptcha Challenge on |
+
+- returns: `reCaptchaKey`

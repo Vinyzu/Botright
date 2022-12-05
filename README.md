@@ -1,4 +1,4 @@
-# Botright v1.0
+# Botright v0.2
 
 ## Install it from PyPI
 
@@ -33,22 +33,37 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
----
-
-## Documentation
 Read the [Documentation](https://botright.readthedocs.io/en/latest)
 
 ---
 
-## Artificial Intelligence
+## Captcha Solving
 
-The AI of this bot is not mine and i dont take any credits for it.
+Botright is able to solve a wide viarity of Captchas.
+For Documentation of these functions visit [BotrightDocumentation](botright.md).
 
-It was created by QIN2DIM and can be found [here](https://github.com/QIN2DIM/hcaptcha-challenger).
+It uses Computer Vision/Artificial Intelligence and other Methods to solve these Captchas.
 
-However, i edited out some code/files, to make Botright lightweighter and to use less imports.
+You dont need to pay for any Captcha Solving APIs and you can solve Captchas with just one simple function call.
 
-Also, i coded a MouseMovement Generator, to get more realistic MotionData. It uses Interpolation between CaptchaImage-Coordinates to do so.
+Here all Captchas supported as of now:
+
+| Captcha Type | Supported | Success Rate |
+|:--------------:|:--------------:|--------------|
+| `hCaptcha` | ✔️ | 50%-90% (Depending on topicality of new Types) |
+| `reCaptcha` | ✔️ | 30%-50% |
+| `geeTestv3` |
+| v3 Intelligent Mode | ✔️ | 100% |
+| v3 Slider Captcha | ✔️ | 100% |
+| v3 Nine Captcha | ✔️ | 50% |
+| v3 Icon Captcha | ✔️ | 70% |
+| v3 Space Captcha | ❌ | 0% |
+| `geeTestv4` |
+| v4 Intelligent Mode | ✔️ | 100% |
+| v4 Slider Captcha | ✔️ | 100% |
+| v4 GoBang Captcha | ✔️ | 100% |
+| v4 Icon Captcha | ✔️ | 60% |
+| v4 IconCrush Captcha | ✔️ | 100% |
 
 ## Development
 
@@ -67,13 +82,15 @@ Read the [CONTRIBUTING.md](https://github.com/Vinyzu/Botright/blob/main/CONTRIBU
 
 ## Thanks to
 
-[QIN2DIM](https://github.com/QIN2DIM/) (For his great AI work.)
+[QIN2DIM](https://github.com/QIN2DIM/) (For his great AI work) (Note his GitHub got banned)
 
-[MaxAndolini](https://github.com/MaxAndolini) (For shared knowledge of hCaptcha bypassing.)
+[MaxAndolini](https://github.com/MaxAndolini) (For shared knowledge of hCaptcha bypassing)
+
+[CreativeProxies](https://creativeproxies.com) (For sponsoring me with Proxies)
 
 ---
 
-![Version](https://img.shields.io/badge/Botright-v1.0.0-blue)
+![Version](https://img.shields.io/badge/Botright-v0.2-blue)
 ![License](https://img.shields.io/badge/License-GNU%20GPL-green)
 ![Python](https://img.shields.io/badge/Python-v3.x-lightgrey)
 

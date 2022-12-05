@@ -22,6 +22,7 @@ class ProxyManager(AsyncObject):
         self.password = None
         self.browser_proxy = None
         self.plain_proxy = None
+        self.timeout = httpx.Timeout(20.0, read=None)
 
         if self.proxy:
             self.split_proxy()
@@ -29,13 +30,11 @@ class ProxyManager(AsyncObject):
             self.plain_proxy = f"http://{self.proxy}"
 
             if self.username:
-                self.browser_proxy = {
-                    "server": self.plain_proxy, "username": self.username, "password": self.password}
+                self.browser_proxy = {"server": self.plain_proxy, "username": self.username, "password": self.password}
             else:
                 self.browser_proxy = {"server": self.plain_proxy}
 
-        self.http_proxy = {"http": self.http_proxy,
-                           "https": self.http_proxy} if self.proxy else None
+        self.http_proxy = {"http": self.http_proxy, "https": self.http_proxy} if self.proxy else None
 
         self.phttpx = httpx.AsyncClient(proxies={"all://": self.plain_proxy})
         self.httpx = httpx.AsyncClient()
@@ -66,8 +65,7 @@ class ProxyManager(AsyncObject):
                 splitted = [x for y in helper for x in y]
                 self.split_helper(splitted)
             else:
-                raise SplitError(
-                    f"Proxy Format ({self.proxy}) isnt supported")
+                raise SplitError(f"Proxy Format ({self.proxy}) isnt supported")
         elif len(splitted) == 4:
             self.split_helper(splitted)
         else:
@@ -75,9 +73,12 @@ class ProxyManager(AsyncObject):
 
     async def check_proxy(self) -> None:
         try:
-            ip_request = await self.phttpx.get('https://jsonip.com')
+            ip_request = await self.phttpx.get("https://jsonip.com", timeout=self.timeout)
             ip = ip_request.json().get("ip")
-            r = await self.httpx.get(f"http://ip-api.com/json/{ip}")
+        except Exception as e:
+            raise ProxyCheckError("Could not get IP-Address of Proxy (Proxy is Invalid/Timed Out)")
+        try:
+            r = await self.httpx.get(f"http://ip-api.com/json/{ip}", timeout=self.timeout)
             data = r.json()
             self.country = data.get("country")
             self.country_code = data.get("countryCode")
@@ -89,8 +90,6 @@ class ProxyManager(AsyncObject):
             self.timezone = data.get("timezone")
 
             if not self.country:
-                raise ProxyCheckError(
-                    "Could not get GeoInformation from proxy (Proxy is Invalid/Failed Check)")
+                raise ProxyCheckError("Could not get GeoInformation from proxy (Proxy is probably not Indexed)")
         except Exception as e:
-            raise ProxyCheckError(
-                "Could not get GeoInformation from proxy (Proxy is Invalid/Failed Check)")
+            raise ProxyCheckError("Could not get GeoInformation from proxy (Proxy is probably not Indexed)")

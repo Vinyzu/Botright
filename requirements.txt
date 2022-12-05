@@ -1,11 +1,23 @@
-httpx~=0.23.0
-playwright~=1.25.2
-playwright-stealth~=1.0.5
-numpy
-scipy
-async_class~=0.5.0
+# General Requirements
+async_class #==0.5.0
+httpx #==0.23.0
+playwright #==1.25.2
+playwright_stealth #==1.0.5
 
-# AI Requirements
-pyyaml~=6.0
-scikit-image~=0.19.2
-opencv-python~=4.5.5.62
+# Math and Others
+numpy #==1.23.5
+scipy #==1.9.3
+# Image Processing
+Pillow #==9.3.0
+scikit_image #==0.19.3
+# Audio Processing
+pydub #==0.25.1
+
+
+# Artificial Intelligence
+yolov5 #==6.2.2
+opencv_python #==4.5.5.64
+tensorflow #==1.12.0
+sentence_transformers #==2.2.2
+easyocr #==1.6.2
+SpeechRecognition #==3.8.1

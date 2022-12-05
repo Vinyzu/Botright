@@ -1,11 +1,7 @@
 # This requirements are for development and testing only, not for production.
 pytest
-coverage
-flake8
 black
 isort
-pytest-cov
-codecov
-mypy
-gitchangelog
 mkdocs
+setuptools
+pytest_asyncio

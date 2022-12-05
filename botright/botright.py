@@ -1,23 +1,24 @@
-
+import hcaptcha_challenger as solver
 from async_class import AsyncObject
 from playwright.async_api import async_playwright
 
 from .modules import Faker, ProxyManager
 from .modules.playwright_mock import browser
-from .modules.hcaptcha_challenger.update import update_ai
 
 
 class Botright(AsyncObject):
-    async def __ainit__(self, headless=False) -> None:
-        # Updating AI
-        update_ai()
+    async def __ainit__(self, headless=False, scroll_into_view=True) -> None:
+        # Init local-side of the ModelHub
+        solver.install()
 
+        # Setting Values
+        self.scroll_into_view = scroll_into_view
         # Collecting items that can be stopped
         self.stopable = []
         # Starting Playwright
         self.playwright = await async_playwright().start()
         # Launching Firefox with Human Emulation and Prevent WebRTC leakage
-        self.main_browser = await self.playwright.firefox.launch(headless=headless, proxy=None, firefox_user_prefs={"media.peerconnection.enabled": False, "media.navigator.enabled": False})
+        self.main_browser = await self.playwright.firefox.launch(headless=headless, proxy=None, firefox_user_prefs={"media.peerconnection.enabled": False, "media.navigator.enabled": False, "privacy.resistFingerprinting": False})
         self.stopable.append(self.main_browser)
 
     async def new_browser(self, proxy=None, **launch_arguments) -> "PlaywrightContext":
@@ -32,7 +33,7 @@ class Botright(AsyncObject):
         return _browser
 
     async def __adel__(self) -> None:
-        """ This method will be called when object will be closed """
+        """This method will be called when object will be closed"""
         for obj in self.stopable:
             try:
                 await obj.close()

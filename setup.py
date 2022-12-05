@@ -1,11 +1,9 @@
 """Python setup.py for botright package"""
 import io
 import os
+import pathlib
 
 from setuptools import find_packages, setup
-
-from requirements import r
-
 
 def read(*paths, **kwargs):
     """Read the contents of a text file safely.
@@ -20,12 +18,6 @@ def read(*paths, **kwargs):
         content = open_file.read().strip()
     return content
 
-
-def read_requirements(path):
-    """Read the contents of a requirements file safely."""
-    return [line.strip() for line in read(path).split("\n") if not line.startswith(('"', "#", "-", "git+"))]
-
-
 setup(name="botright",
       version=read("botright", "VERSION"),
       description="Botright, the next level automation studio for Python. Based on Playwright.",
@@ -35,4 +27,4 @@ setup(name="botright",
       author="Vinyzu",
       packages=find_packages(exclude=["tests", ".github"]),
       package_data={"": ["names.txt", "passwords.txt", "requirements.txt", "geetest.torchscript", "labels.txt", "keras_model.h5"]},
-      **r.dependencies)
+      install_requires=['async_class', 'httpx', 'playwright', 'playwright_stealth', 'numpy', 'scipy', 'Pillow', 'scikit_image', 'pydub', 'yolov5', 'opencv_python', 'tensorflow', 'sentence_transformers', 'easyocr', 'SpeechRecognition'])

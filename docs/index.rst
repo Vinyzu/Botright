@@ -2,7 +2,7 @@ Welcome to Botright!
 ====================
 
 For full documentation of changes visit
-`BotrightDocumentation <https://botright.readthedocs.io/en/latest/#initialization>`__. Except of these changes, you
+`BotrightDocumentation <botright.md>`__. Except of these changes, you
 can use Botright after the
 `PlaywrightDocs <https://playwright.dev/python/docs/api/class-playwright>`__
 
@@ -44,6 +44,47 @@ launch a firefox browser.
 
    if __name__ == "__main__":
        asyncio.run(main())
+
+Captchas
+--------
+
+Botright is able to solve a wide viarity of Captchas. For Documentation
+of these functions visit `BotrightDocumentation <botright.md>`__.
+
+Here all Captchas supported as of now
+
++----------------------+-----------+---------------------------+
+| Captcha Type         | Supported | Success Rate              |
++======================+===========+===========================+
+| ``hCaptcha``         | ✔️        | 50%-90% (Depending on     |
+|                      |           | topicality of new Types)  |
++----------------------+-----------+---------------------------+
+| ``reCaptcha``        | ✔️        | 30%-50%                   |
++----------------------+-----------+---------------------------+
+| ``geeTestv3``        |           |                           |
++----------------------+-----------+---------------------------+
+| v3 Intelligent Mode  | ✔️        | 100%                      |
++----------------------+-----------+---------------------------+
+| v3 Slider Captcha    | ✔️        | 100%                      |
++----------------------+-----------+---------------------------+
+| v3 Nine Captcha      | ✔️        | 50%                       |
++----------------------+-----------+---------------------------+
+| v3 Icon Captcha      | ✔️        | 70%                       |
++----------------------+-----------+---------------------------+
+| v3 Space Captcha     | ❌         | 0%                        |
++----------------------+-----------+---------------------------+
+| ``geeTestv4``        |           |                           |
++----------------------+-----------+---------------------------+
+| v4 Intelligent Mode  | ✔️        | 100%                      |
++----------------------+-----------+---------------------------+
+| v4 Slider Captcha    | ✔️        | 100%                      |
++----------------------+-----------+---------------------------+
+| v4 GoBang Captcha    | ✔️        | 100%                      |
++----------------------+-----------+---------------------------+
+| v4 Icon Captcha      | ✔️        | 60%                       |
++----------------------+-----------+---------------------------+
+| v4 IconCrush Captcha | ✔️        | 100%                      |
++----------------------+-----------+---------------------------+
 
 First script
 ------------
@@ -159,6 +200,3 @@ more details.
 
 .. |PyPI version| image:: https://badge.fury.io/py/botright.svg
    :target: https://pypi.python.org/pypi/botright/
-
-
-.. include:: botright.rst

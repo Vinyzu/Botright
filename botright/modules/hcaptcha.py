@@ -1,5 +1,12 @@
 import random
 
+# Checking if DLL is installed
+try:
+    import skimage
+except ImportError as e:
+    print(e)
+    print("Note from Botright: This error maight be fixable by installing `pip install msvc-runtime` or downloading https://aka.ms/vs/17/release/vc_redist.x64.exe")
+
 import hcaptcha_challenger as solver
 import httpx
 import numpy as np
@@ -35,24 +42,24 @@ class hCaptcha:
     def smooth_out_mouse(captcha_points):
         # Get the Captcha X- and Y-Coordinates
         x_coordinates, y_coordinates = [_[0] for _ in captcha_points], [_[1] for _ in captcha_points]
-        # Fixxing https://github.com/Vinyzu/DiscordGenerator/issues/3 by adding an extra point
-        # (Its two points for real basicly you click an correct image two times again)
+        # Fixing https://github.com/Vinyzu/DiscordGenerator/issues/3 by adding an extra point
+        # (Its two points for real basically you click a correct image two times again)
         if len(x_coordinates) <= 2:
             random_index = random.choice(range(len(x_coordinates)))
             x1, x2 = x_coordinates[random_index] + 1, x_coordinates[random_index] - 1
             x_coordinates.extend([x1, x2])
             y1, y2 = y_coordinates[random_index] + 1, y_coordinates[random_index] - 1
             y_coordinates.extend([y1, y2])
-        # Devide x and y coordinates into two arrays
+        # Divide x and y coordinates into two arrays
         x, y = np.array(x_coordinates), np.array(y_coordinates)
-        # i dont even know, copy pasted from this so https://stackoverflow.com/a/47361677/16523207
+        # I don´t even know, copy pasted from this so https://stackoverflow.com/a/47361677/16523207
         x_new = np.linspace(x.min(), x.max(), 200)
         f = scipy.interpolate.interp1d(x, y, kind="quadratic")
         y_new = f(x_new)
         # Converting NpArrays to lists
         y_new = y_new.tolist()
         x_new = x_new.tolist()
-        # Randomize Points to emulate human mouse wobblyness
+        # Randomize Points to emulate human mouse wobbliness
         x_new = [random.uniform(x - random.randint(5, 20) / 10, x + random.randint(5, 20) / 10) for x in x_new]
         y_new = [random.uniform(y - random.randint(5, 20) / 10, y + random.randint(5, 20) / 10) for y in y_new]
 

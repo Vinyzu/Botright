@@ -14,15 +14,15 @@ class Botright(AsyncObject):
         # Setting Values
         self.scroll_into_view = scroll_into_view
         # Collecting items that can be stopped
-        self.stopable = []
+        self.stoppable = []
         # Starting Playwright
         self.playwright = await async_playwright().start()
         # Launching Firefox with Human Emulation and Prevent WebRTC leakage
         self.main_browser = await self.playwright.firefox.launch(headless=headless, proxy=None, firefox_user_prefs={"media.peerconnection.enabled": False, "media.navigator.enabled": False, "privacy.resistFingerprinting": False})
-        self.stopable.append(self.main_browser)
+        self.stoppable.append(self.main_browser)
 
     async def new_browser(self, proxy=None, **launch_arguments) -> "PlaywrightContext":
-        # Calling ProxyManager and Faker to get neccessary informations for Botright
+        # Calling ProxyManager and Faker to get necessary information for Botright
         _proxy = await ProxyManager(self, proxy)
         _faker = await Faker(self, _proxy)
 
@@ -34,7 +34,7 @@ class Botright(AsyncObject):
 
     async def __adel__(self) -> None:
         """This method will be called when object will be closed"""
-        for obj in self.stopable:
+        for obj in self.stoppable:
             try:
                 await obj.close()
             except:

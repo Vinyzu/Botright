@@ -15,6 +15,7 @@ pydub #==0.25.1
 
 
 # Artificial Intelligence
+hcaptcha_challenger
 yolov5 #==6.2.2
 opencv_python #==4.5.5.64
 tensorflow #==1.12.0

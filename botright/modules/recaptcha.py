@@ -98,8 +98,8 @@ class AudioCaptcha:
 
 class VisualCaptcha:
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    model = keras.models.load_model(f"{dir_path}\\recaptcha_model\\keras_model.h5", compile=False)
-    class_names = open(f"{dir_path}\\recaptcha_model\\labels.txt", "r").readlines()
+    model = keras.models.load_model(f"{dir_path}/recaptcha_model/keras_model.h5", compile=False)
+    class_names = open(f"{dir_path}/recaptcha_model/labels.txt", "r").readlines()
 
     solver.install()
     # Initializing ArmorCaptcha

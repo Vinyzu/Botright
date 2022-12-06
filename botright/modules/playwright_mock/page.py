@@ -21,7 +21,7 @@ async def new_page(botright, browser, proxy, faker, **launch_arguments) -> "Play
 
     # Mocking Page
     await mock_page(page, botright)
-    botright.stopable.append(page)
+    botright.stoppable.append(page)
     return page
 
 

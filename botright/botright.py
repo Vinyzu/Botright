@@ -37,10 +37,10 @@ class Botright(AsyncObject):
         for obj in self.stoppable:
             try:
                 await obj.close()
-            except:
+            except Exception:
                 pass
 
         try:
             await self.playwright.stop()
-        except:
+        except Exception:
             pass

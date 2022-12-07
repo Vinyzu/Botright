@@ -3,16 +3,9 @@ import io
 import json
 import logging
 import tempfile
-
-import numpy as np
-
-# Deactivating Pytorch Logging/Warnings
-logging.getLogger("utils.general").setLevel(logging.WARNING)
 import os
 
-# Deactivating Tensorflow Warnings
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
+import numpy as np
 import hcaptcha_challenger as solver
 import httpx
 import pydub
@@ -21,11 +14,18 @@ from PIL import Image, ImageOps
 from speech_recognition import AudioFile, Recognizer
 from tensorflow import keras
 
+from playwright.async_api import TimeoutError as PlaywrightTimeoutError
+
+# Deactivating Pytorch Logging/Warnings
+logging.getLogger("utils.general").setLevel(logging.WARNING)
 logging.getLogger("yolov5").disabled = True
+
+# Deactivating Tensorflow Warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 class AudioCaptcha:
-    def parse_audio_to_text(path_audio_wav):
+    def parse_audio_to_text(path_audio_wav: str):
         # Internationalized language format of audio files, default en-US American pronunciation.
         language = "en-US"
 
@@ -41,7 +41,7 @@ class AudioCaptcha:
 
         return audio_answer
 
-    def handle_audio(audio_url):
+    def handle_audio(audio_url: str):
         # Splice audio cache file path
         audio_mp3 = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
         audio_wav = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
@@ -61,18 +61,18 @@ class AudioCaptcha:
         try:
             checkbox = page.frame_locator("//iframe[@title='reCAPTCHA']").locator(".recaptcha-checkbox-border")
             await checkbox.click()
-        except Exception:
-            print("reCaptcha didnt load")
+        except PlaywrightTimeoutError:
+            print("reCaptcha did not load")
             return False
 
         try:
             captcha_frame = page.frame_locator("//iframe[contains(@src,'bframe')]")
-        except Exception as e:
+        except PlaywrightTimeoutError:
             captcha_token = await page.evaluate("grecaptcha.getResponse()")
             if captcha_token:
                 return captcha_token
             else:
-                print("reCaptcha didnt load")
+                print("reCaptcha did not load")
                 return False
 
         switcher = captcha_frame.locator("[id='recaptcha-audio-button']")
@@ -81,8 +81,8 @@ class AudioCaptcha:
         try:
             audio_element = captcha_frame.locator("#audio-source")
             audio_url = await audio_element.get_attribute("src")
-        except Exception:
-            print("Ratelimited to prevent Botting (Use another IP)")
+        except PlaywrightTimeoutError:
+            print("Rate limited to prevent Botting (Use another IP)")
             return False
 
         solution = AudioCaptcha.handle_audio(audio_url)
@@ -157,8 +157,8 @@ class VisualCaptcha:
 
     async def object_detection(captcha_frame, samples):
         captcha_area = captcha_frame.locator('[class="rc-imageselect-challenge"]')
-        boundings = await samples.first.bounding_box()
-        start_x, start_y, _, _ = boundings.values()
+        bounding = await samples.first.bounding_box()
+        start_x, start_y, _, _ = bounding.values()
 
         image_data = await captcha_area.screenshot()
 
@@ -172,23 +172,23 @@ class VisualCaptcha:
         json_string = results.pandas().xyxy[0].to_json(orient="records")
         results = json.loads(json_string)
 
-        coords = []
+        coordinates = []
         for result in results:
             if result["name"] == VisualCaptcha.alias[VisualCaptcha.label]:  # and result["confidence"] > 0.2
                 xmin, ymin, xmax, ymax = (int(result["xmin"]), int(result["ymin"]), int(result["xmax"]), int(result["ymax"]))
-                coords.append([xmin + int(start_x), ymin + int(start_y), xmax + int(start_x), ymax + int(start_y)])
+                coordinates.append([xmin + int(start_x), ymin + int(start_y), xmax + int(start_x), ymax + int(start_y)])
 
         already_true = []
         for index in range(await samples.count()):
             sample = samples.nth(index)
             # Getting the Middle Coordinate of the Tile
-            boundings = await sample.bounding_box()
-            x, y, width, height = boundings.values()
+            bounding = await sample.bounding_box()
+            x, y, width, height = bounding.values()
             x, y, width, height = int(x), int(y), int(width), int(height)
             # Checking if the Middle is in the Results
-            for coord in coords:
+            for coord in coordinates:
                 if any(x in range(coord[0], coord[2]) for x in range(x, x + width)) and any(y in range(coord[1], coord[3]) for y in range(y, y + height)):
-                    if not index in already_true:
+                    if index not in already_true:
                         await sample.click()
                         already_true.append(index)
 

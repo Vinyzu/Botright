@@ -1,4 +1,4 @@
-# Botright v0.2
+# Botright v0.2.2
 
 ## Install it from PyPI
 
@@ -90,7 +90,7 @@ Read the [CONTRIBUTING.md](https://github.com/Vinyzu/Botright/blob/main/CONTRIBU
 
 ---
 
-![Version](https://img.shields.io/badge/Botright-v0.2-blue)
+![Version](https://img.shields.io/badge/Botright-v0.2.2-blue)
 ![License](https://img.shields.io/badge/License-GNU%20GPL-green)
 ![Python](https://img.shields.io/badge/Python-v3.x-lightgrey)
 

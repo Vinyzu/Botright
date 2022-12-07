@@ -55,7 +55,7 @@ def mock_locator(locator) -> None:
     # JsHandle
     async def mock_evaluate_handle(expression, arg=None) -> "JSHandle":
         _js_handle = await locator._evaluate_handle(expression, arg=arg)
-        await js_handle.mock_js_handle(_js_handle)
+        await js_handle.mock_js_handle(_js_handle, locator.page)
         return _js_handle
 
     locator._evaluate_handle = locator.evaluate_handle
@@ -73,7 +73,7 @@ def mock_locator(locator) -> None:
     # ElementHandle
     def element_handle_mocker(timeout: typing.Optional[float] = None):
         element = locator._element_handle(timeout=timeout)
-        element_handle.mock_element_handle(element)
+        element_handle.mock_element_handle(element, locator.page)
         return element
 
     locator._element_handle = locator.element_handle

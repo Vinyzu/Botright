@@ -11,7 +11,6 @@ async def new_browser(botright, proxy, faker, **launch_arguments) -> "Playwright
     botright.stoppable.append(browser)
     return browser
 
-
 async def mock_browser(botright, browser, proxy, faker) -> None:
     async def get_hcaptcha_mocker(sitekey="00000000-0000-0000-0000-000000000000", rqdata=None):
         return await hcaptcha.hCaptcha.get_hcaptcha(browser, sitekey=sitekey, rqdata=rqdata)

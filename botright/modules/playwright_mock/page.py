@@ -50,7 +50,7 @@ async def mock_page_functions(page):
     async def mock_query_selector(selector, strict=False) -> typing.Optional["ElementHandle"]:
         element = await page._query_selector(selector, strict=strict)
         if element:
-            element_handle.mock_element_handle(element)
+            element_handle.mock_element_handle(element, page)
         return element
 
     page._query_selector = page.query_selector
@@ -59,7 +59,7 @@ async def mock_page_functions(page):
     async def mock_query_selector_all(selector) -> typing.List["ElementHandle"]:
         elements = await page._query_selector_all(selector)
         for element in elements:
-            element_handle.mock_element_handle(element)
+            element_handle.mock_element_handle(element, page)
         return elements
 
     page._query_selector_all = page.query_selector_all
@@ -68,7 +68,7 @@ async def mock_page_functions(page):
     async def mock_wait_for_selector(selector, state=[], strict=False, timeout: typing.Optional[float] = None) -> typing.Optional["ElementHandle"]:
         element = await page._wait_for_selector(selector, state=state, strict=strict, timeout=timeout)
         if element:
-            element_handle.mock_element_handle(element)
+            element_handle.mock_element_handle(element, page)
         return element
 
     page._wait_for_selector = page.wait_for_selector
@@ -76,7 +76,7 @@ async def mock_page_functions(page):
 
     async def mock_add_script_tag(content="", path="", type="", url="") -> "ElementHandle":
         element = await page._add_script_tag(content=content, path=path, type=type, url=url)
-        element_handle.mock_element_handle(element)
+        element_handle.mock_element_handle(element, page)
         return element
 
     page._add_script_tag = page.add_script_tag
@@ -84,7 +84,7 @@ async def mock_page_functions(page):
 
     async def mock_add_style_tag(content="", path="", type="", url="") -> "ElementHandle":
         element = await page._add_script_tag(content=content, path=path, type=type, url=url)
-        element_handle.mock_element_handle(element)
+        element_handle.mock_element_handle(element, page)
         return element
 
     page._add_script_tag = page.add_script_tag
@@ -102,7 +102,7 @@ async def mock_page_functions(page):
     # JsHandle
     async def mock_evaluate_handle(expression, arg=None) -> "JSHandle":
         _js_handle = await page._evaluate_handle(expression, arg=arg)
-        js_handle.mock_js_handle(_js_handle)
+        js_handle.mock_js_handle(_js_handle, page)
         return _js_handle
 
     page._evaluate_handle = page.evaluate_handle
@@ -110,7 +110,7 @@ async def mock_page_functions(page):
 
     async def mock_wait_for_function(expression, arg=None, polling="raf", timeout: typing.Optional[float] = None) -> "JSHandle":
         _js_handle = await page._wait_for_function(expression, arg=arg, polling=polling, timeout=timeout)
-        js_handle.mock_js_handle(_js_handle)
+        js_handle.mock_js_handle(_js_handle, page)
         return _js_handle
 
     page._wait_for_function = page.wait_for_function

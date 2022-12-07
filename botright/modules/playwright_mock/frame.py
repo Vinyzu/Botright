@@ -49,7 +49,7 @@ def mock_frame(frame) -> None:
     async def mock_query_selector(selector, strict=False) -> typing.Optional["ElementHandle"]:
         element = await frame._query_selector(selector, strict=strict)
         if element:
-            await element_handle.mock_element_handle(element)
+            await element_handle.mock_element_handle(element, frame.page)
         return element
 
     frame._query_selector = frame.query_selector
@@ -58,7 +58,7 @@ def mock_frame(frame) -> None:
     async def mock_query_selector_all(selector) -> typing.List["ElementHandle"]:
         elements = await frame._query_selector_all(selector)
         for element in elements:
-            await element_handle.mock_element_handle(element)
+            await element_handle.mock_element_handle(element, frame.page)
         return elements
 
     frame._query_selector_all = frame.query_selector_all
@@ -67,7 +67,7 @@ def mock_frame(frame) -> None:
     async def mock_wait_for_selector(selector, state=[], strict=False, timeout: typing.Optional[float] = None) -> typing.Optional["ElementHandle"]:
         element = await frame.__wait_for_selector(selector, state=state, strict=strict, timeout=timeout)
         if element:
-            await element_handle.mock_element_handle(element)
+            await element_handle.mock_element_handle(element, frame.page)
         return element
 
     frame.__wait_for_selector = frame.wait_for_selector
@@ -75,7 +75,7 @@ def mock_frame(frame) -> None:
 
     async def mock_add_script_tag(content="", path="", type="", url="") -> "ElementHandle":
         element = await frame._add_script_tag(content=content, path=path, type=type, url=url)
-        await element_handle.mock_element_handle(element)
+        await element_handle.mock_element_handle(element, frame.page)
         return element
 
     frame._add_script_tag = frame.add_script_tag
@@ -83,7 +83,7 @@ def mock_frame(frame) -> None:
 
     async def mock_add_style_tag(content="", path="", type="", url="") -> "ElementHandle":
         element = await frame._add_script_tag(content=content, path=path, type=type, url=url)
-        await element_handle.mock_element_handle(element)
+        await element_handle.mock_element_handle(element, frame.page)
         return element
 
     frame._add_script_tag = frame.add_script_tag
@@ -91,7 +91,7 @@ def mock_frame(frame) -> None:
 
     async def frame_element() -> "ElementHandle":
         element = await frame._frame_element()
-        await element_handle.mock_element_handle(element)
+        await element_handle.mock_element_handle(element, frame.page)
         return element
 
     frame._frame_element = frame.frame_element
@@ -100,7 +100,7 @@ def mock_frame(frame) -> None:
     # JsHandle
     async def mock_evaluate_handle(expression, arg=None) -> "JSHandle":
         _js_handle = await frame._evaluate_handle(expression, arg=arg)
-        await js_handle.mock_js_handle(_js_handle)
+        await js_handle.mock_js_handle(_js_handle, frame.page)
         return _js_handle
 
     frame._evaluate_handle = frame.evaluate_handle
@@ -108,7 +108,7 @@ def mock_frame(frame) -> None:
 
     async def mock_wait_for_function(expression, arg=None, polling="raf", timeout: typing.Optional[float] = None) -> "JSHandle":
         _js_handle = await frame._wait_for_function(expression, arg=arg, polling=polling, timeout=timeout)
-        await js_handle.mock_js_handle(_js_handle)
+        await js_handle.mock_js_handle(_js_handle, frame.page)
         return _js_handle
 
     frame._wait_for_function = frame.wait_for_function

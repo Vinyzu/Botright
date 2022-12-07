@@ -70,7 +70,7 @@ def mock_element_handle(element, page) -> None:
     # JsHandle
     async def mock_evaluate_handle(expression, arg=None) -> "JSHandle":
         _js_handle = await element._evaluate_handle(expression, arg=arg)
-        await js_handle.mock_js_handle(_js_handle)
+        await js_handle.mock_js_handle(_js_handle, page)
         return _js_handle
 
     element._evaluate_handle = element.evaluate_handle

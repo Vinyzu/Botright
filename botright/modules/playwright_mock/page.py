@@ -7,7 +7,6 @@ from typing import Optional, Literal, List, Callable, Any
 from re import Pattern
 
 from playwright.async_api import BrowserContext, Page, Locator, Frame, FrameLocator, ElementHandle, JSHandle
-from botright import Botright
 from botright.modules import Faker
 
 import playwright_stealth
@@ -19,7 +18,7 @@ from . import element_handle, frame, frame_locator, js_handle, locator, mouse
 
 tmp_dir = Path(__file__).parent.joinpath("tmp_dir")
 
-async def new_page(botright: Botright, browser: BrowserContext, faker: Faker,) -> Page:
+async def new_page(botright, browser: BrowserContext, faker: Faker,) -> Page:
     # Create new Page
     page = await browser._new_page()
 
@@ -442,7 +441,7 @@ async def better_google_score(page: Page) -> None:
     await page.wait_for_timeout(1000)
 
 
-async def mock_page(botright: Botright, page: Page) -> None:
+async def mock_page(botright, page: Page) -> None:
     # await better_google_score(page)
     page.scroll_into_view = botright.scroll_into_view
 

@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 def read(*paths, **kwargs):
     """Read the contents of a text file safely.
     >>> read("botright", "VERSION")
-    '0.1.0'
+    "0.1.0"
     >>> read("README.md")
     ...
     """
@@ -16,6 +16,23 @@ def read(*paths, **kwargs):
         content = open_file.read().strip()
     return content
 
+requires = ["async_class",
+            "httpx>=0.24.1",
+            "playwright==1.37.0",
+            "playwright_stealth==1.0.6",
+            "numpy==1.25.2",
+            "scipy==1.11.2",
+            "Pillow==10.0.1",
+            "hcaptcha_challenger>=0.7.10.post2",
+            "yolov5==7.0.12",
+            "sentence_transformers",
+            "easyocr==1.7.1",
+            "Faker==19.6.1",
+            "scikit-image==0.21.0",
+            "opencv-python~=4.8.0.76",
+            "pytest==7.4.2",
+            "imageio==2.31.3",
+            "setuptools==68.2.2"]
 
 setup(
     name="botright",
@@ -28,8 +45,8 @@ setup(
     long_description_content_type="text/markdown",
     license="GNU General Public License v3.0",
     packages=find_packages(include=["botright", "botright.*", "LICENSE"], exclude=["tests", ".github"]),
-    # package_data={"": ["names.txt", "passwords.txt", "requirements.txt", "geetest.torchscript", "labels.txt", "keras_model.h5"]},
-    install_requires=read("requirements.txt").splitlines(),
+    package_data={"": ["requirements.txt", "geetest.torchscript"]},
+    install_requires=requires,
     python_requires=">=3.8",
     classifiers=[
         "Topic :: Scientific/Engineering",

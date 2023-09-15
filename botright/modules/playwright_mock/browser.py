@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from playwright.async_api import BrowserContext, Page
-from botright import Botright
 from botright.modules import ProxyManager, Faker
 
 from . import page
 
-async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, **launch_arguments) -> BrowserContext:
+async def new_browser(botright, proxy: ProxyManager, faker: Faker, **launch_arguments) -> BrowserContext:
     parsed_launch_arguments = {"user_agent": faker.useragent, "locale": "en-US",
                                "timezone_id": proxy.timezone, "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7},
                                "permissions": ["geolocation"], "ignore_https_errors": True,
@@ -25,7 +24,7 @@ async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, **l
     botright.stoppable.append(browser)
     return browser
 
-async def mock_browser(botright: Botright, browser: BrowserContext, faker: Faker) -> None:
+async def mock_browser(botright, browser: BrowserContext, faker: Faker) -> None:
     async def page_mocker(**launch_arguments) -> Page:
         return await page.new_page(botright, browser, faker)
 

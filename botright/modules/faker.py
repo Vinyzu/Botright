@@ -4,14 +4,11 @@ import asyncio
 import random
 import platform
 
-from botright import Botright
 from async_class import AsyncObject, link
-
-from . import ProxyManager
 
 
 class Faker(AsyncObject):
-    async def __ainit__(self, botright: Botright, proxy: ProxyManager) -> None:
+    async def __ainit__(self, botright, proxy) -> None:
         self.botright = botright
         self.os_system = platform.system()
         link(self, botright)
@@ -30,7 +27,7 @@ class Faker(AsyncObject):
         browser_version = ".".join(browser_version_list)
         return useragent.replace(ua_browser_version[0], f"{browser_type}/{browser_version}")
 
-    async def get_computer(self, proxy: ProxyManager) -> None:
+    async def get_computer(self, proxy) -> None:
         try:
             # Sometimes the API is offline
             while True:

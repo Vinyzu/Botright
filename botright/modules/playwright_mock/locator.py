@@ -77,7 +77,7 @@ def mock_locator(locator: Locator, page: Page) -> None:
     locator.frame_locator = mock_frame_locator_func
 
     # ElementHandle
-    def element_handle_mocker(timeout: Optional[float] = None) -> ElementHandle:
+    async def element_handle_mocker(timeout: Optional[float] = None) -> ElementHandle:
         element = await locator.origin_element_handle(timeout=timeout)
         element_handle.mock_element_handle(element, page)
         return element

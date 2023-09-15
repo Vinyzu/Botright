@@ -57,22 +57,22 @@ You dont need to pay for any Captcha Solving APIs and you can solve Captchas wit
 
 Here all Captchas supported as of now:
 
-| Captcha Type | Supported | Success Rate                                   |
-|:--------------:|:--------------:|------------------------------------------------|
-| `hCaptcha` | ✔️ | 50%-90% (Depending on topicality of new Types) |
-| `reCaptcha` | ✔️ | 50%-80%                                        |
+| Captcha Type | Supported |            Solved By            | Success Rate |
+|:--------------:|:--------------:|:-------------------------------:|--------------|
+| `hCaptcha` | ✔️ |       hcaptcha-challenger       | up to 90%    |
+| `reCaptcha` | ✔️ |      recaptcha-challenger       | 50%-80%      |
 | `geeTestv3` |
-| v3 Intelligent Mode | ✔️ | 100%                                           |
-| v3 Slider Captcha | ✔️ | 100%                                           |
-| v3 Nine Captcha | ✔️ | 50%                                            |
-| v3 Icon Captcha | ✔️ | 70%                                            |
-| v3 Space Captcha | ❌ | 0%                                             |
+| v3 Intelligent Mode | ✔️ |     botrights stealthiness      | 100%         |
+| v3 Slider Captcha | ✔️ |        cv2.matchTemplate        | 100%         |
+| v3 Nine Captcha | ✔️ |         CLIP Detection          | 50%          |
+| v3 Icon Captcha | ✔️ | cv2.matchTemplate / SSIM / CLIP | 70%          |
+| v3 Space Captcha | ❌ |          Not solvable           | 0%           |
 | `geeTestv4` |
-| v4 Intelligent Mode | ✔️ | 100%                                           |
-| v4 Slider Captcha | ✔️ | 100%                                           |
-| v4 GoBang Captcha | ✔️ | 100%                                           |
-| v4 Icon Captcha | ✔️ | 60%                                            |
-| v4 IconCrush Captcha | ✔️ | 100%                                           |
+| v4 Intelligent Mode | ✔️ |     botrights stealthiness      | 100%         |
+| v4 Slider Captcha | ✔️ |        cv2.matchTemplate        | 100%         |
+| v4 GoBang Captcha | ✔️ |        Math Calculations        | 100%         |
+| v4 Icon Captcha | ✔️ | cv2.matchTemplate / SSIM / CLIP | 60%          |
+| v4 IconCrush Captcha | ✔️ |        Math Calculations        | 100%         |
 
 ## Development
 

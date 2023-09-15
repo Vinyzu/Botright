@@ -4,7 +4,6 @@ from typing import List
 
 import httpx
 from async_class import AsyncObject, link
-from botright import Botright
 
 class SplitError(Exception):
     pass
@@ -15,7 +14,7 @@ class ProxyCheckError(Exception):
 
 
 class ProxyManager(AsyncObject):
-    async def __ainit__(self, botright: Botright, proxy: str) -> None:
+    async def __ainit__(self, botright, proxy: str) -> None:
         link(self, botright)
 
         self.proxy, self.http_proxy = proxy.strip() if proxy else None, None

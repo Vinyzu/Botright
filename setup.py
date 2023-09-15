@@ -40,4 +40,8 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
     ],
+    project_urls={
+        "Documentation": "https://github.com/Vinyzu/Botright/blob/main/docs/index.rst",
+        "Source": "https://github.com/Vinyzu/Botright",
+    },
 )

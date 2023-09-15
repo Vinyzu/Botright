@@ -1,243 +1,254 @@
-import typing
+from __future__ import annotations
 
-from . import element_handle, frame_locator, js_handle, locator
+from typing import Optional, List, Literal, Any
+
+from playwright.async_api import Page, ElementHandle, JSHandle
+
+from . import js_handle
 
 
-def mock_element_handle(element, page) -> None:
-    async def click_mocker(button="left", click_count=1, delay=20, force=False, modifiers=[], no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False):
-        await ElementHandle.click(element, page, button=button, click_count=click_count, delay=delay, force=force, modifiers=modifiers, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+def mock_element_handle(element: ElementHandle, page: Page) -> None:
+    element_handle_mocker = ElementHandleMock(element, page)
+
+    async def click_mocker(button="left", click_count: Optional[int] = 1, delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        await element_handle_mocker.click(button=button, click_count=click_count, delay=delay, force=force, modifiers=modifiers, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
 
     element.click = click_mocker
 
-    async def dblclick_mocker(button="left", delay=20, force=False, modifiers=[], no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False):
-        await ElementHandle.dblclick(element, page, button=button, delay=delay, force=force, modifiers=modifiers, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+    async def dblclick_mocker(button="left", delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        await element_handle_mocker.dblclick(button=button, delay=delay, force=force, modifiers=modifiers, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
 
     element.dblclick = dblclick_mocker
 
-    async def check_mocker(force=False, no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False):
-        await ElementHandle.check(element, page, force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+    async def check_mocker(force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        await element_handle_mocker.check(force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
 
     element.check = check_mocker
 
-    async def uncheck_mocker(force=False, no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False):
-        await ElementHandle.uncheck(element, page, force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+    async def uncheck_mocker(force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        await element_handle_mocker.uncheck(force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
 
     element.uncheck = uncheck_mocker
 
-    async def set_checked_mocker(checked=False, force=False, no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False):
-        await ElementHandle.set_checked(element, page, checked=checked, force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+    async def set_checked_mocker(checked: Optional[bool] = False, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        await element_handle_mocker.set_checked(checked=checked, force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
 
     element.set_checked = set_checked_mocker
 
-    async def hover_mocker(force=False, modifiers=[], position={}, timeout: typing.Optional[float] = None, trial=False):
-        await ElementHandle.hover(element, page, force=force, modifiers=modifiers, position=position, timeout=timeout, trial=trial)
+    async def hover_mocker(force: Optional[bool] = False, modifiers: Optional[list] = None, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        await element_handle_mocker.hover(force=force, modifiers=modifiers, position=position, timeout=timeout, trial=trial)
 
     element.hover = hover_mocker
 
-    async def type_mocker(text, delay=200, no_wait_after=False, timeout: typing.Optional[float] = None):
-        await ElementHandle.type(element, page, text, delay=delay, no_wait_after=no_wait_after, timeout=timeout)
+    async def type_mocker(text: str, delay: Optional[int] = 200, no_wait_after: Optional[bool] = False, timeout: Optional[float] = None) -> None:
+        await element_handle_mocker.type(text, delay=delay, no_wait_after=no_wait_after, timeout=timeout)
 
     element.type = type_mocker
 
     # ElementHandle
-    async def mock_query_selector(selector, strict=False) -> typing.Optional["ElementHandle"]:
-        element = await element._query_selector(selector, strict=strict)
-        if element:
-            await element_handle.mock_element_handle(element, page)
-        return element
+    async def mock_query_selector(selector: str) -> Optional[ElementHandle]:
+        _element = await element.origin_query_selector(selector)
+        if _element:
+            mock_element_handle(_element, page)
+        return _element
 
-    element._query_selector = element.query_selector
+    element.origin_query_selector = element.query_selector
     element.query_selector = mock_query_selector
 
-    async def mock_query_selector_all(selector) -> typing.List["ElementHandle"]:
-        elements = await element._query_selector_all(selector)
-        for element in elements:
-            await element_handle.mock_element_handle(element, page)
+    async def mock_query_selector_all(selector: str) -> List[ElementHandle]:
+        elements = await element.origin_query_selector_all(selector)
+        for _element in elements:
+            mock_element_handle(_element, page)
         return elements
 
-    element._query_selector_all = element.query_selector_all
+    element.origin_query_selector_all = element.query_selector_all
     element.query_selector_all = mock_query_selector_all
 
-    async def mock_wait_for_selector(selector, state=[], strict=False, timeout: typing.Optional[float] = None) -> typing.Optional["ElementHandle"]:
-        element = await element.__wait_for_selector(selector, state=state, strict=strict, timeout=timeout)
-        if element:
-            await element_handle.mock_element_handle(element, page)
-        return element
+    async def mock_wait_for_selector(selector: str, state: Optional[Literal["attached", "detached", "hidden", "visible"]] = None, timeout: Optional[float] = None, strict: Optional[bool] = False) -> Optional[ElementHandle]:
+        _element = await element.origin_wait_for_selector(selector, state=state, strict=strict, timeout=timeout)
+        if _element:
+            mock_element_handle(_element, page)
+        return _element
 
-    element.__wait_for_selector = element.wait_for_selector
+    element.origin_wait_for_selector = element.wait_for_selector
     element.wait_for_selector = mock_wait_for_selector
 
     # JsHandle
-    async def mock_evaluate_handle(expression, arg=None) -> "JSHandle":
-        _js_handle = await element._evaluate_handle(expression, arg=arg)
-        await js_handle.mock_js_handle(_js_handle, page)
+    async def mock_evaluate_handle(expression: str, arg: Optional[Any] = None) -> JSHandle:
+        _js_handle = await element.origin_evaluate_handle(expression, arg=arg)
+        js_handle.mock_js_handle(_js_handle, page)
         return _js_handle
 
-    element._evaluate_handle = element.evaluate_handle
+    element.origin_evaluate_handle = element.evaluate_handle
     element.evaluate_handle = mock_evaluate_handle
 
 
-class ElementHandle:
-    async def click(element, page, button="left", click_count=1, delay=20, force=False, modifiers=[], no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False) -> None:
-        frame = element.owner_frame()
+class ElementHandleMock:
+    def __init__(self, element: ElementHandle, page: Page):
+        self.element = element
+        self.page = page
+
+    async def click(self, button: Optional[str] = "left", click_count: Optional[int] = 1, delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        modifiers = modifiers or []
+        position = position or {}
 
         if not force:
-            await element.wait_for_element_state("editable", timeout=timeout)
+            await self.element.wait_for_element_state("editable", timeout=timeout)
 
         if not trial:
-            if page.scroll_into_view:
-                await element.scroll_into_view_if_needed(timeout=timeout)
+            if self.page.scroll_into_view:
+                await self.element.scroll_into_view_if_needed(timeout=timeout)
 
-            boundings = await element.bounding_box()
-            x, y, width, height = boundings.values()
+            bounding_box = await self.element.bounding_box()
+            x, y, width, height = bounding_box.values()
             if not position:
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
             for modifier in modifiers:
-                await frame.page.keyboard.down(modifier)
+                await self.page.keyboard.down(modifier)
 
-            await frame.page.mouse.click(x, y, button, click_count, delay)
+            await self.page.mouse.click(x, y, button=button, click_count=click_count, delay=delay)
 
             for modifier in modifiers:
-                await frame.page.keyboard.up(modifier)
+                await self.page.keyboard.up(modifier)
 
-    async def dblclick(element, page, button="left", delay=20, force=False, modifiers=[], no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False) -> None:
-        frame = element.owner_frame()
+    async def dblclick(self, button: Optional[str] = "left", delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        modifiers = modifiers or []
+        position = position or {}
 
         if not force:
-            await element.wait_for_element_state("editable", timeout=timeout)
+            await self.element.wait_for_element_state("editable", timeout=timeout)
 
         if not trial:
-            if page.scroll_into_view:
-                await element.scroll_into_view_if_needed(timeout=timeout)
+            if self.page.scroll_into_view:
+                await self.element.scroll_into_view_if_needed(timeout=timeout)
 
-            boundings = await element.bounding_box()
-            x, y, width, height = boundings.values()
+            bounding_box = await self.element.bounding_box()
+            x, y, width, height = bounding_box.values()
             if not position:
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
             for modifier in modifiers:
-                await frame.page.keyboard.down(modifier)
+                await self.page.keyboard.down(modifier)
 
-            await frame.page.mouse.dblclick(x, y, button, delay)
+            await self.page.mouse.dblclick(x, y, button=button, delay=delay)
 
             for modifier in modifiers:
-                await frame.page.keyboard.up(modifier)
+                await self.page.keyboard.up(modifier)
 
-    async def check(element, page, force=False, no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False) -> None:
-        frame = element.owner_frame()
+    async def check(self, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        position = position or {}
 
         if not force:
-            await element.wait_for_element_state("editable", timeout=timeout)
+            await self.element.wait_for_element_state("editable", timeout=timeout)
 
-        if await element.is_checked():
+        if await self.element.is_checked():
             return
 
         if not trial:
-            if page.scroll_into_view:
-                await element.scroll_into_view_if_needed(timeout=timeout)
+            if self.page.scroll_into_view:
+                await self.element.scroll_into_view_if_needed(timeout=timeout)
 
-            boundings = await element.bounding_box()
-            x, y, width, height = boundings.values()
+            bounding_box = await self.element.bounding_box()
+            x, y, width, height = bounding_box.values()
             if not position:
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
-            await frame.page.mouse.click(x, y, button="left", click_count=1, delay=20)
+            await self.page.mouse.click(x, y, button="left", click_count=1, delay=20)
 
-            assert await element.is_checked()
+            assert await self.element.is_checked()
 
-    async def uncheck(element, page, force=False, no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False) -> None:
-        frame = element.owner_frame()
+    async def uncheck(self, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        position = position or {}
 
         if not force:
-            await element.wait_for_element_state("editable", timeout=timeout)
+            await self.element.wait_for_element_state("editable", timeout=timeout)
 
-        if not await element.is_checked():
+        if not await self.element.is_checked():
             return
 
         if not trial:
-            if page.scroll_into_view:
-                await element.scroll_into_view_if_needed(timeout=timeout)
+            if self.page.scroll_into_view:
+                await self.element.scroll_into_view_if_needed(timeout=timeout)
 
-            boundings = await element.bounding_box()
-            x, y, width, height = boundings.values()
+            bounding_box = await self.element.bounding_box()
+            x, y, width, height = bounding_box.values()
             if not position:
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
-            await frame.page.mouse.click(x, y, button="left", click_count=1, delay=20)
+            await self.page.mouse.click(x, y, button="left", click_count=1, delay=20)
 
-            assert not await element.is_checked()
+            assert not await self.element.is_checked()
 
-    async def set_checked(element, page, checked=False, force=False, no_wait_after=False, position={}, timeout: typing.Optional[float] = None, trial=False) -> None:
-        frame = element.owner_frame()
+    async def set_checked(self, checked: Optional[bool] = False, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        position = position or {}
 
         if not force:
-            await element.wait_for_element_state("editable", timeout=timeout)
+            await self.element.wait_for_element_state("editable", timeout=timeout)
 
-        if await element.is_checked() == checked:
+        if await self.element.is_checked() == checked:
             return
 
         if not trial:
-            if page.scroll_into_view:
-                await element.scroll_into_view_if_needed(timeout=timeout)
+            if self.page.scroll_into_view:
+                await self.element.scroll_into_view_if_needed(timeout=timeout)
 
-            boundings = await element.bounding_box()
-            x, y, width, height = boundings.values()
+            bounding_box = await self.element.bounding_box()
+            x, y, width, height = bounding_box.values()
             if not position:
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
-            await frame.page.mouse.click(x, y, button="left", click_count=1, delay=20)
+            await self.page.mouse.click(x, y, button="left", click_count=1, delay=20)
 
-            assert await element.is_checked()
+            assert await self.element.is_checked()
 
-    async def hover(element, page, force=False, modifiers=[], position={}, timeout: typing.Optional[float] = None, trial=False) -> None:
-        frame = element.owner_frame()
+    async def hover(self, force: Optional[bool] = False, modifiers: Optional[list] = None, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        modifiers = modifiers or []
+        position = position or {}
 
         if not force:
-            await element.wait_for_element_state("editable", timeout=timeout)
+            await self.element.wait_for_element_state("editable", timeout=timeout)
 
         if not trial:
-            if page.scroll_into_view:
-                await element.scroll_into_view_if_needed(timeout=timeout)
+            if self.page.scroll_into_view:
+                await self.element.scroll_into_view_if_needed(timeout=timeout)
 
-            boundings = await element.bounding_box()
-            x, y, width, height = boundings.values()
+            bounding_box = await self.element.bounding_box()
+            x, y, width, height = bounding_box.values()
             if not position:
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
             for modifier in modifiers:
-                await frame.page.keyboard.down(modifier)
+                await self.page.keyboard.down(modifier)
 
-            await frame.page.mouse.move(x, y)
+            await self.page.mouse.move(x, y)
 
             for modifier in modifiers:
-                await frame.page.keyboard.up(modifier)
+                await self.page.keyboard.up(modifier)
 
-    async def type(element, page, text, delay=200, no_wait_after=False, timeout: typing.Optional[float] = None) -> None:
-        frame = element.owner_frame()
+    async def type(self, text: str, delay: Optional[int] = 200, no_wait_after: Optional[bool] = False, timeout: Optional[float] = None) -> None:
+        await self.element.wait_for_element_state("editable", timeout=timeout)
 
-        await element.wait_for_element_state("editable", timeout=timeout)
+        if self.page.scroll_into_view:
+            await self.element.scroll_into_view_if_needed(timeout=timeout)
 
-        if page.scroll_into_view:
-            await element.scroll_into_view_if_needed(timeout=timeout)
-
-        boundings = await element.bounding_box()
-        x, y, width, height = boundings.values()
+        bounding_box = await self.element.bounding_box()
+        x, y, width, height = bounding_box.values()
 
         x, y = x + width // 2, y + height // 2
 
-        await frame.page.mouse.click(x, y, "left", 1, delay)
+        await self.page.mouse.click(x, y, delay=delay)
 
-        await frame.page.keyboard.type(text, delay=delay)
+        await self.page.keyboard.type(text, delay=delay)

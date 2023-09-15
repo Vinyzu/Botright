@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import base64
 import io
 import logging
-import math
 import os
 import random
+from typing import Optional, List, Any, Tuple
 
 import cv2
 import easyocr
-import numpy as np
 import yolov5
+import numpy as np
+from numpy.typing import NDArray
+from numpy import uint8
+
 from PIL import Image
 from scipy import ndimage
 from sentence_transformers import SentenceTransformer, util
@@ -18,19 +23,16 @@ logging.getLogger("yolov5").disabled = True
 logging.getLogger(__name__).disabled = True  # SentenceTransformer
 
 
-def solve_icon_captcha(captcha, template, mode="canny"):
+def solve_icon_captcha(captcha: bytes | NDArray[uint8], template: bytes | NDArray[uint8], mode: Optional[str] = "canny") -> List[List[int, int]]:
     if type(captcha) == bytes:
         nparr0, nparr1 = np.frombuffer(captcha, np.uint8), np.frombuffer(template, np.uint8)
         captcha, template = cv2.imdecode(nparr0, cv2.IMREAD_COLOR), cv2.imdecode(nparr1, cv2.IMREAD_COLOR)
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     # init yolov5 model
-    # yolov5 = YOLOv5(f"{dir_path}\\geetest.torchscript", "cpu")
     model = yolov5.load(f"{dir_path}\\geetest.torchscript", device="cpu", verbose=False, autoshape=True)
     results = model(captcha)
 
-    # perform inference
-    # results = yolov5.predict(captcha)
     # show detection bounding boxes on image
     pd = results.pandas().xyxy[0]
     # Converting to Dict
@@ -219,7 +221,7 @@ def solve_icon_captcha(captcha, template, mode="canny"):
     return final
 
 
-def solve_nine_captcha(captcha, template):
+def solve_nine_captcha(captcha: bytes, template: bytes) -> List[List[int, int]]:
     # Using OCR to Read the Captcha Prompt
     reader = easyocr.Reader(["en"])
     result = reader.readtext(template, detail=0)
@@ -273,9 +275,9 @@ def solve_nine_captcha(captcha, template):
     return best_coords
 
 
-def solve_slider_captcha(image_bytes, template_bytes):
+def solve_slider_captcha(captcha: bytes, template: bytes) -> int:
     # reading image
-    template = cv2.imdecode(np.frombuffer(template_bytes, np.uint8), -1)
+    template = cv2.imdecode(np.frombuffer(template, np.uint8), -1)
     # Blurring Template for cleaner Contours
     blurred_template = cv2.GaussianBlur(template, (9, 9), 0)
     # converting image into grayscale image
@@ -284,7 +286,7 @@ def solve_slider_captcha(image_bytes, template_bytes):
     template_canny = cv2.Canny(gray_template, 50, 400)
 
     # reading image
-    img = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), -1)
+    img = cv2.imdecode(np.frombuffer(captcha, np.uint8), -1)
     # Blurring Template for cleaner Contours
     blurred = cv2.GaussianBlur(img, (3, 3), 0)
     # Detecing Contours with Canny
@@ -308,34 +310,9 @@ def solve_slider_captcha(image_bytes, template_bytes):
 
     return startX
 
-
-def delete_non_neighbors_from_grid(grid, coord):
-    # Over-Engineered asf lol
-    def parse_grid(grid):
-        return {(i, j): val for i, row in enumerate(grid) for j, val in enumerate(row)}
-
-    def to_grid(cells):
-        def chunkify(lst, n):
-            return [lst[i::n] for i in range(n)]
-
-        values = list(cells.values())
-        return chunkify(values, int(math.sqrt(len(values))))
-
-    def neighbors(cell):
-        i, j = cell
-        return {(i + di, j + dj) for (di, dj) in ((-1, 0), (+1, 0), (0, -1), (0, +1))}
-
-    cells = parse_grid(grid)
-
-    for cell in cells.keys() - neighbors(coord) - {coord}:
-        cells[cell] = 0
-
-    return to_grid(cells)
-
-
-def solve_icon_crush(grid):
+def solve_icon_crush(grid: List[List[str | None]]) -> Tuple[List[int | int], List[int | int]]:
     # Helpers
-    def most_common(lst):
+    def most_common(lst: List[Any]) -> Any:
         not_none = list(filter(None, lst))
         if not any(not_none):
             return None
@@ -354,7 +331,7 @@ def solve_icon_crush(grid):
             row_index, item_index = wanted_index
 
             column = columns[item_index]
-            neighbours = [next(iter(column[row_index - 1 : row_index]), None), next(iter(column[row_index + 1 : row_index + 2]), None)]
+            neighbours = [next(iter(column[row_index - 1: row_index]), None), next(iter(column[row_index + 1: row_index + 2]), None)]
             for neighbor in neighbours:
                 if neighbor == good:
                     addition = -1 if not neighbours.index(neighbor) else 1
@@ -371,7 +348,7 @@ def solve_icon_crush(grid):
             row_index, item_index = wanted_index
 
             row = grid[row_index]
-            neighbours = [next(iter(row[item_index - 1 : item_index]), None), next(iter(row[item_index + 1 : item_index + 2]), None)]
+            neighbours = [next(iter(row[item_index - 1: item_index]), None), next(iter(row[item_index + 1: item_index + 2]), None)]
 
             for neighbor in neighbours:
                 if neighbor == good:
@@ -382,15 +359,15 @@ def solve_icon_crush(grid):
     return [0, 0], [1, 1]
 
 
-def solve_grid_captcha(grid, switch_elements=False):
+def solve_grid_captcha(grid: List[List[str | int | None]], switch_elements: Optional[bool] = False) -> Tuple[List[int | int], List[int | int]] | False:
     # Helpers
-    def most_common(lst):
+    def most_common(lst: List[Any]):
         not_none = list(filter(None, lst))
         if not any(not_none):
             return None
         return max(set(not_none), key=not_none.count)
 
-    def find_point(haystack, needle):
+    def find_point(haystack: List[Any], needle: Any):
         return next(elem for elem in haystack if needle in elem)
 
     # Rows

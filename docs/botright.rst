@@ -7,16 +7,29 @@ Botright
 -  ``await botright.Botright()``
 -  Initialize a Botright Session
 
-+-----------------------------------+-----------------------------------+
-| Kwargs                            | Usage                             |
-+===================================+===================================+
-| ``headless`` (bool)               | Whether to run browser in         |
-|                                   | headless mode. Defaults to        |
-|                                   | ``False``                         |
-+-----------------------------------+-----------------------------------+
-| ``scroll_into_view`` (bool)       | Whether to scroll every Element   |
-|                                   | into View. Defaults to ``True``   |
-+-----------------------------------+-----------------------------------+
++-----------------------------------+--------------------------------------+
+| Kwargs                            | Usage                                |
++===================================+======================================+
+| ``headless`` (bool)               | Whether to run browser in            |
+|                                   | headless mode. Defaults to           |
+|                                   | ``False``                            |
++-----------------------------------+--------------------------------------+
+| ``block_images`` (bool)           | Wether to block images to lower      |
+|                                   | Network Usage. Defaults to ``False`` |
++-----------------------------------+--------------------------------------+
+| ``cache_responses`` (bool)        | Whether to Cache certain responses.  |
+|                                   | to lower Network Usage.              |
+|                                   | Defaults to ``False``                |
++-----------------------------------+--------------------------------------+
+| ``disable_canvas`` (bool)         | Whether to disable Canvas reading    |
+|                                   | by Websites. Defaults to ``True``    |
++-----------------------------------+--------------------------------------+
+| ``scroll_into_view`` (bool)       | Whether to scroll every Element      |
+|                                   | into View. Defaults to ``True``      |
++-----------------------------------+--------------------------------------+
+| ``user_action_layer`` (bool)      | Shows what the Bot is doing in the   |
+|                                   | Browser GUI. Defaults to ``True``    |
++-----------------------------------+--------------------------------------+
 
 -  returns: ``BotrightObject``
 
@@ -36,67 +49,11 @@ NewBrowser
 |                                     | ``username:password@ip:port``. |
 |                                     | Defaults to ``None``           |
 +-------------------------------------+--------------------------------+
-| ``locale`` (str)                    | Specify user locale, for       |
-|                                     | example en-GB, de-DE, etc.     |
-|                                     | Locale will affect             |
-|                                     | navigator.language value,      |
-|                                     | Accept-Language request header |
-|                                     | value as well as number and    |
-|                                     | date formatting rules. Affects |
-|                                     | Captcha Language. Defaults to  |
-|                                     | ``en-US``                      |
-+-------------------------------------+--------------------------------+
-| ``useragent`` (str)                 | Specific user agent. Defaults  |
-|                                     | to ``FakerUseragent``          |
-+-------------------------------------+--------------------------------+
-| ``geolocation`` (dict)              | Specify the Browsers           |
-|                                     | Geolocation. See               |
-|                                     | `GeolocationDocs <https:       |
-|                                     | //playwright.dev/python/docs/a |
-|                                     | pi/class-browser#browser-new-c |
-|                                     | ontext-option-geolocation>`__. |
-|                                     | Defaults to                    |
-|                                     | ``ProxyGeoLocation``           |
-+-------------------------------------+--------------------------------+
-| ``timezone_id`` (str)               | Specify the Browsers Timezone. |
-|                                     | Defaults to                    |
-|                                     | ``ProxyTimezoneID``            |
-+-------------------------------------+--------------------------------+
-| ``screen`` (dict)                   | Specify the Browsers Screen    |
-|                                     | Resolution. See                |
-|                                     | `ScreenDocs <h                 |
-|                                     | ttps://playwright.dev/python/d |
-|                                     | ocs/api/class-browser#browser- |
-|                                     | new-context-option-screen>`__. |
-|                                     | Defaults to                    |
-|                                     | ``FakerScreenResolution``      |
-+-------------------------------------+--------------------------------+
-| ``viewport`` (dict)                 | Specify the Browsers Viewport  |
-|                                     | Resolution. See                |
-|                                     | `ViewportDocs <htt             |
-|                                     | ps://playwright.dev/python/doc |
-|                                     | s/api/class-browser#browser-ne |
-|                                     | w-context-option-viewport>`__. |
-|                                     | Defaults to                    |
-|                                     | ``FakerViewportResolution``    |
-+-------------------------------------+--------------------------------+
-| ``proxy`` (dict)                    | Specify the Browser Proxy. See |
-|                                     | `ProxyDocs <                   |
-|                                     | https://playwright.dev/python/ |
-|                                     | docs/api/class-browser#browser |
-|                                     | -new-context-option-proxy>`__. |
-|                                     | Defaults to                    |
-|                                     | ``ProxyManagerBrowserProxy``   |
-+-------------------------------------+--------------------------------+
-| ``http_credentials`` (dict)         | Specify the Browser Proxy      |
-|                                     | Credentials. See               |
-|                                     | `HttpCredentialsDocs <https:// |
-|                                     | playwright.dev/python/docs/api |
-|                                     | /class-browser#browser-new-pag |
-|                                     | e-option-http-credentials>`__. |
-|                                     | Defaults to                    |
-|                                     | ``ProxyManagerUse              |
-|                                     | rname & ProxyManagerPassword`` |
+| ``stealth_page`` (bool)             | Whether to use certain         |
+|                                     | puppeteer-stealth modules to   |
+|                                     | enhance the stealthiness of    |
+|                                     | botright browsers.             |
+|                                     | Defaults to ``True``           |
 +-------------------------------------+--------------------------------+
 | ``**PlaywrightContextArgs``         | See                            |
 |                                     | `ContextDocs <https://playwrig |
@@ -109,10 +66,12 @@ NewBrowser
 
 -  returns: ``PlaywrightContext``
 
+--------------
+
 Get hCaptcha Key with Sitekey & rqData
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  ``await browser.get_hcaptcha()``
+-  ``await page.get_hcaptcha()``
 -  Spawns a new Page and Solves Captcha
 
 +-------------------------------------+--------------------------------+
@@ -129,6 +88,8 @@ Get hCaptcha Key with Sitekey & rqData
 +-------------------------------------+--------------------------------+
 
 -  returns: ``hCaptchaKey``
+
+--------------
 
 Solve hCaptcha
 ~~~~~~~~~~~~~~
@@ -150,6 +111,24 @@ Args     Usage
 +------------------+--------------------------------------------------+
 
 -  returns: ``hCaptchaKey``
+
+--------------
+
+Solve reCaptcha
+~~~~~~~~~~~~~~~
+
+-  ``await page.solve_recaptcha()``
+-  Solves a reCaptcha on the given Page
+
+======== ==================================================
+Args     Usage
+======== ==================================================
+``page`` Specify the Page to solve a reCaptcha Challenge on
+======== ==================================================
+
+-  returns: ``reCaptchaKey``
+
+--------------
 
 Solve geeTest
 ~~~~~~~~~~~~~
@@ -174,20 +153,3 @@ Args     Usage
 +-------------------------------------+--------------------------------+
 
 -  returns: ``geeTestKey``
-
-Solve reCaptcha
-~~~~~~~~~~~~~~~
-
--  ``await page.solve_recaptcha()``
--  Solves a reCaptcha on the given Page
--  Note: Use ``await page.audio_recaptcha()`` for solving via Audio
-   Challenge and ``await page.visual_recaptcha()`` (alias to
-   ``await page.solve_recaptcha()``)
-
-======== ==================================================
-Args     Usage
-======== ==================================================
-``page`` Specify the Page to solve a reCaptcha Challenge on
-======== ==================================================
-
--  returns: ``reCaptchaKey``

@@ -1,10 +1,10 @@
 Welcome to Botright!
 ====================
 
-For full documentation of changes visit
-`BotrightDocumentation <botright.md>`__. Except of these changes, you
+For full documentation of changes (compared to Playwright) visit
+`Botright Documentation <botright.rst>`__. Except of these changes, you
 can use Botright after the
-`PlaywrightDocs <https://playwright.dev/python/docs/api/class-playwright>`__
+`Playwright Docs <https://playwright.dev/python/docs/api/class-playwright>`__
 
 Installation
 ------------
@@ -48,48 +48,53 @@ launch a firefox browser.
 Captchas
 --------
 
-Botright is able to solve a wide viarity of Captchas. For Documentation
+Botright is able to solve a wide variety of Captchas. For Documentation
 of these functions visit `BotrightDocumentation <botright.md>`__.
 
 Here all Captchas supported as of now
 
-+----------------------+-----------+---------------------------+
-| Captcha Type         | Supported | Success Rate              |
-+======================+===========+===========================+
-| ``hCaptcha``         | ✔️        | 50%-90% (Depending on     |
-|                      |           | topicality of new Types)  |
-+----------------------+-----------+---------------------------+
-| ``reCaptcha``        | ✔️        | 30%-50%                   |
-+----------------------+-----------+---------------------------+
-| ``geeTestv3``        |           |                           |
-+----------------------+-----------+---------------------------+
-| v3 Intelligent Mode  | ✔️        | 100%                      |
-+----------------------+-----------+---------------------------+
-| v3 Slider Captcha    | ✔️        | 100%                      |
-+----------------------+-----------+---------------------------+
-| v3 Nine Captcha      | ✔️        | 50%                       |
-+----------------------+-----------+---------------------------+
-| v3 Icon Captcha      | ✔️        | 70%                       |
-+----------------------+-----------+---------------------------+
-| v3 Space Captcha     | ❌         | 0%                        |
-+----------------------+-----------+---------------------------+
-| ``geeTestv4``        |           |                           |
-+----------------------+-----------+---------------------------+
-| v4 Intelligent Mode  | ✔️        | 100%                      |
-+----------------------+-----------+---------------------------+
-| v4 Slider Captcha    | ✔️        | 100%                      |
-+----------------------+-----------+---------------------------+
-| v4 GoBang Captcha    | ✔️        | 100%                      |
-+----------------------+-----------+---------------------------+
-| v4 Icon Captcha      | ✔️        | 60%                       |
-+----------------------+-----------+---------------------------+
-| v4 IconCrush Captcha | ✔️        | 100%                      |
-+----------------------+-----------+---------------------------+
++----------------------+-----------+---------------------------------+---------------------------+
+| Captcha Type         | Supported | Solved By                       | Success Rate              |
++======================+===========+=================================+===========================+
+| **hCaptcha**         | Yes       | hcaptcha-challenger             | Up to 90%                 |
++----------------------+-----------+---------------------------------+---------------------------+
+|                      |           |                                 |                           |
++----------------------+-----------+---------------------------------+---------------------------+
+| **reCaptcha**        | Yes       | recaptcha-challenger            | 50%-80%                   |
++----------------------+-----------+---------------------------------+---------------------------+
+|                      |           |                                 |                           |
++----------------------+-----------+---------------------------------+---------------------------+
+| **geeTestv3**        |           |                                 |                           |
++----------------------+-----------+---------------------------------+---------------------------+
+| v3 Intelligent Mode  | Yes       | botrights stealthiness          | 100%                      |
++----------------------+-----------+---------------------------------+---------------------------+
+| v3 Slider Captcha    | Yes       | cv2.matchTemplate               | 100%                      |
++----------------------+-----------+---------------------------------+---------------------------+
+| v3 Nine Captcha      | Yes       | CLIP Detection                  | 50%                       |
++----------------------+-----------+---------------------------------+---------------------------+
+| v3 Icon Captcha      | Yes       | cv2.matchTemplate / SSIM / CLIP | 70%                       |
++----------------------+-----------+---------------------------------+---------------------------+
+| v3 Space Captcha     | No        | Not solvable                    | 0%                        |
++----------------------+-----------+---------------------------------+---------------------------+
+|                      |           |                                 |                           |
++----------------------+-----------+---------------------------------+---------------------------+
+| **geeTestv4**        |           |                                 |                           |
++----------------------+-----------+---------------------------------+---------------------------+
+| v4 Intelligent Mode  | Yes       | botrights stealthiness          | 100%                      |
++----------------------+-----------+---------------------------------+---------------------------+
+| v4 Slider Captcha    | Yes       | cv2.matchTemplate               | 100%                      |
++----------------------+-----------+---------------------------------+---------------------------+
+| v4 GoBang Captcha    | Yes       | Math Calculations               | 100%                      |
++----------------------+-----------+---------------------------------+---------------------------+
+| v4 Icon Captcha      | Yes       | cv2.matchTemplate / SSIM / CLIP | 60%                       |
++----------------------+-----------+---------------------------------+---------------------------+
+| v4 IconCrush Captcha | Yes       | Math Calculations               | 100%                      |
++----------------------+-----------+---------------------------------+---------------------------+
 
 First script
 ------------
 
-In our first script, we will navigate to ``whatsmyuseragent.org`` and
+In our first script, we will navigate to `Creep.js <https://abrahamjuliot.github.io/creepjs/>`__ and
 take a screenshot in WebKit.
 
 .. code:: py
@@ -103,21 +108,14 @@ take a screenshot in WebKit.
        browser = await botright_client.new_browser()
        page = await browser.new_page()
 
-       page.goto("http://whatsmyuseragent.org/")
-       page.screenshot(path="example.png")
+       await page.goto("https://abrahamjuliot.github.io/creepjs/")
+       await page.wait_for_timeout(5000) # Wait for stats to load
+       await page.screenshot(path="example.png", full_page=True)
 
        await botright_client.close()
 
    if __name__ == "__main__":
        asyncio.run(main())
-
-By default, Botright runs the browsers in headless mode. To see the
-browser UI, pass the ``headless=False`` flag while launching
-botright/the browser.
-
-.. code:: py
-
-   await botright.Botright(headless=False)
 
 Interactive mode (REPL)
 -----------------------
@@ -137,9 +135,10 @@ and then launch Botright within it for quick experimentation:
    # Pass headless=False to botright.Botright() to see the browser UI
    >>> browser = await botright_client.new_browser()
    >>> page = await browser.new_page()
-   >>> await page.goto("http://whatsmyuseragent.org/")
-   >>> await page.screenshot(path="example.png")
-   >>> await botright_client.stop()
+   >>> await page.goto("https://abrahamjuliot.github.io/creepjs/")
+   >>> await page.wait_for_timeout(5000) # Wait for stats to load
+   >>> await page.screenshot(path="example.png", full_page=True)
+   >>> await botright_client.close()
 
 Pyinstaller
 -----------
@@ -192,11 +191,12 @@ Known issues
 Threading
 ~~~~~~~~~
 
-Botright’s API is not thread-safe. If you are using Botright in a
+Botrights API is not thread-safe. If you are using Botright in a
 multi-threaded environment, you should create a botright instance per
 thread. See `threading
 issue <https://github.com/microsoft/playwright-python/issues/623>`__ for
 more details.
+For asynchronous usage, you should probably use asyncio.gather(*threads) instead.
 
 .. |PyPI version| image:: https://badge.fury.io/py/botright.svg
    :target: https://pypi.python.org/pypi/botright/

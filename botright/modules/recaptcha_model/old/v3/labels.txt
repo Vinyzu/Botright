@@ -1,8 +1,0 @@
-bridges
-chimneys
-crosswalks
-mountains or hills
-other
-palm trees
-stairs
-tractors

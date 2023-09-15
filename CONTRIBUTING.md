@@ -1,6 +1,6 @@
 # How to develop on this project
 
-botright welcomes contributions from the community.
+Botright welcomes contributions from the community.
 
 **You need PYTHON3!**
 

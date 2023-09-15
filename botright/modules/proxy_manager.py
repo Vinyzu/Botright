@@ -1,6 +1,10 @@
+from __future__ import annotations
+
+from typing import List
+
 import httpx
 from async_class import AsyncObject, link
-
+from botright import Botright
 
 class SplitError(Exception):
     pass
@@ -11,72 +15,80 @@ class ProxyCheckError(Exception):
 
 
 class ProxyManager(AsyncObject):
-    async def __ainit__(self, botright, proxy) -> None:
+    async def __ainit__(self, botright: Botright, proxy: str) -> None:
         link(self, botright)
 
-        self.proxy = proxy.strip() if proxy else None
-        self.http_proxy = None
-        self.ip = None
-        self.port = None
-        self.username = None
-        self.password = None
-        self.browser_proxy = None
-        self.plain_proxy = None
+        self.proxy, self.http_proxy = proxy.strip() if proxy else None, None
+        self.ip, self.port, self.username, self.password = None,  None, None, None
+        self.browser_proxy, self.plain_proxy = None, None
+
+        self.country, self.country_code = None, None
+        self.region, self.city, self.zip = None, None, None
+        self.latitude, self.longitude, self.timezone = None, None, None
+
         self.timeout = httpx.Timeout(20.0, read=None)
+        self.httpx = httpx.AsyncClient()
 
         if self.proxy:
             self.split_proxy()
             self.proxy = f"{self.username}:{self.password}@{self.ip}:{self.port}" if self.username else f"{self.ip}:{self.port}"
             self.plain_proxy = f"http://{self.proxy}"
+            self.phttpx = httpx.AsyncClient(proxies={"all://": self.plain_proxy})
+            self.http_proxy = {"http": self.plain_proxy, "https": self.plain_proxy}
 
             if self.username:
-                self.browser_proxy = {"server": self.plain_proxy, "username": self.username, "password": self.password}
+                self.browser_proxy = {"server": f"{self.ip}:{self.port}", "username": self.username, "password": self.password}
             else:
                 self.browser_proxy = {"server": self.plain_proxy}
 
-        self.http_proxy = {"http": self.http_proxy, "https": self.http_proxy} if self.proxy else None
+            await self.check_proxy(self.phttpx)
 
-        self.phttpx = httpx.AsyncClient(proxies={"all://": self.plain_proxy})
-        self.httpx = httpx.AsyncClient()
-
-        await self.check_proxy()
+        else:
+            self.phttpx = self.httpx
+            await self.check_proxy(self.httpx)
 
     async def __adel__(self) -> None:
         await self.httpx.aclose()
         await self.phttpx.aclose()
 
-    def split_helper(self, splitted) -> None:
-        if not any([_.isdigit() for _ in splitted]):
+    def split_helper(self, split_proxy: List[str]) -> None:
+        if not any([_.isdigit() for _ in split_proxy]):
             raise SplitError("No ProxyPort could be detected")
-        if splitted[1].isdigit():
-            self.ip, self.port, self.username, self.password = splitted
-        elif splitted[3].isdigit():
-            self.username, self.password, self.ip, self.port = splitted
+        if split_proxy[1].isdigit():
+            self.ip, self.port, self.username, self.password = split_proxy
+        elif split_proxy[3].isdigit():
+            self.username, self.password, self.ip, self.port = split_proxy
         else:
             raise SplitError(f"Proxy Format ({self.proxy}) isnt supported")
 
     def split_proxy(self) -> None:
-        splitted = self.proxy.split(":")
-        if len(splitted) == 2:
-            self.ip, self.port = splitted
-        elif len(splitted) == 3:
+        split_proxy = self.proxy.split(":")
+        if len(split_proxy) == 2:
+            self.ip, self.port = split_proxy
+        elif len(split_proxy) == 3:
             if "@" in self.proxy:
                 helper = [_.split(":") for _ in self.proxy.split("@")]
-                splitted = [x for y in helper for x in y]
-                self.split_helper(splitted)
+                split_proxy = [x for y in helper for x in y]
+                self.split_helper(split_proxy)
             else:
                 raise SplitError(f"Proxy Format ({self.proxy}) isnt supported")
-        elif len(splitted) == 4:
-            self.split_helper(splitted)
+        elif len(split_proxy) == 4:
+            self.split_helper(split_proxy)
         else:
             raise SplitError(f"Proxy Format ({self.proxy}) isnt supported")
 
-    async def check_proxy(self) -> None:
+    async def check_proxy(self, httpx_client: httpx.AsyncClient) -> None:
         try:
-            ip_request = await self.phttpx.get("https://jsonip.com", timeout=self.timeout)
+            ip_request = await httpx_client.get("http://jsonip.com", timeout=self.timeout)
             ip = ip_request.json().get("ip")
         except Exception as e:
-            raise ProxyCheckError("Could not get IP-Address of Proxy (Proxy is Invalid/Timed Out)")
+
+            # Trying again on different site (jsonip.com is known to have downtimes)
+            try:
+                ip_request = await httpx_client.get("http://httpbin.org/ip", timeout=self.timeout)
+                ip = ip_request.json().get("origin")
+            except Exception as e:
+                raise ProxyCheckError("Could not get IP-Address of Proxy (Proxy is Invalid/Timed Out)")
         try:
             r = await self.httpx.get(f"http://ip-api.com/json/{ip}", timeout=self.timeout)
             data = r.json()

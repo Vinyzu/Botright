@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    
+    <title></title>
+</head>
+
+<body>
+<a href="#"></a>
+
+<div class="main-view">
+
+	<div class="main-view__header">
+		<div class="main-view__header__logo">
+			<img src="images/logo-small.png">
+		</div>
+	</div>
+
+	<div class="main-view__content">
+
+		<div class="main-view__content__button" id="toggle-webrtc">
+			<div class="main-view__content__button__icon">
+				<i class="material-icons">power_settings_new</i>
+			</div>
+
+			<div class="main-view__content__button__text" id="toggle-webrtc-text">
+				Turn off
+			</div>
+		</div>
+
+		<div class="main-view__content__button" id="run-test">
+			<div class="main-view__content__button__icon">
+				<i class="material-icons">assignment_turned_in</i>
+			</div>
+
+			<div class="main-view__content__button__text">
+
+				Run WebRTC Leak Test
+			</div>
+		</div>
+
+		<div class="main-view__content__button" id="run-dns-test">
+			<div class="main-view__content__button__icon">
+				<i class="material-icons">device_hub</i>
+			</div>
+
+			<div class="main-view__content__button__text">
+
+				Run DNS Leak Test
+			</div>
+		</div>
+
+	</div>
+
+	<div class="main-view__footer">
+		<div class="main-view__footer__status" id="status-container">
+			<i class="material-icons main-view__footer__status__icon" id="status-icon">report_problem</i>
+			<div class="main-view__footer__status__text" id="status-text">
+				Your IP is visible through WebRTC
+			</div>
+		</div>
+		<span style="padding-right: 3px;" id="ext-version"></span>
+	</div>
+
+</div>
+
+
+<script src="js/popup.js"></script>
+</body>
+</html>

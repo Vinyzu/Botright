@@ -1,24 +1,33 @@
-from .. import hcaptcha
+from __future__ import annotations
+
+from playwright.async_api import BrowserContext, Page
+from botright import Botright
+from botright.modules import ProxyManager, Faker
+
 from . import page
 
+async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, **launch_arguments) -> BrowserContext:
+    parsed_launch_arguments = {"user_agent": faker.useragent, "locale": "en-US",
+                               "timezone_id": proxy.timezone, "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7},
+                               "permissions": ["geolocation"], "ignore_https_errors": True,
+                               "screen": {"width": faker.avail_width, "height": faker.avail_height}, "viewport": {"width": faker.width, "height": faker.height},
+                               "proxy": proxy.browser_proxy,
+                               "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None,
+                               **launch_arguments}  # self.faker.locale
 
-async def new_browser(botright, proxy, faker, **launch_arguments) -> "PlaywrightContext":
-    parsed_launch_arguments = {"locale": "en-US", "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7}, "timezone_id": proxy.timezone, "permissions": ["geolocation"], "screen": {"width": faker.avail_width, "height": faker.avail_height}, "user_agent": faker.useragent, "viewport": {"width": faker.width, "height": faker.height}, "proxy": proxy.browser_proxy, "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None, **launch_arguments}  # self.faker.locale
     # Spawning a new Context for more options
-    browser = await botright.main_browser.new_context(**parsed_launch_arguments)
+    if proxy.browser_proxy:
+        browser = await botright.proxy_main_browser.new_context(**parsed_launch_arguments)
+    else:
+        browser = await botright.main_browser.new_context(**parsed_launch_arguments)
 
-    await mock_browser(botright, browser, proxy, faker)
+    await mock_browser(botright, browser, faker)
     botright.stoppable.append(browser)
     return browser
 
-async def mock_browser(botright, browser, proxy, faker) -> None:
-    async def get_hcaptcha_mocker(sitekey="00000000-0000-0000-0000-000000000000", rqdata=None):
-        return await hcaptcha.hCaptcha.get_hcaptcha(browser, sitekey=sitekey, rqdata=rqdata)
-
-    browser.get_hcaptcha = get_hcaptcha_mocker
-
-    async def page_mocker(**launch_arguments):
-        return await page.new_page(botright, browser, proxy, faker, **launch_arguments)
+async def mock_browser(botright: Botright, browser: BrowserContext, faker: Faker) -> None:
+    async def page_mocker(**launch_arguments) -> Page:
+        return await page.new_page(botright, browser, faker)
 
     browser._new_page = browser.new_page
     browser.new_page = page_mocker

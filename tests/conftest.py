@@ -13,7 +13,8 @@ async def botright_client(headless=False):
 
 @pytest_asyncio.fixture  # (scope="session")
 async def browser(botright_client, **launch_arguments):
-    browser = await botright_client.new_browser(**launch_arguments)
+    #
+    browser = await botright_client.new_browser(block_images=True, no_proxy=True, **launch_arguments)
     yield browser
     await browser.close()
 

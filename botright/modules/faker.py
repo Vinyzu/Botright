@@ -1,39 +1,71 @@
+from __future__ import annotations
+
 import asyncio
 import random
-from os.path import dirname, join
+import platform
 
+from botright import Botright
 from async_class import AsyncObject, link
+
+from . import ProxyManager
 
 
 class Faker(AsyncObject):
-    async def __ainit__(self, botright, proxy) -> None:
+    async def __ainit__(self, botright: Botright, proxy: ProxyManager) -> None:
+        self.botright = botright
+        self.os_system = platform.system()
         link(self, botright)
-        threads = [self.computer(proxy), self.locale(proxy), self.person()]
+
+        self.locale, self.language_code = None, None
+        self.useragent, self.vendor, self.renderer = None, None, None
+        self.width, self.height, self.avail_width, self.avail_height = None, None, None, None
+
+        threads = [self.get_computer(proxy), self.get_locale(proxy)]
         await asyncio.gather(*threads)
 
-    async def computer(self, proxy) -> None:
+    @staticmethod
+    def adjust_browser_version(useragent: str, browser_type: str, browser_version: str) -> str:
+        ua_browser_version = [word for word in useragent.split() if browser_type.capitalize() + "/" in word]
+        browser_version_list = browser_version.split(".")[:2] + ["0", "0"]
+        browser_version = ".".join(browser_version_list)
+        return useragent.replace(ua_browser_version[0], f"{browser_type}/{browser_version}")
+
+    async def get_computer(self, proxy: ProxyManager) -> None:
         try:
             # Sometimes the API is offline
             while True:
-                url = "http://fingerprints.bablosoft.com/preview?rand=0.1&tags=Firefox,Desktop,Microsoft%20Windows"
+                os_dict = {"Darwin": "Apple%20Mac", "Windows": "Microsoft%20Windows", "Linux": "Linux", "Java": "Linux"}
+                parsed_os = os_dict[self.os_system]
+
+                url = f"http://fingerprints.bablosoft.com/preview?rand=0.1&tags=Chrome,Desktop,{parsed_os}"
                 r = await proxy.httpx.get(url, timeout=20)
                 data = r.json()
                 self.useragent = data.get("ua")
+                if not self.useragent:
+                    await asyncio.sleep(2)
+                    continue
+
+                # Replacing the BrowserVersion in the UserAgent with the real BrowserVersion
+                self.useragent = self.adjust_browser_version(self.useragent, "Chrome", self.botright.main_browser.version)
                 self.vendor = data.get("vendor")
                 self.renderer = data.get("renderer")
                 self.width = data.get("width")
                 self.height = data.get("height")
                 self.avail_width = data.get("availWidth")
-                self.avail_height = data.get("availHeight")
+                self.avail_height = data.get("availHeight") - 48
+
                 # If the Window is too small for the captcha
                 if self.height > 810 and self.avail_height > 810 and self.avail_width > 810 and self.avail_width > 810:
                     return
 
         except Exception as e:
-            useragents = await proxy.httpx.get("https://gist.githubusercontent.com/ally-petitt/ecca8a395702e9e51c5a8fc404d0b8aa/raw/2ef3e6a1e0de1ce4968894ad9d2610cb9eb641c0/user-agents.txt").splitlines()
-            firefox_ua = [line for line in useragents if "Firefox" in line]
+            print(f"Faker Error: {e}")
+            response = await proxy.httpx.get("https://gist.githubusercontent.com/ally-petitt/ecca8a395702e9e51c5a8fc404d0b8aa/raw/2ef3e6a1e0de1ce4968894ad9d2610cb9eb641c0/user-agents.txt")
+            useragents = response.text
+            useragent = [line for line in useragents.splitlines() if "Chrome" in line.lower()]
+
             # If Bablosoft Website is offline
-            self.useragent = random.choice(firefox_ua)
+            self.useragent = random.choice(useragent)
             self.vendor = "Google Inc."
             self.renderer = "Google Inc. (AMD)"
             self.width = 1280
@@ -41,7 +73,7 @@ class Faker(AsyncObject):
             self.avail_width = 1280
             self.avail_height = 720
 
-    async def locale(self, proxy) -> None:
+    async def get_locale(self, proxy: ProxyManager) -> None:
         language_dict = {
             "AF": ["pr-AF", "pr"],
             "AX": ["sw-AX", "sw"],
@@ -297,11 +329,3 @@ class Faker(AsyncObject):
             self.locale, self.language_code = language_dict[country_code]
         else:
             raise ValueError("Proxy Country not supported")
-
-    async def person(self):
-        path = dirname(__file__)
-        self.username = random.choice(open(join(path, "names.txt"), "r", encoding="utf-8").read().splitlines())
-        self.password = random.choice(open(join(path, "passwords.txt"), "r", encoding="utf-8").read().splitlines())
-        self.birth_year = str(random.randint(1950, 2000))
-        self.birth_month = str(random.randint(1, 12))
-        self.birth_day = str(random.randint(1, 12))

@@ -1,4 +1,4 @@
-# Botright v0.2.2
+# Botright v0.3
 
 ## Install it from PyPI
 
@@ -11,7 +11,7 @@ playwright install
 
 ## Usage
 
-### Botright is only available in async mode.
+### Botright is currently only available in async mode.
 ### It is fully plugable with your existing playwright code. You only have to change your browser initialization!
 
 ```py
@@ -26,6 +26,7 @@ async def main():
     page = await browser.new_page()
 
     # Continue by using the Page
+    await page.goto("https://google.com")
 
     await botright_client.close()
 
@@ -34,6 +35,14 @@ if __name__ == "__main__":
 ```
 
 Read the [Documentation](https://botright.readthedocs.io/en/latest)
+
+---
+
+## Browser Stealth
+
+Botright uses a vast amount of techniques to hide its functionality as a bot from websites.
+To enhance stealth, since Version 0.3, it uses a real Chromium-based browser from the local machine to start up a botted browser.
+Furthermore, it scrapes information about the browser and from the internet, to build up a fake browser fingerprint and to deceive website into thinking it is legit.
 
 ---
 
@@ -48,22 +57,22 @@ You dont need to pay for any Captcha Solving APIs and you can solve Captchas wit
 
 Here all Captchas supported as of now:
 
-| Captcha Type | Supported | Success Rate |
-|:--------------:|:--------------:|--------------|
+| Captcha Type | Supported | Success Rate                                   |
+|:--------------:|:--------------:|------------------------------------------------|
 | `hCaptcha` | ✔️ | 50%-90% (Depending on topicality of new Types) |
-| `reCaptcha` | ✔️ | 30%-50% |
+| `reCaptcha` | ✔️ | 50%-80%                                        |
 | `geeTestv3` |
-| v3 Intelligent Mode | ✔️ | 100% |
-| v3 Slider Captcha | ✔️ | 100% |
-| v3 Nine Captcha | ✔️ | 50% |
-| v3 Icon Captcha | ✔️ | 70% |
-| v3 Space Captcha | ❌ | 0% |
+| v3 Intelligent Mode | ✔️ | 100%                                           |
+| v3 Slider Captcha | ✔️ | 100%                                           |
+| v3 Nine Captcha | ✔️ | 50%                                            |
+| v3 Icon Captcha | ✔️ | 70%                                            |
+| v3 Space Captcha | ❌ | 0%                                             |
 | `geeTestv4` |
-| v4 Intelligent Mode | ✔️ | 100% |
-| v4 Slider Captcha | ✔️ | 100% |
-| v4 GoBang Captcha | ✔️ | 100% |
-| v4 Icon Captcha | ✔️ | 60% |
-| v4 IconCrush Captcha | ✔️ | 100% |
+| v4 Intelligent Mode | ✔️ | 100%                                           |
+| v4 Slider Captcha | ✔️ | 100%                                           |
+| v4 GoBang Captcha | ✔️ | 100%                                           |
+| v4 Icon Captcha | ✔️ | 60%                                            |
+| v4 IconCrush Captcha | ✔️ | 100%                                           |
 
 ## Development
 
@@ -82,7 +91,7 @@ Read the [CONTRIBUTING.md](https://github.com/Vinyzu/Botright/blob/main/CONTRIBU
 
 ## Thanks to
 
-[QIN2DIM](https://github.com/QIN2DIM/) (For his great AI work) (Note his GitHub got banned)
+[QIN2DIM](https://github.com/QIN2DIM/) (For his great AI work)
 
 [MaxAndolini](https://github.com/MaxAndolini) (For shared knowledge of hCaptcha bypassing)
 
@@ -90,7 +99,7 @@ Read the [CONTRIBUTING.md](https://github.com/Vinyzu/Botright/blob/main/CONTRIBU
 
 ---
 
-![Version](https://img.shields.io/badge/Botright-v0.2.2-blue)
+![Version](https://img.shields.io/badge/Botright-v0.3-blue)
 ![License](https://img.shields.io/badge/License-GNU%20GPL-green)
 ![Python](https://img.shields.io/badge/Python-v3.x-lightgrey)
 

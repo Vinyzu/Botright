@@ -21,7 +21,7 @@ import botright
 
 
 async def main():
-    botright_client = await botright.Botright(headless=False)
+    botright_client = await botright.Botright()
     browser = await botright_client.new_browser()
     page = await browser.new_page()
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-Read the [Documentation](https://botright.readthedocs.io/en/latest)
+Read the [Documentation](https://github.com/Vinyzu/Botright/blob/main/docs/index.rst)
 
 ---
 
@@ -42,7 +42,33 @@ Read the [Documentation](https://botright.readthedocs.io/en/latest)
 
 Botright uses a vast amount of techniques to hide its functionality as a bot from websites.
 To enhance stealth, since Version 0.3, it uses a real Chromium-based browser from the local machine to start up a botted browser.
-Furthermore, it scrapes information about the browser and from the internet, to build up a fake browser fingerprint and to deceive website into thinking it is legit.
+For best stealth, you want to install [Ungoogled Chromium](https://ungoogled-software.github.io/ungoogled-chromium-binaries/)
+Furthermore, it uses scraped and AI-enhanced (bayesian network based) fingerprints to build up a fake browser fingerprint and to deceive website into thinking it is legit.
+
+
+| Test                                                                                                | Status | Score                                                      |
+|-----------------------------------------------------------------------------------------------------|-------|------------------------------------------------------------|
+| **reCaptcha Score**                                                                                 |   ✔️ | 0.9                                                        |
+| => [nopecha.com](https://nopecha.com/demo/recaptcha#v3)                                             |   ✔️ | 0.9                                                        |
+| => [recaptcha-demo.appspot.com](https://recaptcha-demo.appspot.com/recaptcha-v3-request-scores.php) |   ✔️ | 0.9                                                        |
+| => [berstend.github.io](https://berstend.github.io/static/recaptcha/v3-programmatic.html)           |   ✔️ | 0.9                                                        |
+| => [antcpt.com](https://antcpt.com/score_detector/)                                                 | ❌❓ | 0.1 (Detects Legitimate Browsers as Bad)                   |
+| [**CreepJS**](https://abrahamjuliot.github.io/creepjs/)                                             |   ✔️ | ~56% (With Canvas Manipulation 9%)                         |
+| **DataDome**                                                                                        |   ✔️ |                                                            |
+| => [antoinevastel.com](https://antoinevastel.com/bots/datadome)                                     |   ✔️ |                                                            |
+| => [datadome.co](https://datadome.co/bot-tester/)                                                   |   ✔️ |                                                            |
+| **Imperva**                                                                                         | ✔️❓ | (Cant find approved Testing Sites)                         |
+| => [ticketmaster.es](https://www.ticketmaster.es/)                                                  |   ✔️ |                                                            |
+| **Cloudflare**                                                                                      |   ❌ |                                                            |
+| => [Turnstile](https://nopecha.com/demo/turnstile)                                                  |   ❌ |                                                            |
+| => [Interstitial](https://nopecha.com/demo/cloudflare)                                              |   ❌ |                                                            |
+| [**SannySoft**](https://bot.sannysoft.com/)                                                         |   ✔️ |                                                            |
+| [**Incolumitas**](https://bot.incolumitas.com/)                                                     |   ✔️ | 0.8-1.0                                                    |
+| [**Fingerprint.com**](https://fingerprint.com/products/bot-detection/)                              |   ✔️ |                                                            |
+| [**IpHey**](https://iphey.com/)                                                                     |   ✔️ |                                                            |
+| [**BrowserScan**](https://browserscan.net/)                                                         |   ❓ | (Maybe caused by WebGL-disabling)                          |
+| [**PixelScan**](https://pixelscan.net/)                                                             |   ❓ | (Platform Test Outdated & Maybe caused by WebGL-disabling) |
+
 
 ---
 
@@ -57,22 +83,22 @@ You dont need to pay for any Captcha Solving APIs and you can solve Captchas wit
 
 Here all Captchas supported as of now:
 
-| Captcha Type | Supported |            Solved By            | Success Rate |
-|:--------------:|:--------------:|:-------------------------------:|--------------|
-| `hCaptcha` | ✔️ |       hcaptcha-challenger       | up to 90%    |
-| `reCaptcha` | ✔️ |      recaptcha-challenger       | 50%-80%      |
-| `geeTestv3` |
-| v3 Intelligent Mode | ✔️ |     botrights stealthiness      | 100%         |
-| v3 Slider Captcha | ✔️ |        cv2.matchTemplate        | 100%         |
-| v3 Nine Captcha | ✔️ |         CLIP Detection          | 50%          |
-| v3 Icon Captcha | ✔️ | cv2.matchTemplate / SSIM / CLIP | 70%          |
-| v3 Space Captcha | ❌ |          Not solvable           | 0%           |
-| `geeTestv4` |
-| v4 Intelligent Mode | ✔️ |     botrights stealthiness      | 100%         |
-| v4 Slider Captcha | ✔️ |        cv2.matchTemplate        | 100%         |
-| v4 GoBang Captcha | ✔️ |        Math Calculations        | 100%         |
-| v4 Icon Captcha | ✔️ | cv2.matchTemplate / SSIM / CLIP | 60%          |
-| v4 IconCrush Captcha | ✔️ |        Math Calculations        | 100%         |
+|             Captcha Type             | Supported |            Solved By            | Success Rate |
+|:------------------------------------:|:---------:|:-------------------------------:|--------------|
+|              `hCaptcha`              |    ✔️    |       hcaptcha-challenger       | up to 90%    |
+| `reCaptcha` Currently Not Available! |    ✔️    |      recaptcha-challenger       | 50%-80%      |
+| `geeTestv3` Currently Not Available! |
+|         v3 Intelligent Mode          |    ✔️    |     botrights stealthiness      | 100%         |
+|          v3 Slider Captcha           |    ✔️    |        cv2.matchTemplate        | 100%         |
+|           v3 Nine Captcha            |    ✔️    |         CLIP Detection          | 50%          |
+|           v3 Icon Captcha            |    ✔️    | cv2.matchTemplate / SSIM / CLIP | 70%          |
+|           v3 Space Captcha           |    ❌    |          Not solvable           | 0%           |
+| `geeTestv4` Currently Not Available! |
+|         v4 Intelligent Mode          |    ✔️    |     botrights stealthiness      | 100%         |
+|          v4 Slider Captcha           |    ✔️    |        cv2.matchTemplate        | 100%         |
+|          v4 GoBang Captcha           |    ✔️    |        Math Calculations        | 100%         |
+|           v4 Icon Captcha            |    ✔️    | cv2.matchTemplate / SSIM / CLIP | 60%          |
+|         v4 IconCrush Captcha         |    ✔️    |        Math Calculations        | 100%         |
 
 ## Development
 

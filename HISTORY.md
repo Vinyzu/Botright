@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.4 (2023-10-06)
+------------------
+- Better Stealth. [Vinyzu]
+- Added Support and Recommendation for Ungoogled Chromium. [Vinyzu]
+- Using Bayesian Network to generate Fingerprints.
+- Improved Code Runtime & Generated DocStrings. [Vinyzu]
+- Added Detection Tests (see dev_test.py). [Vinyzu]
+- Removed unnecessary Extension. [Vinyzu]
+- Added Requirements. [Vinyzu]
+
 0.3 (2023-09-15)
 ------------------
 - Better Stealth. [Vinyzu]

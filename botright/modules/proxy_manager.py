@@ -15,6 +15,13 @@ class ProxyCheckError(Exception):
 
 class ProxyManager(AsyncObject):
     async def __ainit__(self, botright, proxy: str) -> None:
+        """
+        Initialize a ProxyManager instance with a proxy string and perform proxy checks.
+
+        Args:
+            botright: An instance of Botright for linking purposes.
+            proxy (str): The proxy string to be managed and checked.
+        """
         link(self, botright)
 
         self.proxy, self.http_proxy = proxy.strip() if proxy else None, None
@@ -51,6 +58,12 @@ class ProxyManager(AsyncObject):
         await self.phttpx.aclose()
 
     def split_helper(self, split_proxy: List[str]) -> None:
+        """
+        Helper function to split and parse the proxy string into its components.
+
+        Args:
+            split_proxy (List[str]): A list containing the components of the proxy string.
+        """
         if not any([_.isdigit() for _ in split_proxy]):
             raise SplitError("No ProxyPort could be detected")
         if split_proxy[1].isdigit():
@@ -77,6 +90,12 @@ class ProxyManager(AsyncObject):
             raise SplitError(f"Proxy Format ({self.proxy}) isnt supported")
 
     async def check_proxy(self, httpx_client: httpx.AsyncClient) -> None:
+        """
+Check the validity of the proxy by making HTTP requests to determine its properties.
+
+Args:
+    httpx_client (httpx.AsyncClient): The HTTPX client to use for proxy checks.
+"""
         try:
             ip_request = await httpx_client.get("http://jsonip.com", timeout=self.timeout)
             ip = ip_request.json().get("ip")

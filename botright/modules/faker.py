@@ -1,76 +1,89 @@
 from __future__ import annotations
 
 import asyncio
-import random
-import platform
 
 from async_class import AsyncObject, link
+
+from .proxy_manager import ProxyManager
 
 
 class Faker(AsyncObject):
     async def __ainit__(self, botright, proxy) -> None:
+        """
+        Initialize a Faker instance with a botright instance and a proxy, and generate fake data.
+
+        Args:
+            botright: An instance of Botright for linking purposes.
+            proxy: The proxy to be used for generating locale-related fake data.
+        """
         self.botright = botright
-        self.os_system = platform.system()
         link(self, botright)
 
         self.locale, self.language_code = None, None
-        self.useragent, self.vendor, self.renderer = None, None, None
+        self.useragent, self.vendor, self.gpu_vendor, self.renderer = None, None, None, None
         self.width, self.height, self.avail_width, self.avail_height = None, None, None, None
 
-        threads = [self.get_computer(proxy), self.get_locale(proxy)]
+        threads = [self.get_computer(), self.get_locale(proxy)]
         await asyncio.gather(*threads)
 
     @staticmethod
     def adjust_browser_version(useragent: str, browser_type: str, browser_version: str) -> str:
+        """
+        Adjust the browser version in a user agent string.
+
+        Args:
+            useragent (str): The user agent string to be adjusted.
+            browser_type (str): The type of the browser (e.g., "Firefox").
+            browser_version (str): The desired browser version (e.g., "92.0").
+
+        Returns:
+            str: The adjusted user agent string.
+        """
         ua_browser_version = [word for word in useragent.split() if browser_type.capitalize() + "/" in word]
         browser_version_list = browser_version.split(".")[:2] + ["0", "0"]
         browser_version = ".".join(browser_version_list)
         return useragent.replace(ua_browser_version[0], f"{browser_type}/{browser_version}")
 
-    async def get_computer(self, proxy) -> None:
+    async def get_computer(self) -> None:
+        """
+        Generate fake computer-related data such as user agent, vendor, GPU information, screen dimensions, etc.
+        """
+        fingerprint = self.botright.fingerprint_generator.get_fingerprint()
+
+        self.useragent = fingerprint.get("userAgent")
+        self.vendor = fingerprint.get("renderer")
         try:
-            # Sometimes the API is offline
-            while True:
-                os_dict = {"Darwin": "Apple%20Mac", "Windows": "Microsoft%20Windows", "Linux": "Linux", "Java": "Linux"}
-                parsed_os = os_dict[self.os_system]
+            self.gpu_vendor = fingerprint.get("videoCard").get("vendor")
+            self.renderer = fingerprint.get("videoCard").get("renderer")
+        except AttributeError:
+            self.gpu_vendor = 'Intel Inc.'
+            self.renderer = 'Intel Iris OpenGL Engine'
 
-                url = f"http://fingerprints.bablosoft.com/preview?rand=0.1&tags=Chrome,Desktop,{parsed_os}"
-                r = await proxy.httpx.get(url, timeout=20)
-                data = r.json()
-                self.useragent = data.get("ua")
-                if not self.useragent:
-                    await asyncio.sleep(2)
-                    continue
+        self.width = fingerprint.get("screen").get("width")
+        self.height = fingerprint.get("screen").get("height")
+        self.avail_width = fingerprint.get("screen").get("availWidth")
+        self.avail_height = fingerprint.get("screen").get("availHeight")
 
-                # Replacing the BrowserVersion in the UserAgent with the real BrowserVersion
-                self.useragent = self.adjust_browser_version(self.useragent, "Chrome", self.botright.main_browser.version)
-                self.vendor = data.get("vendor")
-                self.renderer = data.get("renderer")
-                self.width = data.get("width")
-                self.height = data.get("height")
-                self.avail_width = data.get("availWidth")
-                self.avail_height = data.get("availHeight") - 48
+        self.platform = fingerprint.get("platform")
+        self.brands = fingerprint.get("userAgentData").get("brands")
+        self.full_version_brands = fingerprint.get("userAgentData").get("fullVersionList")
+        self.architecture = fingerprint.get("userAgentData").get("architecture")
+        self.bitness = fingerprint.get("userAgentData").get("bitness")
+        self.platform_version = fingerprint.get("userAgentData").get("platformVersion")
+        self.full_version = fingerprint.get("userAgentData").get("uaFullVersion")
 
-                # If the Window is too small for the captcha
-                if self.height > 810 and self.avail_height > 810 and self.avail_width > 810 and self.avail_width > 810:
-                    return
-
-        except Exception as e:
-            print(f"Faker Error: {e}")
-            response = await proxy.httpx.get("https://gist.githubusercontent.com/ally-petitt/ecca8a395702e9e51c5a8fc404d0b8aa/raw/2ef3e6a1e0de1ce4968894ad9d2610cb9eb641c0/user-agents.txt")
-            useragents = response.text
-            useragent = [line for line in useragents.splitlines() if "Chrome" in line.lower()]
-
-            # If Bablosoft Website is offline
-            self.useragent = random.choice(useragent)
-            self.vendor = "Google Inc."
-            self.renderer = "Google Inc. (AMD)"
-            self.width = 1280
-            self.height = 720
-            self.avail_width = 1280
-            self.avail_height = 720
+        if self.avail_width == self.height:
+            self.avail_width = self.avail_width - 48
+        if self.avail_height == self.height:
+            self.avail_height = self.avail_height - 48
 
     async def get_locale(self, proxy: ProxyManager) -> None:
+        """
+        Generate fake locale-related data such as locale and language code based on the provided proxy.
+
+        Args:
+            proxy (ProxyManager): The proxy manager used to determine the locale.
+        """
         language_dict = {
             "AF": ["pr-AF", "pr"],
             "AX": ["sw-AX", "sw"],

@@ -29,6 +29,8 @@ Botright
 +-----------------------------------+--------------------------------------+
 | ``user_action_layer`` (bool)      | Shows what the Bot is doing in the   |
 |                                   | Browser GUI. Defaults to ``True``    |
+| ``dont_mask_fingerprint`` (bool)  | Disables spoofing a fake fingerprint |
+|                                   | boosts stealth. Defaults to ``True`` |
 +-----------------------------------+--------------------------------------+
 
 -  returns: ``BotrightObject``

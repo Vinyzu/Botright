@@ -3,9 +3,10 @@ async_class #==0.5.0
 httpx>=0.24.1
 playwright==1.37.0
 playwright_stealth==1.0.6 #==1.0.5
+pybrowsers==0.5.2
 
 # Math and Others
-numpy==1.25.2
+numpy==1.26.0
 scipy==1.11.2
 # Image Processing
 Pillow==10.0.1

@@ -1,0 +1,1 @@
+from .fingerprint import FingerprintGenerator

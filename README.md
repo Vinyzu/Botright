@@ -1,4 +1,5 @@
 # Botright v0.5
+![Tests & Linting](https://github.com/Vinyzu/botright/actions/workflows/tests.yml/badge.svg)
 [![](https://img.shields.io/pypi/v/botright.svg?color=1182C3)](https://pypi.org/project/selenium-driverless/)
 [![Downloads](https://static.pepy.tech/badge/botright)](https://pepy.tech/project/botright)
 

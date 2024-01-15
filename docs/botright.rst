@@ -1,47 +1,59 @@
 Initialization
 --------------
 
-Botright
+Botright_
 ~~~~~~~~
 
 -  ``await botright.Botright()``
--  Initialize a Botright Session
+..
 
-+-----------------------------------+--------------------------------------+
-| Kwargs                            | Usage                                |
-+===================================+======================================+
-| ``headless`` (bool)               | Whether to run browser in            |
-|                                   | headless mode. Defaults to           |
-|                                   | ``False``                            |
-+-----------------------------------+--------------------------------------+
-| ``block_images`` (bool)           | Wether to block images to lower      |
-|                                   | Network Usage. Defaults to ``False`` |
-+-----------------------------------+--------------------------------------+
-| ``cache_responses`` (bool)        | Whether to Cache certain responses.  |
-|                                   | to lower Network Usage.              |
-|                                   | Defaults to ``False``                |
-+-----------------------------------+--------------------------------------+
-| ``disable_canvas`` (bool)         | Whether to disable Canvas reading    |
-|                                   | by Websites. Defaults to ``True``    |
-+-----------------------------------+--------------------------------------+
-| ``scroll_into_view`` (bool)       | Whether to scroll every Element      |
-|                                   | into View. Defaults to ``True``      |
-+-----------------------------------+--------------------------------------+
-| ``user_action_layer`` (bool)      | Shows what the Bot is doing in the   |
-|                                   | Browser GUI. Defaults to ``True``    |
-| ``dont_mask_fingerprint`` (bool)  | Disables spoofing a fake fingerprint |
-|                                   | boosts stealth. Defaults to ``True`` |
-+-----------------------------------+--------------------------------------+
+ Initialize a Botright Session
 
--  returns: ``BotrightObject``
++--------------------------------------+--------------------------------------+
+| Kwargs                               | Usage                                |
++======================================+======================================+
+| ``headless`` (bool)                  | Whether to run browser in            |
+|                                      | headless mode. Defaults to           |
+|                                      | ``False``                            |
++--------------------------------------+--------------------------------------+
+| ``block_images`` (bool)              | Wether to block images to lower      |
+|                                      | Network Usage. Defaults to ``False`` |
++--------------------------------------+--------------------------------------+
+| ``cache_responses`` (bool)           | Whether to Cache certain responses.  |
+|                                      | to lower Network Usage.              |
+|                                      | Defaults to ``False``                |
++--------------------------------------+--------------------------------------+
+| ``user_action_layer`` (bool)         | Shows what the Bot is doing in the   |
+|                                      | Browser GUI. Defaults to ``True``    |
++--------------------------------------+--------------------------------------+
+| ``scroll_into_view`` (bool)          | Whether to scroll every Element      |
+|                                      | into View. Defaults to ``True``      |
++--------------------------------------+--------------------------------------+
+| ``spoof_canvas`` (bool)              | Whether to disable canvas fingerprint|
+|                                      | protection. Defaults to ``True``     |
++--------------------------------------+--------------------------------------+
+| ``mask_fingerprint`` (bool)          | Wether to mask browser fingerprints  |
+|                                      | Disables spoofing a fake fingerprint |
+|                                      | boosts stealth. Defaults to ``False``|
++--------------------------------------+--------------------------------------+
+| ``spoof_canvas`` (bool)              | Whether to disable canvas fingerprint|
+|                                      | protection. Defaults to ``True``     |
++--------------------------------------+--------------------------------------+
+| ``use_undetected_playwright`` (bool) | hether to use undetected_playwright. |
+|                                      | Only Temporary. Defaults to ``False``|
++--------------------------------------+--------------------------------------+
+
+-  returns: ``Botright``
 
 --------------
 
-NewBrowser
+NewBrowser_
 ~~~~~~~~~~
 
 -  ``await botright_client.new_browser()``
--  Spawns a new Browser
+..
+
+ Create a new Botright browser instance with specified configurations.
 
 +-------------------------------------+--------------------------------+
 | Kwargs                              | Usage                          |
@@ -50,12 +62,6 @@ NewBrowser
 |                                     | ProxyServer-Address. Example:  |
 |                                     | ``username:password@ip:port``. |
 |                                     | Defaults to ``None``           |
-+-------------------------------------+--------------------------------+
-| ``stealth_page`` (bool)             | Whether to use certain         |
-|                                     | puppeteer-stealth modules to   |
-|                                     | enhance the stealthiness of    |
-|                                     | botright browsers.             |
-|                                     | Defaults to ``True``           |
 +-------------------------------------+--------------------------------+
 | ``**PlaywrightContextArgs``         | See                            |
 |                                     | `ContextDocs <https://playwrig |
@@ -66,15 +72,20 @@ NewBrowser
 |                                     | ``None``                       |
 +-------------------------------------+--------------------------------+
 
--  returns: ``PlaywrightContext``
+-  returns: ``botright.extended_typing.Browser``
 
 --------------
 
-Get hCaptcha Key with Sitekey & rqData
+Captcha Solving
+--------------
+
+Get a hCaptcha Key with Sitekey & rqData_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  ``await page.get_hcaptcha()``
--  Spawns a new Page and Solves Captcha
+..
+
+ Spawns a new Page and Solves Captcha
 
 +-------------------------------------+--------------------------------+
 | Kwargs                              | Usage                          |
@@ -89,21 +100,17 @@ Get hCaptcha Key with Sitekey & rqData
 |                                     | ``None``                       |
 +-------------------------------------+--------------------------------+
 
--  returns: ``hCaptchaKey``
+-  returns: ``hCaptchaKey (str)``
 
 --------------
 
-Solve hCaptcha
+Solve hCaptcha_
 ~~~~~~~~~~~~~~
 
 -  ``await page.solve_hcaptcha()``
--  Solves a hCaptcha on the given Page
+..
 
-======== =================================================
-Args     Usage
-======== =================================================
-``page`` Specify the Page to solve a hCaptcha Challenge on
-======== =================================================
+ Solves a hCaptcha on the given Page
 
 +------------------+--------------------------------------------------+
 | Kwargs           | Usage                                            |
@@ -112,37 +119,31 @@ Args     Usage
 |                  | Defaults to ``None``                             |
 +------------------+--------------------------------------------------+
 
--  returns: ``hCaptchaKey``
+-  returns: ``hCaptchaKey (str)``
 
 --------------
 
-Solve reCaptcha
+Solve reCaptcha_
 ~~~~~~~~~~~~~~~
 
 -  ``await page.solve_recaptcha()``
--  Solves a reCaptcha on the given Page
+..
 
-======== ==================================================
-Args     Usage
-======== ==================================================
-``page`` Specify the Page to solve a reCaptcha Challenge on
-======== ==================================================
+ Solves a reCaptcha on the given Page
+
+|
 
 -  returns: ``reCaptchaKey``
 
 --------------
 
-Solve geeTest
+Solve geeTest_
 ~~~~~~~~~~~~~
 
 -  ``await page.solve_geetest()``
--  Solves a geeTest (v3 or v4) on the given Page
+..
 
-======== =================================================
-Args     Usage
-======== =================================================
-``page`` Specify the Page to solve a hCaptcha Challenge on
-======== =================================================
+ Solves a geeTest (v3 or v4) on the given Page
 
 +-------------------------------------+--------------------------------+
 | Kwargs                              | Usage                          |

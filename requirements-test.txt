@@ -1,7 +1,7 @@
 # This requirements are for development and testing only, not for production.
-pytest
-black
-isort
-mkdocs
-setuptools
-pytest_asyncio
+flake8==7.0.0
+tox==4.12.0
+pytest==7.4.4
+pytest_asyncio==0.23.3
+mypy==1.8.0
+types-setuptools==69.0.0.20240106

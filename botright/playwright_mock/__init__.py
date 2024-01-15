@@ -1,7 +1,25 @@
-from .element_handle import mock_element_handle
-from .frame import mock_frame
-from .frame_locator import mock_frame_locator
-from .js_handle import mock_js_handle
-from .locator import mock_locator
-from .mouse import mock_mouse
-from .page import new_page
+from .handles import ElementHandle, JSHandle
+from .frame import Frame
+from .frame_locator import FrameLocator
+from .routes import Route, Response, Request
+from .locator import Locator
+from .mouse import Mouse
+from .keyboard import Keyboard
+from .page import Page, new_page
+from .browser import BrowserContext
+
+__all__ = [
+    "ElementHandle",
+    "JSHandle",
+    "Frame",
+    "FrameLocator",
+    "Route",
+    "Response",
+    "Request",
+    "Locator",
+    "Mouse",
+    "Keyboard",
+    "Page",
+    "new_page",
+    "BrowserContext"
+]

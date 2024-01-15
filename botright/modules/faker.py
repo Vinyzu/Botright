@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import asyncio
 
+from chrome_fingerprints import ChromeFingerprint
 from async_class import AsyncObject, link
 
 from .proxy_manager import ProxyManager
 
 
 class Faker(AsyncObject):
-    async def __ainit__(self, botright, proxy) -> None:
+    locale: str = ""
+    language_code: str = ""
+    fingerprint: ChromeFingerprint
+
+    async def __ainit__(self, botright, proxy):
         """
         Initialize a Faker instance with a botright instance and a proxy, and generate fake data.
 
@@ -18,10 +23,6 @@ class Faker(AsyncObject):
         """
         self.botright = botright
         link(self, botright)
-
-        self.locale, self.language_code = None, None
-        self.useragent, self.vendor, self.gpu_vendor, self.renderer = None, None, None, None
-        self.width, self.height, self.avail_width, self.avail_height = None, None, None, None
 
         threads = [self.get_computer(), self.get_locale(proxy)]
         await asyncio.gather(*threads)
@@ -48,34 +49,7 @@ class Faker(AsyncObject):
         """
         Generate fake computer-related data such as user agent, vendor, GPU information, screen dimensions, etc.
         """
-        fingerprint = self.botright.fingerprint_generator.get_fingerprint()
-
-        self.useragent = fingerprint.get("userAgent")
-        self.vendor = fingerprint.get("renderer")
-        try:
-            self.gpu_vendor = fingerprint.get("videoCard").get("vendor")
-            self.renderer = fingerprint.get("videoCard").get("renderer")
-        except AttributeError:
-            self.gpu_vendor = 'Intel Inc.'
-            self.renderer = 'Intel Iris OpenGL Engine'
-
-        self.width = fingerprint.get("screen").get("width")
-        self.height = fingerprint.get("screen").get("height")
-        self.avail_width = fingerprint.get("screen").get("availWidth")
-        self.avail_height = fingerprint.get("screen").get("availHeight")
-
-        self.platform = fingerprint.get("platform")
-        self.brands = fingerprint.get("userAgentData").get("brands")
-        self.full_version_brands = fingerprint.get("userAgentData").get("fullVersionList")
-        self.architecture = fingerprint.get("userAgentData").get("architecture")
-        self.bitness = fingerprint.get("userAgentData").get("bitness")
-        self.platform_version = fingerprint.get("userAgentData").get("platformVersion")
-        self.full_version = fingerprint.get("userAgentData").get("uaFullVersion")
-
-        if self.avail_width == self.height:
-            self.avail_width = self.avail_width - 48
-        if self.avail_height == self.height:
-            self.avail_height = self.avail_height - 48
+        self.fingerprint = await self.botright.fingerprint_generator.get_fingerprint()
 
     async def get_locale(self, proxy: ProxyManager) -> None:
         """

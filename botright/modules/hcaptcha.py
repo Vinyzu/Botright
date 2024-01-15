@@ -1,8 +1,15 @@
 from __future__ import annotations
 
-from typing import Optional
+from pathlib import Path
+from typing import Optional, TYPE_CHECKING
 
-from playwright.async_api import BrowserContext, Page, Route, Request
+from hcaptcha_challenger.agents import AgentT
+
+if TYPE_CHECKING:
+    from botright.extended_typing import BrowserContext, Page
+
+tmp_dir = Path(__file__).parent.joinpath("tmp_dir")
+
 
 class hCaptcha:
     def __init__(self, browser: BrowserContext, page: Page) -> None:
@@ -13,29 +20,11 @@ class hCaptcha:
             browser (BrowserContext): The Playwright browser context to use.
             page (Page): The Playwright page where hCaptcha challenges will be solved.
         """
-        self.captcha_token = ""
-
         self.browser = browser
         self.page = page
 
-    async def log_captcha(self) -> None:
-        """
-        Log the hCaptcha token by intercepting network requests to checkcaptcha.
-
-        This method monitors network requests to capture the hCaptcha token when it is generated.
-        """
-        async def check_json(route: Route, request: Request):
-            await route.continue_()
-            try:
-                response = await request.response()
-                await response.finished()
-                json = await response.json()
-                if json.get("generated_pass_UUID"):
-                    hCaptcha.captcha_token = json.get("generated_pass_UUID")
-            except Exception:
-                pass
-
-        await self.page.route("https://hcaptcha.com/checkcaptcha/**", check_json)
+        self.retry_times = 8
+        self.hcaptcha_agent = AgentT.from_page(page=page, tmp_dir=tmp_dir, self_supervised=True)
 
     async def mock_captcha(self, rq_data: str) -> None:
         """
@@ -50,10 +39,6 @@ class hCaptcha:
 
             payload = {**request.post_data_json, "rqdata": rq_data, "hl": "en"} if rq_data else request.post_data_json
             response = await self.page.request.post(request.url, form=payload, headers=request.headers)
-            json = await response.json()
-
-            if json.get("generated_pass_UUID"):
-                hCaptcha.captcha_token = json.get("generated_pass_UUID")
             await route.fulfill(response=response)
 
         await self.page.route("https://hcaptcha.com/getcaptcha/**", mock_json)
@@ -71,16 +56,25 @@ class hCaptcha:
         This method captures the hCaptcha token by logging and mocking hCaptcha requests, then simulates clicking the
         hCaptcha checkbox to solve the challenge.
         """
-        self.captcha_token = None
-        # Logging Captcha Token
-        await self.log_captcha()
         # Mocking Captcha Request
-        await self.mock_captcha(rq_data)
+        if rq_data:
+            await self.mock_captcha(rq_data)
         # Clicking Captcha Checkbox
-        await self.page.hcaptcha_agent.handle_checkbox()
-        await self.page.hcaptcha_agent()
+        await self.hcaptcha_agent.handle_checkbox()
 
-        return self.captcha_token
+        for pth in range(1, self.retry_times):
+            result = await self.hcaptcha_agent.execute()
+            match result:
+                case self.hcaptcha_agent.status.CHALLENGE_BACKCALL:
+                    await self.page.wait_for_timeout(500)
+                    fl = self.page.frame_locator(self.hcaptcha_agent.HOOK_CHALLENGE)
+                    await fl.locator("//div[@class='refresh button']").click()
+                case self.hcaptcha_agent.status.CHALLENGE_SUCCESS:
+                    if self.hcaptcha_agent.cr:
+                        captcha_token: str = self.hcaptcha_agent.cr.generated_pass_UUID
+                        return captcha_token
+
+        return f"Exceeded maximum retry times of {self.retry_times}"
 
     async def get_hcaptcha(self, site_key: Optional[str] = "00000000-0000-0000-0000-000000000000", rq_data: Optional[str] = None) -> Optional[str]:
         """

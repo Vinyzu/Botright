@@ -1,9 +1,8 @@
-from .botright import *
-from .modules.faker import *
-from .modules.proxy_manager import *
+from .botright import Botright
+from .modules.faker import Faker
+from .modules.proxy_manager import ProxyManager
 
-firefox = "firefox"
-chromium = "chromium"
-webkit = "webkit"
 
-__all__ = ["firefox", "chromium", "webkit", "Botright", "Faker", "ProxyManager"]
+VERSION = 0.5
+
+__all__ = ["Botright", "Faker", "ProxyManager", "VERSION"]

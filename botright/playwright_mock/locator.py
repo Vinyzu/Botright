@@ -1,284 +1,344 @@
 from __future__ import annotations
 
-from typing import Optional
-
-from playwright.async_api import Locator, Page, JSHandle, ElementHandle, FrameLocator
-
-from . import element_handle, frame_locator, js_handle
+from typing import Optional, Any, Literal, Pattern, Union, Sequence, TYPE_CHECKING
 
 
-def attach_dyn_prop(locator: Locator, prop_name: str, prop: property) -> None:
-    """Attach property proper to instance with name prop_name.
+# from undetected_playwright.async_api import Position, Locator as PlaywrightLocator, ElementHandle as PlaywrightElementHandle, Error as PlaywrightError
+from playwright.async_api import Position, Locator as PlaywrightLocator, ElementHandle as PlaywrightElementHandle, Error as PlaywrightError
 
-    Reference:
-      * https://stackoverflow.com/a/1355444/509706
-      * https://stackoverflow.com/questions/48448074
-    """
-    class_name = locator.__class__.__name__ + "Child"
-    child_class = type(class_name, (locator.__class__,), {prop_name: prop})
-
-    locator.__class__ = child_class
+if TYPE_CHECKING:
+    from . import Page
+    from . import JSHandle
+    from . import FrameLocator
+    from . import ElementHandle
 
 
-def mock_locator(locator: Locator, page: Page) -> None:
-    locator_mocker = LocatorMock(locator, page)
+class Locator(PlaywrightLocator):
+    def __init__(self, locator: PlaywrightLocator, page: Page):
+        super().__init__(locator)
+        self._impl_obj = locator._impl_obj
+        self._page = page
+        self._origin_first = None
+        self._origin_last = None
 
-    async def click_mocker(button="left", click_count: Optional[int] = 1, delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        await locator_mocker.click(button=button, click_count=click_count, delay=delay, force=force, modifiers=modifiers, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+        self.origin_locator = locator.locator
+        locator.locator = self.locator
+        self.origin_evaluate_handle = locator.evaluate_handle
+        locator.evaluate_handle = self.evaluate_handle
+        self.origin_frame_locator = locator.frame_locator
+        locator.frame_locator = self.frame_locator
+        self.origin_element_handle = locator.element_handle
+        locator.element_handle = self.element_handle
+        self.origin_nth = locator.nth
+        locator.nth = self.nth
 
-    locator.click = click_mocker
+        self.origin_first = locator.first  # type: ignore
+        self.origin_last = locator.last  # type: ignore
 
-    async def dblclick_mocker(button="left", delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        await locator_mocker.dblclick(button=button, delay=delay, force=force, modifiers=modifiers, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+        # self._attach_dyn_prop(locator, "first", self.first)
+        # self._attach_dyn_prop(locator, "last", self.last)
 
-    locator.dblclick = dblclick_mocker
+        locator.click = self.click
+        locator.dblclick = self.dblclick
+        locator.check = self.check
+        locator.uncheck = self.uncheck
+        locator.set_checked = self.set_checked
+        locator.hover = self.hover
+        locator.type = self.type
 
-    async def check_mocker(force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        await locator_mocker.check(force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
+    @property
+    def page(self) -> Page:
+        return self._page
 
-    locator.check = check_mocker
-
-    async def uncheck_mocker(force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        await locator_mocker.uncheck(force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
-
-    locator.uncheck = uncheck_mocker
-
-    async def set_checked_mocker(checked: Optional[bool] = False, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        await locator_mocker.set_checked(checked=checked, force=force, no_wait_after=no_wait_after, position=position, timeout=timeout, trial=trial)
-
-    locator.set_checked = set_checked_mocker
-
-    async def hover_mocker(force: Optional[bool] = False, modifiers: Optional[list] = None, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        await locator_mocker.hover(force=force, modifiers=modifiers, position=position, timeout=timeout, trial=trial)
-
-    locator.hover = hover_mocker
-
-    async def type_mocker(text: str, delay: Optional[int] = 200, no_wait_after: Optional[bool] = False, timeout: Optional[float] = None) -> None:
-        await Locator.type(locator, text, delay=delay, no_wait_after=no_wait_after, timeout=timeout)
-
-    locator.type = type_mocker
+    def locator(self, selector_or_locator: Union[str, PlaywrightLocator], has_text: Optional[Union[str, Pattern[str]]] = None, has_not_text: Optional[Union[str, Pattern[str]]] = None,
+                has: Optional[PlaywrightLocator] = None, has_not: Optional[PlaywrightLocator] = None) -> Locator:
+        _locator = self.origin_locator(selector_or_locator, has=has, has_not=has_not, has_text=has_text, has_not_text=has_not_text)
+        locator = Locator(_locator, self._page)
+        return locator
 
     # JsHandle
-    async def mock_evaluate_handle(expression, arg=None) -> JSHandle:
-        _js_handle = await locator.origin_evaluate_handle(expression, arg=arg)
-        js_handle.mock_js_handle(_js_handle, locator.page)
-        return _js_handle
+    async def evaluate_handle(self, expression: str, arg: Optional[Any] = None, timeout: Optional[float] = None) -> Union[JSHandle, ElementHandle]:
+        from . import JSHandle, ElementHandle
 
-    locator.origin_evaluate_handle = locator.evaluate_handle
-    locator.evaluate_handle = mock_evaluate_handle
+        _js_handle = await self.origin_evaluate_handle(expression=expression, arg=arg, timeout=timeout)
+        if isinstance(_js_handle, PlaywrightElementHandle):
+            element_handle = ElementHandle(_js_handle, self._page)
+            return element_handle
+        else:
+            js_handle = JSHandle(_js_handle, self._page)
+            return js_handle
 
     # FrameLocator
-    def mock_frame_locator_func(selector) -> FrameLocator:
-        _frame_locator = locator.origin_frame_locator(selector)
-        frame_locator.mock_frame_locator(_frame_locator, page)
-        return _frame_locator
+    def frame_locator(self, selector) -> FrameLocator:
+        from . import FrameLocator
 
-    locator.origin_frame_locator = locator.frame_locator
-    locator.frame_locator = mock_frame_locator_func
+        _frame_locator = self.origin_frame_locator(selector=selector)
+        frame_locator = FrameLocator(_frame_locator, self._page)
+        return frame_locator
 
     # ElementHandle
-    async def element_handle_mocker(timeout: Optional[float] = None) -> ElementHandle:
-        element = await locator.origin_element_handle(timeout=timeout)
-        element_handle.mock_element_handle(element, page)
+    async def element_handle(self, timeout: Optional[float] = None) -> ElementHandle:
+        from . import ElementHandle
+
+        _element = await self.origin_element_handle(timeout=timeout)
+        element = ElementHandle(_element, self._page)
         return element
 
-    locator.origin_element_handle = locator.element_handle
-    locator.element_handle = element_handle_mocker
-
     # Locator
-    def nth_mocker(index) -> Locator:
-        _locator = locator.origin_nth(index)
-        mock_locator(_locator, page)
-        return _locator
-
-    locator.origin_nth = locator.nth
-    locator.nth = nth_mocker
+    def nth(self, index) -> Locator:
+        _locator = self.origin_nth(index=index)
+        locator = Locator(_locator, self._page)
+        return locator
 
     @property
-    def first_mocker(self) -> Locator:
-        _locator = locator.origin_first
-        mock_locator(_locator, page)
-        return _locator
+    def first(self) -> Locator:
+        _locator = self.origin_first
+
+        locator = Locator(_locator, self._page)
+        return locator
 
     @property
-    def last_mocker(self) -> Locator:
-        _locator = locator.origin_last
-        mock_locator(_locator, page)
-        return _locator
+    def origin_first(self):
+        return self._origin_first
 
-    locator.origin_first = locator.first
-    locator.origin_last = locator.last
+    @origin_first.setter
+    def origin_first(self, value):
+        self._origin_first = value
 
-    attach_dyn_prop(locator, "first", first_mocker)
-    attach_dyn_prop(locator, "last", last_mocker)
+    @property
+    def last(self) -> Locator:
+        _locator = self.origin_last
+        locator = Locator(_locator, self._page)
+        return locator
 
+    @property
+    def origin_last(self):
+        return self._origin_last
 
-class LocatorMock:
-    def __init__(self, locator: Locator, page: Page):
-        self.locator = locator
-        self.page = page
+    @origin_last.setter
+    def origin_last(self, value):
+        self._origin_last = value
 
-    async def click(self, button="left", click_count: Optional[int] = 1, delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def click(self, button: Optional[Literal["left", "middle", "right"]] = "left", click_count: Optional[int] = 1, delay: Optional[float] = 20.0, force: Optional[bool] = False,
+                    modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
+                    timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
         modifiers = modifiers or []
-        position = position or {}
+        position = position or Position(x=0, y=0)
 
         if not force:
-            await self.locator.wait_for(state="attached", timeout=timeout)
+            await self.wait_for(state="attached", timeout=timeout)
 
         if not trial:
-            if self.page.scroll_into_view:
-                await self.locator.scroll_into_view_if_needed(timeout=timeout)
+            bounding_box = await self.bounding_box()
+            if not bounding_box:
+                raise PlaywrightError("Element is not visible")
 
-            bounding_box = await self.locator.bounding_box()
-            x, y, width, height = bounding_box.values()
-            if not position:
+            if self._page.scroll_into_view:
+                await self.scroll_into_view_if_needed(timeout=timeout)
+
+            if not await self.is_visible():
+                raise PlaywrightError("Element is outside of the viewport")
+
+            x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
+            if not any(position.values()):
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
             for modifier in modifiers:
-                await self.page.keyboard.down(modifier)
+                await self._page.keyboard.down(modifier)
 
-            await self.page.mouse.click(x, y, button, click_count, delay)
+            await self._page.mouse.click(x=int(x), y=y, button=button, click_count=click_count, delay=delay)
 
             for modifier in modifiers:
-                await self.page.keyboard.up(modifier)
+                await self._page.keyboard.up(modifier)
 
-    async def dblclick(self, button="left", delay: Optional[int] = 20, force: Optional[bool] = False, modifiers: Optional[list] = None, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def dblclick(self, modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, position: Optional[Position] = None, delay: Optional[float] = 20.0,
+                       button: Optional[Literal["left", "middle", "right"]] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
+                       trial: Optional[bool] = None) -> None:
         modifiers = modifiers or []
-        position = position or {}
+        position = position or Position(x=0, y=0)
 
         if not force:
-            await self.locator.wait_for(state="attached", timeout=timeout)
+            await self.wait_for(state="attached", timeout=timeout)
 
         if not trial:
-            if self.page.scroll_into_view:
-                await self.locator.scroll_into_view_if_needed(timeout=timeout)
+            bounding_box = await self.bounding_box()
+            if not bounding_box:
+                raise PlaywrightError("Element is not visible")
 
-            bounding_box = await self.locator.bounding_box()
-            x, y, width, height = bounding_box.values()
-            if not position:
+            if self._page.scroll_into_view:
+                await self.scroll_into_view_if_needed(timeout=timeout)
+
+            if not await self.is_visible():
+                raise PlaywrightError("Element is outside of the viewport")
+
+            x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
+            if not any(position.values()):
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
             for modifier in modifiers:
-                await self.page.keyboard.down(modifier)
+                await self._page.keyboard.down(modifier)
 
-            await self.page.mouse.dblclick(x, y, button, delay)
+            await self._page.mouse.dblclick(x, y, button=button, delay=delay)
 
             for modifier in modifiers:
-                await self.page.keyboard.up(modifier)
+                await self._page.keyboard.up(modifier)
 
-    async def check(self, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        position = position or {}
+    async def check(self, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
+                    trial: Optional[bool] = None) -> None:
+        position = position or Position(x=0, y=0)
 
         if not force:
-            await self.locator.wait_for(state="attached", timeout=timeout)
+            await self.wait_for(state="attached", timeout=timeout)
 
-        if await self.locator.is_checked():
+        if await self.is_checked():
             return
 
         if not trial:
-            if self.page.scroll_into_view:
-                await self.locator.scroll_into_view_if_needed(timeout=timeout)
+            bounding_box = await self.bounding_box()
+            if not bounding_box:
+                raise PlaywrightError("Element is not visible")
 
-            bounding_box = await self.locator.bounding_box()
-            x, y, width, height = bounding_box.values()
-            if not position:
+            if self._page.scroll_into_view:
+                await self.scroll_into_view_if_needed(timeout=timeout)
+
+            if not await self.is_visible():
+                raise PlaywrightError("Element is outside of the viewport")
+
+            x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
+            if not any(position.values()):
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
-            await self.page.mouse.click(x, y, button="left", click_count=1, delay=20)
+            await self._page.mouse.click(x, y, button="left", click_count=1, delay=20)
 
-            assert await self.locator.is_checked()
+            assert await self.is_checked()
 
-    async def uncheck(self, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        position = position or {}
+    async def uncheck(self, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
+                      timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        position = position or Position(x=0, y=0)
 
         if not force:
-            await self.locator.wait_for(state="attached", timeout=timeout)
+            await self.wait_for(state="attached", timeout=timeout)
 
-        if not await self.locator.is_checked():
+        if not await self.is_checked():
             return
 
         if not trial:
-            if self.page.scroll_into_view:
-                await self.locator.scroll_into_view_if_needed(timeout=timeout)
+            bounding_box = await self.bounding_box()
+            if not bounding_box:
+                raise PlaywrightError("Element is not visible")
 
-            bounding_box = await self.locator.bounding_box()
-            x, y, width, height = bounding_box.values()
-            if not position:
+            if self._page.scroll_into_view:
+                await self.scroll_into_view_if_needed(timeout=timeout)
+
+            if not await self.is_visible():
+                raise PlaywrightError("Element is outside of the viewport")
+
+            x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
+            if not any(position.values()):
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
-            await self.page.mouse.click(x, y, button="left", click_count=1, delay=20)
+            await self._page.mouse.click(x, y, button="left", click_count=1, delay=20)
 
-            assert not await self.locator.is_checked()
+            assert not await self.is_checked()
 
-    async def set_checked(self, checked: Optional[bool] = False, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
-        position = position or {}
+    async def set_checked(self, checked: bool, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
+                          timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+        position = position or Position(x=0, y=0)
 
         if not force:
-            await self.locator.wait_for(state="attached", timeout=timeout)
+            await self.wait_for(state="attached", timeout=timeout)
 
-        if await self.locator.is_checked() == checked:
+        if await self.is_checked() == checked:
             return
 
         if not trial:
-            if self.page.scroll_into_view:
-                await self.locator.scroll_into_view_if_needed(timeout=timeout)
+            bounding_box = await self.bounding_box()
+            if not bounding_box:
+                raise PlaywrightError("Element is not visible")
 
-            bounding_box = await self.locator.bounding_box()
-            x, y, width, height = bounding_box.values()
-            if not position:
+            if self._page.scroll_into_view:
+                await self.scroll_into_view_if_needed(timeout=timeout)
+
+            if not await self.is_visible():
+                raise PlaywrightError("Element is outside of the viewport")
+
+            x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
+            if not any(position.values()):
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
-            await self.page.mouse.click(x, y, button="left", click_count=1, delay=20)
+            await self._page.mouse.click(x, y, button="left", click_count=1, delay=20)
 
-            assert await self.locator.is_checked()
+            assert await self.is_checked() == checked
 
-    async def hover(self, force: Optional[bool] = False, modifiers: Optional[list] = None, position: Optional[dict] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def hover(self, force: Optional[bool] = False, modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, position: Optional[Position] = None,
+                    timeout: Optional[float] = None, trial: Optional[bool] = False, no_wait_after: Optional[bool] = False) -> None:
         modifiers = modifiers or []
-        position = position or {}
+        position = position or Position(x=0, y=0)
 
         if not force:
-            await self.locator.wait_for(state="attached", timeout=timeout)
+            await self.wait_for(state="attached", timeout=timeout)
 
         if not trial:
-            if self.page.scroll_into_view:
-                await self.locator.scroll_into_view_if_needed(timeout=timeout)
+            bounding_box = await self.bounding_box()
+            if not bounding_box:
+                raise PlaywrightError("Element is not visible")
 
-            bounding_box = await self.locator.bounding_box()
-            x, y, width, height = bounding_box.values()
-            if not position:
+            if self._page.scroll_into_view:
+                await self.scroll_into_view_if_needed(timeout=timeout)
+
+            if not await self.is_visible():
+                raise PlaywrightError("Element is outside of the viewport")
+
+            x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
+            if not any(position.values()):
                 x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
             for modifier in modifiers:
-                await self.page.keyboard.down(modifier)
+                await self._page.keyboard.down(modifier)
 
-            await self.page.mouse.move(x, y)
+            await self._page.mouse.move(x, y)
 
             for modifier in modifiers:
-                await self.page.keyboard.up(modifier)
+                await self._page.keyboard.up(modifier)
 
-    async def type(self, text: str, delay: Optional[int] = 200, no_wait_after: Optional[bool] = False, timeout: Optional[float] = None) -> None:
-        await self.locator.wait_for(state="attached", timeout=timeout)
+    async def type(self, text: str, delay: Optional[float] = 200.0, no_wait_after: Optional[bool] = False, timeout: Optional[float] = None) -> None:
+        await self.wait_for(state="attached", timeout=timeout)
 
-        if self.page.scroll_into_view:
-            await self.locator.scroll_into_view_if_needed(timeout=timeout)
+        bounding_box = await self.bounding_box()
+        if not bounding_box:
+            raise PlaywrightError("Element is not visible")
 
-        bounding_box = await self.locator.bounding_box()
-        x, y, width, height = bounding_box.values()
+        if self._page.scroll_into_view:
+            await self.scroll_into_view_if_needed(timeout=timeout)
+
+        x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
 
         x, y = x + width // 2, y + height // 2
 
         await self.click(delay=delay)
 
-        await self.page.keyboard.type(text, delay=delay)
+        await self._page.keyboard.type(text, delay=delay)
+
+    def _attach_dyn_prop(self, locator: Locator, prop_name: str, prop: Any) -> None:
+        """Attach property proper to instance with name prop_name.y
+
+        Reference:
+          * https://stackoverflow.com/a/1355444/509706
+          * https://stackoverflow.com/questions/48448074
+        """
+        class_name = locator.__class__.__name__ + "Child"
+        child_class = type(class_name, (locator.__class__,), {prop_name: prop})
+
+        locator.__class__ = child_class

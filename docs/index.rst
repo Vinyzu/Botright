@@ -19,6 +19,7 @@ Pip
    pip install --upgrade pip
    pip install botright
    playwright install
+   python -c 'import hcaptcha_challenger; solver.install(clip=True)'
 
 Usage
 -----
@@ -60,13 +61,13 @@ Here all Captchas supported as of now
 +----------------------+-----------+---------------------------------+---------------------------+
 |                      |           |                                 |                           |
 +----------------------+-----------+---------------------------------+---------------------------+
-| **reCaptcha**        | Temp. Not | recaptcha-challenger            | 50%-80%                   |
+| **reCaptcha**        | Yes       | reCognizer                      | 50%-80%                   |
 +----------------------+-----------+---------------------------------+---------------------------+
 |                      |           |                                 |                           |
 +----------------------+-----------+---------------------------------+---------------------------+
 | **geeTestv3**        | Temp. Not |                                 |                           |
 +----------------------+-----------+---------------------------------+---------------------------+
-| v3 Intelligent Mode  | Yes       | botrights stealthiness          | 100%                      |
+| v3 Intelligent Mode  | Yes       | botright´s stealthiness          | 100%                      |
 +----------------------+-----------+---------------------------------+---------------------------+
 | v3 Slider Captcha    | Yes       | cv2.matchTemplate               | 100%                      |
 +----------------------+-----------+---------------------------------+---------------------------+
@@ -80,7 +81,7 @@ Here all Captchas supported as of now
 +----------------------+-----------+---------------------------------+---------------------------+
 | **geeTestv4**        | Temp. Not |                                 |                           |
 +----------------------+-----------+---------------------------------+---------------------------+
-| v4 Intelligent Mode  | Yes       | botrights stealthiness          | 100%                      |
+| v4 Intelligent Mode  | Yes       | botright´s stealthiness          | 100%                      |
 +----------------------+-----------+---------------------------------+---------------------------+
 | v4 Slider Captcha    | Yes       | cv2.matchTemplate               | 100%                      |
 +----------------------+-----------+---------------------------------+---------------------------+
@@ -91,11 +92,17 @@ Here all Captchas supported as of now
 | v4 IconCrush Captcha | Yes       | Math Calculations               | 100%                      |
 +----------------------+-----------+---------------------------------+---------------------------+
 
+Proxies
+--------
+
+Botright currently only supports HTTP(S) proxies.
+You can use almost every common format, but if you want to go safe, use ``ip:port`` or ``username:password@ip:port`` for auth proxies.
+
 First script
 ------------
 
 In our first script, we will navigate to `Creep.js <https://abrahamjuliot.github.io/creepjs/>`__ and
-take a screenshot in WebKit.
+take a screenshot in Chromium.
 
 .. code:: py
 
@@ -131,6 +138,14 @@ and then launch Botright within it for quick experimentation:
 .. code:: py
 
    >>> import botright
+      >>> botright_client = await botright.Botright()
+      # Pass headless=False to botright.Botright() to see the browser UI
+      >>> browser = await botright_client.new_browser()
+      >>> page = await browser.new_page()
+      >>> await page.goto("https://abrahamjuliot.github.io/creepjs/")
+      >>> await page.wait_for_timeout(5000) # Wait for stats to load
+      >>> await page.screenshot(path="example.png", full_page=True)
+      >>> await botright_client.close()
    >>> botright_client = await botright.Botright()
    # Pass headless=False to botright.Botright() to see the browser UI
    >>> browser = await botright_client.new_browser()
@@ -191,7 +206,7 @@ Known issues
 Threading
 ~~~~~~~~~
 
-Botrights API is not thread-safe. If you are using Botright in a
+Botright´s API is not thread-safe. If you are using Botright in a
 multi-threaded environment, you should create a botright instance per
 thread. See `threading
 issue <https://github.com/microsoft/playwright-python/issues/623>`__ for

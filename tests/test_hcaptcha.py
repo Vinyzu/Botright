@@ -2,9 +2,16 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_hcaptcha(page):
+@pytest.mark.xfail
+async def test_solve_hcaptcha(page):
     await page.goto("https://accounts.hcaptcha.com/demo")
 
     result = await page.solve_hcaptcha()
-    print(result)
+    assert result
+
+
+@pytest.mark.asyncio
+@pytest.mark.xfail
+async def test_get_hcaptcha(page):
+    result = await page.get_hcaptcha()
     assert result

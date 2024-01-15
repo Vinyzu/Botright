@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Dict, Optional
 
 import httpx
 from async_class import AsyncObject, link
+
 
 class SplitError(Exception):
     pass
@@ -14,6 +15,25 @@ class ProxyCheckError(Exception):
 
 
 class ProxyManager(AsyncObject):
+    proxy: str = ""
+    http_proxy: Dict[str, str] = {}
+    browser_proxy: Optional[Dict[str, str]] = None
+    plain_proxy: str = ""
+    _httpx: httpx.AsyncClient
+    _phttpx: httpx.AsyncClient
+    ip: str = ""
+    port: str = ""
+    username: str = ""
+    password: str = ""
+    country: str = ""
+    country_code: str = ""
+    region: str = ""
+    city: str = ""
+    zip: str = ""
+    latitude: str = ""
+    longitude: str = ""
+    timezone: str = ""
+
     async def __ainit__(self, botright, proxy: str) -> None:
         """
         Initialize a ProxyManager instance with a proxy string and perform proxy checks.
@@ -24,22 +44,16 @@ class ProxyManager(AsyncObject):
         """
         link(self, botright)
 
-        self.proxy, self.http_proxy = proxy.strip() if proxy else None, None
-        self.ip, self.port, self.username, self.password = None,  None, None, None
-        self.browser_proxy, self.plain_proxy = None, None
-
-        self.country, self.country_code = None, None
-        self.region, self.city, self.zip = None, None, None
-        self.latitude, self.longitude, self.timezone = None, None, None
+        self.proxy = proxy.strip() if proxy else ""
 
         self.timeout = httpx.Timeout(20.0, read=None)
-        self.httpx = httpx.AsyncClient()
+        self._httpx = httpx.AsyncClient()
 
         if self.proxy:
             self.split_proxy()
             self.proxy = f"{self.username}:{self.password}@{self.ip}:{self.port}" if self.username else f"{self.ip}:{self.port}"
             self.plain_proxy = f"http://{self.proxy}"
-            self.phttpx = httpx.AsyncClient(proxies={"all://": self.plain_proxy})
+            self._phttpx = httpx.AsyncClient(proxies={"all://": self.plain_proxy})
             self.http_proxy = {"http": self.plain_proxy, "https": self.plain_proxy}
 
             if self.username:
@@ -47,15 +61,15 @@ class ProxyManager(AsyncObject):
             else:
                 self.browser_proxy = {"server": self.plain_proxy}
 
-            await self.check_proxy(self.phttpx)
+            await self.check_proxy(self._phttpx)
 
         else:
-            self.phttpx = self.httpx
-            await self.check_proxy(self.httpx)
+            self._phttpx = self._httpx
+            await self.check_proxy(self._phttpx)
 
     async def __adel__(self) -> None:
-        await self.httpx.aclose()
-        await self.phttpx.aclose()
+        await self._httpx.aclose()
+        await self._phttpx.aclose()
 
     def split_helper(self, split_proxy: List[str]) -> None:
         """
@@ -91,24 +105,24 @@ class ProxyManager(AsyncObject):
 
     async def check_proxy(self, httpx_client: httpx.AsyncClient) -> None:
         """
-Check the validity of the proxy by making HTTP requests to determine its properties.
+        Check the validity of the proxy by making HTTP requests to determine its properties.
 
-Args:
-    httpx_client (httpx.AsyncClient): The HTTPX client to use for proxy checks.
-"""
+        Args:
+            httpx_client (httpx.AsyncClient): The HTTPX client to use for proxy checks.
+        """
         try:
             ip_request = await httpx_client.get("http://jsonip.com", timeout=self.timeout)
             ip = ip_request.json().get("ip")
-        except Exception as e:
+        except Exception:
 
             # Trying again on different site (jsonip.com is known to have downtimes)
             try:
                 ip_request = await httpx_client.get("http://httpbin.org/ip", timeout=self.timeout)
                 ip = ip_request.json().get("origin")
-            except Exception as e:
+            except Exception:
                 raise ProxyCheckError("Could not get IP-Address of Proxy (Proxy is Invalid/Timed Out)")
         try:
-            r = await self.httpx.get(f"http://ip-api.com/json/{ip}", timeout=self.timeout)
+            r = await self._httpx.get(f"http://ip-api.com/json/{ip}", timeout=self.timeout)
             data = r.json()
             self.country = data.get("country")
             self.country_code = data.get("countryCode")
@@ -121,5 +135,5 @@ Args:
 
             if not self.country:
                 raise ProxyCheckError("Could not get GeoInformation from proxy (Proxy is probably not Indexed)")
-        except Exception as e:
+        except Exception:
             raise ProxyCheckError("Could not get GeoInformation from proxy (Proxy is probably not Indexed)")

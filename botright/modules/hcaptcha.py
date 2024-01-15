@@ -64,15 +64,14 @@ class hCaptcha:
 
         for pth in range(1, self.retry_times):
             result = await self.hcaptcha_agent.execute()
-            match result:
-                case self.hcaptcha_agent.status.CHALLENGE_BACKCALL:
-                    await self.page.wait_for_timeout(500)
-                    fl = self.page.frame_locator(self.hcaptcha_agent.HOOK_CHALLENGE)
-                    await fl.locator("//div[@class='refresh button']").click()
-                case self.hcaptcha_agent.status.CHALLENGE_SUCCESS:
-                    if self.hcaptcha_agent.cr:
-                        captcha_token: str = self.hcaptcha_agent.cr.generated_pass_UUID
-                        return captcha_token
+            if result == self.hcaptcha_agent.status.CHALLENGE_BACKCALL:
+                await self.page.wait_for_timeout(500)
+                fl = self.page.frame_locator(self.hcaptcha_agent.HOOK_CHALLENGE)
+                await fl.locator("//div[@class='refresh button']").click()
+            elif result == self.hcaptcha_agent.status.CHALLENGE_SUCCESS:
+                if self.hcaptcha_agent.cr:
+                    captcha_token: str = self.hcaptcha_agent.cr.generated_pass_UUID
+                    return captcha_token
 
         return f"Exceeded maximum retry times of {self.retry_times}"
 

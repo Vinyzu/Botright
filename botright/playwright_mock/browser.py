@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import inspect
 from tempfile import TemporaryDirectory
 from typing import Optional, Pattern, Callable, Any, List, Dict, Union, TYPE_CHECKING, TypedDict
@@ -66,7 +67,10 @@ async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, fla
                                    "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None,
                                    **launch_arguments}  # self.faker.locale
 
-    temp_dir = TemporaryDirectory(prefix="botright-", ignore_cleanup_errors=True)
+    if sys.version_info.minor >= 10:
+        temp_dir = TemporaryDirectory(prefix="botright-", ignore_cleanup_errors=True)
+    else:
+        temp_dir = TemporaryDirectory(prefix="botright-")
     temp_dir_path = temp_dir.name
     botright.temp_dirs.append(temp_dir)
 

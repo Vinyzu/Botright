@@ -137,10 +137,6 @@ dmypy.json
 
 .idea
 .vscode
-tests/**
-!tests/*.py
-!tests/playwright_tests/
-!tests/playwright_tests/*.py
 
 # Yolo Models
 *.pt

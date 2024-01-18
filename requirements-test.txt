@@ -5,4 +5,3 @@ pytest==7.4.4
 pytest_asyncio==0.23.3
 mypy==1.8.0
 types-setuptools==69.0.0.20240106
-pytest-xdist==3.5.0

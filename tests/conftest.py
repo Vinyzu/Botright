@@ -14,7 +14,7 @@ def utils():
 
 @pytest_asyncio.fixture  # (scope="session")
 async def botright_client():
-    botright_client = await botright.Botright(headless=True)
+    botright_client = await botright.Botright(headless=False)
     yield botright_client
     await botright_client.close()
 

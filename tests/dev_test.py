@@ -3,7 +3,7 @@ import botright
 
 
 async def main():
-    botright_client = await botright.Botright(headless=True, use_undetected_playwright=False, mask_fingerprint=False)
+    botright_client = await botright.Botright(headless=True)
     browser = await botright_client.new_browser()
 
     # single_url = ["https://abrahamjuliot.github.io/creepjs/", "https://nowsecure.nl/#relax"]
@@ -17,14 +17,6 @@ async def main():
     # for url in all_urls:
     #     page = await browser.new_page()
     #     await page.goto(url)
-
-    page = await browser.new_page()
-
-    await page.goto("https://abrahamjuliot.github.io/creepjs/")
-
-    await asyncio.sleep(5)
-    await page.screenshot(path="screen.png")
-    await botright_client.close()
 
     # await page.goto("https://www.aircanada.com/aeroplan/redeem/availability/outbound?org0=JFK&dest0=LHR&departureDate0=2024-01-01&lang=en-CA")
 

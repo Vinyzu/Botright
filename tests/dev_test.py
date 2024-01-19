@@ -5,6 +5,7 @@ import botright
 async def main():
     botright_client = await botright.Botright(headless=True)
     # browser = await botright_client.new_browser()
+    # page = await browser.new_page()
 
     # single_url = ["https://abrahamjuliot.github.io/creepjs/", "https://nowsecure.nl/#relax"]
     # webrtc_urls = ["https://browserleaks.com/webrtc", "https://www.expressvpn.com/en/webrtc-leak-test", "https://www.vpnmentor.com/tools/ip-leak-test-vpns-tor/",

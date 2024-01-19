@@ -40,9 +40,9 @@ async def test_closed_should_not_visible_in_context_pages(browser):
     assert page not in browser.pages
 
 
-async def close_should_run_beforeunload_if_asked_for(browser):
+async def close_should_run_beforeunload_if_asked_for(browser, server):
     page = await browser.new_page()
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/beforeunload.html")
+    await page.goto(server.PREFIX + "/beforeunload.html")
     # We have to interact with a page so that 'beforeunload' handlers
     # fire.
     await page.click("body")
@@ -59,9 +59,9 @@ async def close_should_run_beforeunload_if_asked_for(browser):
 
 
 @pytest.mark.asyncio
-async def test_close_should_not_run_beforeunload_by_default(browser):
+async def test_close_should_not_run_beforeunload_by_default(browser, server):
     page = await browser.new_page()
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/beforeunload.html")
+    await page.goto(server.PREFIX + "/beforeunload.html")
     # We have to interact with a page so that 'beforeunload' handlers
     # fire.
     await page.click("body")
@@ -69,12 +69,12 @@ async def test_close_should_not_run_beforeunload_by_default(browser):
 
 
 @pytest.mark.asyncio
-async def test_should_be_able_to_navigate_away_from_page_with_before_unload(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/beforeunload.html")
+async def test_should_be_able_to_navigate_away_from_page_with_before_unload(page: Page, server):
+    await page.goto(server.PREFIX + "/beforeunload.html")
     # We have to interact with a page so that 'beforeunload' handlers
     # fire.
     await page.click("body")
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
 
 
 @pytest.mark.asyncio
@@ -86,18 +86,18 @@ async def test_close_should_set_the_page_close_state(browser):
 
 
 @pytest.mark.asyncio
-async def test_close_should_terminate_network_waiters(browser):
+async def test_close_should_terminate_network_waiters(browser, server):
     page = await browser.new_page()
 
     async def wait_for_request():
         with pytest.raises(Error) as exc_info:
-            async with page.expect_request("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"):
+            async with page.expect_request(server.EMPTY_PAGE):
                 pass
         return exc_info.value
 
     async def wait_for_response():
         with pytest.raises(Error) as exc_info:
-            async with page.expect_response("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"):
+            async with page.expect_response(server.EMPTY_PAGE):
                 pass
         return exc_info.value
 
@@ -127,12 +127,12 @@ async def test_load_should_fire_when_expected(page):
 
 
 @pytest.mark.asyncio
-async def test_async_stacks_should_work(page):
+async def test_async_stacks_should_work(page, server):
     await page.route(
         "**/empty.html", lambda route, response: asyncio.create_task(route.abort())
     )
     with pytest.raises(Error) as exc_info:
-        await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+        await page.goto(server.EMPTY_PAGE)
     assert __file__ in exc_info.value.stack
 
 
@@ -164,35 +164,35 @@ async def test_domcontentloaded_should_fire_when_expected(page):
 
 
 @pytest.mark.asyncio
-async def test_wait_for_request(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    async with page.expect_request("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png") as request_info:
+async def test_wait_for_request(page, server):
+    await page.goto(server.EMPTY_PAGE)
+    async with page.expect_request(server.PREFIX + "/digits/2.png") as request_info:
         await page.evaluate(
             """() => {
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/3.png')
+                fetch('/digits/1.png')
+                fetch('/digits/2.png')
+                fetch('/digits/3.png')
             }"""
         )
     request = await request_info.value
-    assert request.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+    assert request.url == server.PREFIX + "/digits/2.png"
 
 
 @pytest.mark.asyncio
-async def test_wait_for_request_should_work_with_predicate(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_wait_for_request_should_work_with_predicate(page, server):
+    await page.goto(server.EMPTY_PAGE)
     async with page.expect_request(
-            lambda request: request.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+            lambda request: request.url == server.PREFIX + "/digits/2.png"
     ) as request_info:
         await page.evaluate(
             """() => {
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/3.png')
+                fetch('/digits/1.png')
+                fetch('/digits/2.png')
+                fetch('/digits/3.png')
             }"""
         )
     request = await request_info.value
-    assert request.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+    assert request.url == server.PREFIX + "/digits/2.png"
 
 
 @pytest.mark.asyncio
@@ -213,29 +213,29 @@ async def test_wait_for_request_should_respect_default_timeout(page):
 
 
 @pytest.mark.asyncio
-async def test_wait_for_request_should_work_with_no_timeout(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_wait_for_request_should_work_with_no_timeout(page, server):
+    await page.goto(server.EMPTY_PAGE)
     async with page.expect_request(
-            "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png", timeout=0
+            server.PREFIX + "/digits/2.png", timeout=0
     ) as request_info:
         await page.evaluate(
             """() => setTimeout(() => {
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/3.png')
+                fetch('/digits/1.png')
+                fetch('/digits/2.png')
+                fetch('/digits/3.png')
             }, 50)"""
         )
     request = await request_info.value
-    assert request.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+    assert request.url == server.PREFIX + "/digits/2.png"
 
 
 @pytest.mark.asyncio
-async def test_wait_for_request_should_work_with_url_match(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_wait_for_request_should_work_with_url_match(page: Page, server):
+    await page.goto(server.EMPTY_PAGE)
     async with page.expect_request(re.compile(r"digits\/\d\.png")) as request_info:
-        await page.evaluate("fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png')")
+        await page.evaluate("fetch('/digits/1.png')")
     request = await request_info.value
-    assert request.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png"
+    assert request.url == server.PREFIX + "/digits/1.png"
 
 
 @pytest.mark.asyncio
@@ -247,18 +247,18 @@ async def test_wait_for_event_should_fail_with_error_upon_disconnect(page):
 
 
 @pytest.mark.asyncio
-async def test_wait_for_response_should_work(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    async with page.expect_response("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png") as response_info:
+async def test_wait_for_response_should_work(page, server):
+    await page.goto(server.EMPTY_PAGE)
+    async with page.expect_response(server.PREFIX + "/digits/2.png") as response_info:
         await page.evaluate(
             """() => {
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/3.png')
+                fetch('/digits/1.png')
+                fetch('/digits/2.png')
+                fetch('/digits/3.png')
             }"""
         )
     response = await response_info.value
-    assert response.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+    assert response.url == server.PREFIX + "/digits/2.png"
 
 
 @pytest.mark.asyncio
@@ -279,42 +279,42 @@ async def test_wait_for_response_should_respect_default_timeout(page):
 
 
 @pytest.mark.asyncio
-async def test_wait_for_response_should_work_with_predicate(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_wait_for_response_should_work_with_predicate(page, server):
+    await page.goto(server.EMPTY_PAGE)
     async with page.expect_response(
-            lambda response: response.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+            lambda response: response.url == server.PREFIX + "/digits/2.png"
     ) as response_info:
         await page.evaluate(
             """() => {
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/3.png')
+                fetch('/digits/1.png')
+                fetch('/digits/2.png')
+                fetch('/digits/3.png')
             }"""
         )
     response = await response_info.value
-    assert response.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+    assert response.url == server.PREFIX + "/digits/2.png"
 
 
 @pytest.mark.asyncio
-async def test_wait_for_response_should_work_with_no_timeout(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    async with page.expect_response("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png") as response_info:
+async def test_wait_for_response_should_work_with_no_timeout(page, server):
+    await page.goto(server.EMPTY_PAGE)
+    async with page.expect_response(server.PREFIX + "/digits/2.png") as response_info:
         await page.evaluate(
             """() => {
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/1.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png')
-                fetch('https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/3.png')
+                fetch('/digits/1.png')
+                fetch('/digits/2.png')
+                fetch('/digits/3.png')
             }"""
         )
     response = await response_info.value
-    assert response.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/digits/2.png"
+    assert response.url == server.PREFIX + "/digits/2.png"
 
 
 @pytest.mark.asyncio
 async def test_wait_for_response_should_use_context_timeout(
-        page: Page, browser: BrowserContext
+        page: Page, browser: BrowserContext, server
 ) -> None:
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
 
     browser.set_default_timeout(1000)
     with pytest.raises(Error) as exc_info:
@@ -387,9 +387,9 @@ async def test_expose_function_should_be_callable_from_inside_add_init_script(pa
 
 
 @pytest.mark.asyncio
-async def test_expose_function_should_survive_navigation(page):
+async def test_expose_function_should_survive_navigation(page, server):
     await page.expose_function("compute", lambda a, b: a * b)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     result = await page.evaluate("compute(9, 4)")
     assert result == 36
 
@@ -404,26 +404,26 @@ async def test_expose_function_should_await_returned_promise(page):
 
 
 @pytest.mark.asyncio
-async def test_expose_function_should_work_on_frames(page):
+async def test_expose_function_should_work_on_frames(page, server):
     await page.expose_function("compute", lambda a, b: a * b)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/frames/nested-frames.html")
+    await page.goto(server.PREFIX + "/frames/nested-frames.html")
     frame = page.frames[1]
     assert await frame.evaluate("compute(3, 5)") == 15
 
 
 @pytest.mark.asyncio
-async def test_expose_function_should_work_on_frames_before_navigation(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/frames/nested-frames.html")
+async def test_expose_function_should_work_on_frames_before_navigation(page, server):
+    await page.goto(server.PREFIX + "/frames/nested-frames.html")
     await page.expose_function("compute", lambda a, b: a * b)
     frame = page.frames[1]
     assert await frame.evaluate("compute(3, 5)") == 15
 
 
 @pytest.mark.asyncio
-async def test_expose_function_should_work_after_cross_origin_navigation(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_expose_function_should_work_after_cross_origin_navigation(page, server):
+    await page.goto(server.EMPTY_PAGE)
     await page.expose_function("compute", lambda a, b: a * b)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.CROSS_PROCESS_PREFIX + "/empty.html")
     assert await page.evaluate("compute(9, 4)") == 36
 
 
@@ -449,8 +449,8 @@ async def test_expose_bindinghandle_should_work(page):
 
 
 @pytest.mark.asyncio
-async def test_page_error_should_fire(page):
-    url = "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/error.html"
+async def test_page_error_should_fire(page, server):
+    url = server.PREFIX + "/error.html"
     async with page.expect_event("pageerror") as error_info:
         await page.goto(url)
     error = await error_info.value
@@ -546,7 +546,7 @@ async def test_set_content_should_respect_default_navigation_timeout(page):
     await page.route(img_path, lambda route, request: None)
 
     with pytest.raises(Error) as exc_info:
-        await page.set_content('<img src="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/img.png"></img>')
+        await page.set_content('<img src=server.PREFIX + "/img.png"></img>')
     assert "Timeout 1ms exceeded" in exc_info.value.message
     assert exc_info.type is TimeoutError
 
@@ -558,7 +558,7 @@ async def test_set_content_should_await_resources_to_load(page):
     loaded = []
 
     async def load():
-        await page.set_content('<img src="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/img.png"></img>')
+        await page.set_content('<img src=server.PREFIX + "/img.png"></img>')
         loaded.append(True)
 
     content_promise = asyncio.create_task(load())
@@ -594,25 +594,25 @@ async def test_set_content_should_work_with_newline(page):
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_work_with_a_url(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    script_handle = await page.add_script_tag(url="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/injectedfile.js")
+async def test_add_script_tag_should_work_with_a_url(page, server):
+    await page.goto(server.EMPTY_PAGE)
+    script_handle = await page.add_script_tag(url=server.PREFIX + "/injectedfile.js")
     assert script_handle.as_element()
     assert await page.evaluate("__injected") == 42
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_work_with_a_url_and_type_module(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await page.add_script_tag(url="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/es6/es6import.js", type="module")
+async def test_add_script_tag_should_work_with_a_url_and_type_module(page, server):
+    await page.goto(server.EMPTY_PAGE)
+    await page.add_script_tag(url=server.PREFIX + "/es6/es6import.js", type="module")
     assert await page.evaluate("__es6injected") == 42
 
 
 @pytest.mark.asyncio
 async def test_add_script_tag_should_work_with_a_path_and_type_module(
-        page, assetdir
+        page, assetdir, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     await page.add_script_tag(path=assetdir / "es6" / "es6pathimport.js", type="module")
     await page.wait_for_function("window.__es6injected")
     assert await page.evaluate("__es6injected") == 42
@@ -620,17 +620,17 @@ async def test_add_script_tag_should_work_with_a_path_and_type_module(
 
 @pytest.mark.asyncio
 async def test_add_script_tag_should_throw_an_error_if_loading_from_url_fail(
-        page
+        page, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     with pytest.raises(Error) as exc_info:
-        await page.add_script_tag(url="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/nonexistfile.js")
+        await page.add_script_tag(url=server.PREFIX + "/nonexistfile.js")
     assert exc_info.value
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_work_with_a_path(page, assetdir):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_add_script_tag_should_work_with_a_path(page, assetdir, server):
+    await page.goto(server.EMPTY_PAGE)
     script_handle = await page.add_script_tag(path=assetdir / "injectedfile.js")
     assert script_handle.as_element()
     assert await page.evaluate("__injected") == 42
@@ -638,18 +638,18 @@ async def test_add_script_tag_should_work_with_a_path(page, assetdir):
 
 @pytest.mark.asyncio
 async def test_add_script_tag_should_include_source_url_when_path_is_provided(
-        page, assetdir
+        page, assetdir, server
 ):
     # Lacking sourceURL support in WebKit
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     await page.add_script_tag(path=assetdir / "injectedfile.js")
     result = await page.evaluate("__injectedError.stack")
     assert os.path.join("assets", "injectedfile.js") in result
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_work_with_content(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_add_script_tag_should_work_with_content(page, server):
+    await page.goto(server.EMPTY_PAGE)
     script_handle = await page.add_script_tag(content="window.__injected = 35;")
     assert script_handle.as_element()
     assert await page.evaluate("__injected") == 35
@@ -657,10 +657,10 @@ async def test_add_script_tag_should_work_with_content(page):
 
 @pytest.mark.asyncio
 async def test_add_script_tag_should_throw_when_added_with_content_to_the_csp_page(
-        page
+        page, server
 ):
     # Firefox fires onload for blocked script before it issues the CSP console error.
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/csp.html")
+    await page.goto(server.PREFIX + "/csp.html")
     with pytest.raises(Error) as exc_info:
         await page.add_script_tag(content="window.__injected = 35;")
     assert exc_info.value
@@ -668,19 +668,19 @@ async def test_add_script_tag_should_throw_when_added_with_content_to_the_csp_pa
 
 @pytest.mark.asyncio
 async def test_add_script_tag_should_throw_a_nice_error_when_the_request_fails(
-        page
+        page, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    url = "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/this_does_not_exist.js"
+    await page.goto(server.EMPTY_PAGE)
+    url = server.PREFIX + "/this_does_not_exist.js"
     with pytest.raises(Error) as exc_info:
         await page.add_script_tag(url=url)
     assert url in exc_info.value.message
 
 
 @pytest.mark.asyncio
-async def test_add_style_tag_should_work_with_a_url(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    style_handle = await page.add_style_tag(url="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/injectedstyle.css")
+async def test_add_style_tag_should_work_with_a_url(page, server):
+    await page.goto(server.EMPTY_PAGE)
+    style_handle = await page.add_style_tag(url=server.PREFIX + "/injectedstyle.css")
     assert style_handle.as_element()
     assert (
             await page.evaluate(
@@ -692,17 +692,17 @@ async def test_add_style_tag_should_work_with_a_url(page):
 
 @pytest.mark.asyncio
 async def test_add_style_tag_should_throw_an_error_if_loading_from_url_fail(
-        page
+        page, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     with pytest.raises(Error) as exc_info:
-        await page.add_style_tag(url="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/nonexistfile.js")
+        await page.add_style_tag(url=server.PREFIX + "/nonexistfile.js")
     assert exc_info.value
 
 
 @pytest.mark.asyncio
-async def test_add_style_tag_should_work_with_a_path(page, assetdir):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_add_style_tag_should_work_with_a_path(page, assetdir, server):
+    await page.goto(server.EMPTY_PAGE)
     style_handle = await page.add_style_tag(path=assetdir / "injectedstyle.css")
     assert style_handle.as_element()
     assert (
@@ -715,9 +715,9 @@ async def test_add_style_tag_should_work_with_a_path(page, assetdir):
 
 @pytest.mark.asyncio
 async def test_add_style_tag_should_include_source_url_when_path_is_provided(
-        page, assetdir
+        page, assetdir, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     await page.add_style_tag(path=assetdir / "injectedstyle.css")
     style_handle = await page.query_selector("style")
     style_content = await page.evaluate("style => style.innerHTML", style_handle)
@@ -725,8 +725,8 @@ async def test_add_style_tag_should_include_source_url_when_path_is_provided(
 
 
 @pytest.mark.asyncio
-async def test_add_style_tag_should_work_with_content(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_add_style_tag_should_work_with_content(page, server):
+    await page.goto(server.EMPTY_PAGE)
     style_handle = await page.add_style_tag(content="body { background-color: green; }")
     assert style_handle.as_element()
     assert (
@@ -739,32 +739,32 @@ async def test_add_style_tag_should_work_with_content(page):
 
 @pytest.mark.asyncio
 async def test_add_style_tag_should_throw_when_added_with_content_to_the_CSP_page(
-        page
+        page, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/csp.html")
+    await page.goto(server.PREFIX + "/csp.html")
     with pytest.raises(Error) as exc_info:
         await page.add_style_tag(content="body { background-color: green; }")
     assert exc_info.value
 
 
 @pytest.mark.asyncio
-async def test_url_should_work(page):
+async def test_url_should_work(page, server):
     assert page.url == "about:blank"
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    assert page.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"
+    await page.goto(server.EMPTY_PAGE)
+    assert page.url == server.EMPTY_PAGE
 
 
 @pytest.mark.asyncio
-async def test_url_should_include_hashes(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html" + "#hash")
-    assert page.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html" + "#hash"
+async def test_url_should_include_hashes(page, server):
+    await page.goto(server.EMPTY_PAGE + "#hash")
+    assert page.url == server.EMPTY_PAGE + "#hash"
     await page.evaluate("window.location.hash = 'dynamic'")
-    assert page.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html" + "#dynamic"
+    assert page.url == server.EMPTY_PAGE + "#dynamic"
 
 
 @pytest.mark.asyncio
-async def test_title_should_return_the_page_title(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/title.html")
+async def test_title_should_return_the_page_title(page, server):
+    await page.goto(server.PREFIX + "/title.html")
     assert await page.title() == "Woof-Woof"
 
 
@@ -776,22 +776,22 @@ async def give_it_a_chance_to_fill(page):
 
 
 @pytest.mark.asyncio
-async def test_fill_should_fill_textarea(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_fill_textarea(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.fill("textarea", "some value")
     assert await page.evaluate("result") == "some value"
 
 
 @pytest.mark.asyncio
-async def test_fill_should_fill_input(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_fill_input(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.fill("input", "some value")
     assert await page.evaluate("result") == "some value"
 
 
 @pytest.mark.asyncio
-async def test_fill_should_throw_on_unsupported_inputs(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_throw_on_unsupported_inputs(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     for type in [
         "button",
         "checkbox",
@@ -810,8 +810,8 @@ async def test_fill_should_throw_on_unsupported_inputs(page):
 
 
 @pytest.mark.asyncio
-async def test_fill_should_fill_different_input_types(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_fill_different_input_types(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     for type in ["password", "search", "tel", "text", "url"]:
         await page.eval_on_selector(
             "input", "(input, type) => input.setAttribute('type', type)", type
@@ -872,8 +872,8 @@ async def test_fill_should_throw_on_incorrect_datetime_local(page):
 
 
 @pytest.mark.asyncio
-async def test_fill_should_fill_contenteditable(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_fill_contenteditable(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.fill("div[contenteditable]", "some value")
     assert (
             await page.eval_on_selector("div[contenteditable]", "div => div.textContent")
@@ -883,9 +883,9 @@ async def test_fill_should_fill_contenteditable(page):
 
 @pytest.mark.asyncio
 async def test_fill_should_fill_elements_with_existing_value_and_selection(
-        page
+        page, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+    await page.goto(server.PREFIX + "/input/textarea.html")
 
     await page.eval_on_selector("input", "input => input.value = 'value one'")
     await page.fill("input", "another value")
@@ -923,25 +923,25 @@ async def test_fill_should_fill_elements_with_existing_value_and_selection(
 
 @pytest.mark.asyncio
 async def test_fill_should_throw_when_element_is_not_an_input_textarea_or_contenteditable(
-        page
+        page, server
 ):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+    await page.goto(server.PREFIX + "/input/textarea.html")
     with pytest.raises(Error) as exc_info:
         await page.fill("body", "")
     assert "Element is not an <input>" in exc_info.value.message
 
 
 @pytest.mark.asyncio
-async def test_fill_should_throw_if_passed_a_non_string_value(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_throw_if_passed_a_non_string_value(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     with pytest.raises(Error) as exc_info:
         await page.fill("textarea", 123)
     assert "expected string, got number" in exc_info.value.message
 
 
 @pytest.mark.asyncio
-async def test_fill_should_retry_on_disabled_element(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_retry_on_disabled_element(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.eval_on_selector("input", "i => i.disabled = true")
     done = []
 
@@ -960,8 +960,8 @@ async def test_fill_should_retry_on_disabled_element(page):
 
 
 @pytest.mark.asyncio
-async def test_fill_should_retry_on_readonly_element(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_retry_on_readonly_element(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.eval_on_selector("textarea", "i => i.readOnly = true")
     done = []
 
@@ -980,8 +980,8 @@ async def test_fill_should_retry_on_readonly_element(page):
 
 
 @pytest.mark.asyncio
-async def test_fill_should_retry_on_invisible_element(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_retry_on_invisible_element(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.eval_on_selector("input", "i => i.style.display = 'none'")
     done = []
 
@@ -1056,8 +1056,8 @@ async def test_fill_should_not_be_able_to_fill_text_into_the_input_type_number_(
 
 
 @pytest.mark.asyncio
-async def test_fill_should_be_able_to_clear_using_fill(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_should_be_able_to_clear_using_fill(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.fill("input", "some value")
     assert await page.evaluate("result") == "some value"
     await page.fill("input", "")
@@ -1096,15 +1096,15 @@ async def test_frame_should_respect_name(page):
 
 
 @pytest.mark.asyncio
-async def test_frame_should_respect_url(page):
-    await page.set_content(f'<iframe src="{"https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"}"></iframe>')
+async def test_frame_should_respect_url(page, server):
+    await page.set_content(f'<iframe src="{server.EMPTY_PAGE}"></iframe>')
     assert page.frame(url=re.compile(r"bogus")) is None
-    assert page.frame(url=re.compile(r"empty")).url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"
+    assert page.frame(url=re.compile(r"empty")).url == server.EMPTY_PAGE
 
 
 @pytest.mark.asyncio
-async def test_press_should_work(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_press_should_work(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.press("textarea", "a")
     assert await page.evaluate("document.querySelector('textarea').value") == "a"
 
@@ -1112,7 +1112,7 @@ async def test_press_should_work(page):
 @pytest.mark.asyncio
 async def test_frame_press_should_work(page):
     await page.set_content(
-        '<iframe name=inner src="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html"></iframe>'
+        '<iframe name=inner src=server.PREFIX + "/input/textarea.html"></iframe>'
     )
     frame = page.frame("inner")
     await frame.press("textarea", "a")
@@ -1139,8 +1139,8 @@ async def test_should_emulate_reduced_motion(page):
 
 
 @pytest.mark.asyncio
-async def test_input_value(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_input_value(page: Page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
 
     await page.fill("input", "my-text-content")
     assert await page.input_value("input") == "my-text-content"
@@ -1150,8 +1150,8 @@ async def test_input_value(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_drag_and_drop_helper_method(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/drag-n-drop.html")
+async def test_drag_and_drop_helper_method(page: Page, server):
+    await page.goto(server.PREFIX + "/drag-n-drop.html")
     await page.drag_and_drop("#source", "#target")
     assert (
             await page.eval_on_selector(
@@ -1162,8 +1162,8 @@ async def test_drag_and_drop_helper_method(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_drag_and_drop_with_position(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_drag_and_drop_with_position(page: Page, server):
+    await page.goto(server.EMPTY_PAGE)
     await page.set_content(
         """
       <div style="width:100px;height:100px;background:red;" id="red">
@@ -1216,8 +1216,8 @@ async def test_should_check_box_using_set_checked(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_should_set_bodysize_and_headersize(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_should_set_bodysize_and_headersize(page: Page, server):
+    await page.goto(server.EMPTY_PAGE)
     async with page.expect_request("*/**") as request_info:
         await page.evaluate(
             "() => fetch('./get', { method: 'POST', body: '12345'}).then(r => r.text())"
@@ -1229,8 +1229,8 @@ async def test_should_set_bodysize_and_headersize(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_should_set_bodysize_to_0(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_should_set_bodysize_to_0(page: Page, server):
+    await page.goto(server.EMPTY_PAGE)
     async with page.expect_request("*/**") as request_info:
         await page.evaluate("() => fetch('./get').then(r => r.text())")
     request = await request_info.value
@@ -1252,7 +1252,7 @@ async def test_should_emulate_forced_colors(page):
 
 @pytest.mark.asyncio
 async def test_should_not_throw_when_continuing_while_page_is_closing(
-        page: Page
+        page: Page, server
 ):
     done = None
 
@@ -1262,13 +1262,13 @@ async def test_should_not_throw_when_continuing_while_page_is_closing(
 
     await page.route("**/*", handle_route)
     with pytest.raises(Error):
-        await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+        await page.goto(server.EMPTY_PAGE)
     await done
 
 
 @pytest.mark.asyncio
 async def test_should_not_throw_when_continuing_after_page_is_closed(
-        page: Page
+        page: Page, server
 ):
     done = asyncio.Future()
 
@@ -1280,7 +1280,7 @@ async def test_should_not_throw_when_continuing_after_page_is_closed(
 
     await page.route("**/*", handle_route)
     with pytest.raises(Error):
-        await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+        await page.goto(server.EMPTY_PAGE)
     await done
 
 

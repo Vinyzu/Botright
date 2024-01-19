@@ -7,7 +7,6 @@ import pytest
 from playwright.async_api import Error
 from botright.extended_typing import Page
 
-
 @pytest.mark.asyncio
 async def test_pages_should_return_all_of_the_pages(browser):
     page = await browser.new_page()
@@ -116,7 +115,7 @@ async def test_expose_bindinghandle_should_work(browser):
 
 
 @pytest.mark.asyncio
-async def test_route_should_intercept(browser):
+async def test_route_should_intercept(browser, server):
     intercepted = []
 
     def handle(route, request):
@@ -133,14 +132,14 @@ async def test_route_should_intercept(browser):
 
     await browser.route("**/empty.html", lambda route, request: handle(route, request))
     page = await browser.new_page()
-    response = await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    response = await page.goto(server.EMPTY_PAGE)
     assert response.ok
     assert intercepted == [True]
     await browser.close()
 
 
 @pytest.mark.asyncio
-async def test_route_should_unroute(browser):
+async def test_route_should_unroute(browser, server):
     page = await browser.new_page()
 
     intercepted = []
@@ -162,22 +161,22 @@ async def test_route_should_unroute(browser):
 
     await browser.route(re.compile("empty.html"), handler4)
 
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     assert intercepted == [4]
 
     intercepted = []
     await browser.unroute(re.compile("empty.html"), handler4)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     assert intercepted == [3]
 
     intercepted = []
     await browser.unroute("**/empty.html")
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     assert intercepted == [1]
 
 
 @pytest.mark.asyncio
-async def test_route_should_yield_to_page_route(browser):
+async def test_route_should_yield_to_page_route(browser, server):
     await browser.route(
         "**/empty.html",
         lambda route, request: asyncio.create_task(
@@ -193,13 +192,13 @@ async def test_route_should_yield_to_page_route(browser):
         ),
     )
 
-    response = await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    response = await page.goto(server.EMPTY_PAGE)
     assert response.ok
     assert await response.text() == "page"
 
 
 @pytest.mark.asyncio
-async def test_route_should_fall_back_to_context_route(browser):
+async def test_route_should_fall_back_to_context_route(browser, server):
     await browser.route(
         "**/empty.html",
         lambda route, request: asyncio.create_task(
@@ -215,7 +214,7 @@ async def test_route_should_fall_back_to_context_route(browser):
         ),
     )
 
-    response = await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    response = await page.goto(server.EMPTY_PAGE)
     assert response.ok
     assert await response.text() == "context"
 
@@ -231,22 +230,22 @@ async def test_offline_should_emulate_navigator_online(browser):
 
 
 @pytest.mark.asyncio
-async def test_page_event_should_have_url(browser):
+async def test_page_event_should_have_url(browser, server):
     page = await browser.new_page()
     async with browser.expect_page() as other_page_info:
-        await page.evaluate("url => window.open(url)", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+        await page.evaluate("url => window.open(url)", server.EMPTY_PAGE)
     other_page = await other_page_info.value
-    assert other_page.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"
+    assert other_page.url == server.EMPTY_PAGE
 
 
 @pytest.mark.asyncio
-async def test_page_event_should_have_url_after_domcontentloaded(browser):
+async def test_page_event_should_have_url_after_domcontentloaded(browser, server):
     page = await browser.new_page()
     async with browser.expect_page() as other_page_info:
-        await page.evaluate("url => window.open(url)", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+        await page.evaluate("url => window.open(url)", server.EMPTY_PAGE)
     other_page = await other_page_info.value
     await other_page.wait_for_load_state("domcontentloaded")
-    assert other_page.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"
+    assert other_page.url == server.EMPTY_PAGE
 
 
 @pytest.mark.asyncio
@@ -270,16 +269,16 @@ async def test_page_event_should_have_about_blank_for_empty_url_with_domcontentl
 
 
 @pytest.mark.asyncio
-async def test_page_event_should_report_when_a_new_page_is_created_and_closed(browser):
+async def test_page_event_should_report_when_a_new_page_is_created_and_closed(browser, server):
     page = await browser.new_page()
     async with browser.expect_page() as page_info:
         await page.evaluate(
-            "url => window.open(url)", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"
+            "url => window.open(url)", server.CROSS_PROCESS_PREFIX + "/empty.html"
         )
     other_page = Page(await page_info.value, browser, browser.faker)
 
     # The url is about:blank in FF when 'page' event is fired.
-    assert "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/" in other_page.url
+    assert server.CROSS_PROCESS_PREFIX + "/empty.html" in other_page.url
     assert await other_page.evaluate("['Hello', 'world'].join(' ')") == "Hello world"
     assert await other_page.query_selector("body")
 
@@ -311,19 +310,19 @@ async def test_page_event_should_report_initialized_pages(browser):
 
 
 @pytest.mark.asyncio
-async def test_page_event_should_have_an_opener(browser):
+async def test_page_event_should_have_an_opener(browser, server):
     page = await browser.new_page()
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     async with browser.expect_page() as page_info:
-        await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/popup/window-open.html")
+        await page.goto(server.PREFIX + "/popup/window-open.html")
     popup = Page(await page_info.value, browser, browser.faker)
-    assert popup.url == "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/popup/popup.html"
+    assert popup.url == server.PREFIX + "/popup/popup.html"
     assert await popup.opener() == page
     assert await page.opener() is None
 
 
 @pytest.mark.asyncio
-async def test_page_event_should_fire_page_lifecycle_events(browser):
+async def test_page_event_should_fire_page_lifecycle_events(browser, server):
     events = []
 
     def handle_page(page):
@@ -333,17 +332,17 @@ async def test_page_event_should_fire_page_lifecycle_events(browser):
     browser.on("page", handle_page)
 
     page = await browser.new_page()
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     await page.close()
-    assert events == ["CREATED: about:blank", "DESTROYED: https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"]
+    assert events == ["CREATED: about:blank", f"DESTROYED: {server.EMPTY_PAGE}"]
 
 
 @pytest.mark.asyncio
-async def test_page_event_should_work_with_shift_clicking(browser):
+async def test_page_event_should_work_with_shift_clicking(browser, server):
     # WebKit: Shift+Click does not open a new window.
     page = await browser.new_page()
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await page.set_content('<a href="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/one-style.html">yo</a>')
+    await page.goto(server.EMPTY_PAGE)
+    await page.set_content('<a href="/one-style.html">yo</a>')
     async with browser.expect_page() as page_info:
         await page.click("a", modifiers=["Shift"])
     popup = await page_info.value
@@ -351,12 +350,12 @@ async def test_page_event_should_work_with_shift_clicking(browser):
 
 
 @pytest.mark.asyncio
-async def test_page_event_should_work_with_ctrl_clicking(browser):
+async def test_page_event_should_work_with_ctrl_clicking(browser, server):
     # Firefox: reports an opener in this case.
     # WebKit: Ctrl+Click does not open a new tab.
     page = await browser.new_page()
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await page.set_content('<a href="https://raw.githack.com/microsoft/playwright-python/main/tests/assets/one-style.html">yo</a>')
+    await page.goto(server.EMPTY_PAGE)
+    await page.set_content('<a href="/one-style.html">yo</a>')
     async with browser.expect_page() as popup_info:
         await page.click("a", modifiers=["Meta" if (sys.platform == "darwin") else "Control"])
     popup = await popup_info.value

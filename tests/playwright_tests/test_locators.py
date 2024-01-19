@@ -13,16 +13,16 @@ FILE_TO_UPLOAD = _dirname / ".." / "assets/file-to-upload.txt"
 
 
 @pytest.mark.asyncio
-async def test_locators_click_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_locators_click_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = page.locator("button")
     await button.click()
     assert await page.evaluate("window['result']") == "Clicked"
 
 
 @pytest.mark.asyncio
-async def test_locators_click_should_work_with_node_removed(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_locators_click_should_work_with_node_removed(page: Page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     await page.evaluate("delete window['Node']")
     button = page.locator("button")
     await button.click()
@@ -30,8 +30,8 @@ async def test_locators_click_should_work_with_node_removed(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_click_should_work_for_text_nodes(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_locators_click_should_work_for_text_nodes(page: Page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     await page.evaluate(
         """() => {
         window['double'] = false;
@@ -48,55 +48,55 @@ async def test_locators_click_should_work_for_text_nodes(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_should_have_repr(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_locators_should_have_repr(page: Page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = page.locator("button")
     await button.click()
     assert (
         str(button)
-        == "<Locator frame=<Frame name= url='https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html'> selector='button'>"
+        == f"<Locator frame=<Frame name= url='{server.PREFIX}/input/button.html'> selector='button'>"
     )
 
 
 @pytest.mark.asyncio
-async def test_locators_get_attribute_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_locators_get_attribute_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     button = page.locator("#outer")
     assert await button.get_attribute("name") == "value"
     assert await button.get_attribute("foo") is None
 
 
 @pytest.mark.asyncio
-async def test_locators_input_value_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_locators_input_value_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     await page.fill("#textarea", "input value")
     text_area = page.locator("#textarea")
     assert await text_area.input_value() == "input value"
 
 
 @pytest.mark.asyncio
-async def test_locators_inner_html_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_locators_inner_html_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     locator = page.locator("#outer")
     assert await locator.inner_html() == '<div id="inner">Text,\nmore text</div>'
 
 
 @pytest.mark.asyncio
-async def test_locators_inner_text_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_locators_inner_text_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     locator = page.locator("#inner")
     assert await locator.inner_text() == "Text, more text"
 
 
 @pytest.mark.asyncio
-async def test_locators_text_content_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_locators_text_content_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     locator = page.locator("#inner")
     assert await locator.text_content() == "Text,\nmore text"
 
 
 @pytest.mark.asyncio
-async def test_locators_is_hidden_and_is_visible_should_work(page: Page):
+async def test_locators_is_hidden_and_is_visible_should_work(page: Page, server):
     await page.set_content("<div>Hi</div><span></span>")
 
     div = page.locator("div")
@@ -185,8 +185,8 @@ async def test_locators_all_inner_texts(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_should_query_existing_element(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/playground.html")
+async def test_locators_should_query_existing_element(page: Page, server):
+    await page.goto(server.PREFIX + "/playground.html")
     await page.set_content(
         """<html><body><div class="second"><div class="inner">A</div></div></body></html>"""
     )
@@ -199,8 +199,8 @@ async def test_locators_should_query_existing_element(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_evaluate_handle_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_locators_evaluate_handle_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     outer = page.locator("#outer")
     inner = outer.locator("#inner")
     check = inner.locator("#check")
@@ -208,16 +208,16 @@ async def test_locators_evaluate_handle_should_work(page: Page):
     await page.evaluate("1 + 1")
     assert (
         str(outer)
-        == "<Locator frame=<Frame name= url='https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html'> selector='#outer'>"
+        == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer'>"
     )
     assert (
         str(inner)
-        == "<Locator frame=<Frame name= url='https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html'> selector='#outer >> #inner'>"
+        == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer >> #inner'>"
     )
     assert str(text) == "JSHandle@#text=Text,↵more text"
     assert (
         str(check)
-        == "<Locator frame=<Frame name= url='https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html'> selector='#outer >> #inner >> #check'>"
+        == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer >> #inner >> #check'>"
     )
 
 
@@ -267,8 +267,8 @@ async def test_locators_evaluate_all_should_work_with_missing_selector(page: Pag
 
 
 @pytest.mark.asyncio
-async def test_locators_hover_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/scrollable.html")
+async def test_locators_hover_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/input/scrollable.html")
     button = page.locator("#button-6")
     await button.hover()
     assert (
@@ -277,16 +277,16 @@ async def test_locators_hover_should_work(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_fill_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_locators_fill_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     button = page.locator("input")
     await button.fill("some value")
     assert await page.evaluate("result") == "some value"
 
 
 @pytest.mark.asyncio
-async def test_locators_clear_should_work(page: Page) -> None:
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_locators_clear_should_work(page: Page, server) -> None:
+    await page.goto(server.PREFIX + "/input/textarea.html")
     button = page.locator("input")
     await button.fill("some value")
     assert await page.evaluate("result") == "some value"
@@ -311,8 +311,8 @@ async def test_locators_uncheck_should_work(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_select_option_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/select.html")
+async def test_locators_select_option_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/input/select.html")
     select = page.locator("select")
     await select.select_option("blue")
     assert await page.evaluate("result.onInput") == ["blue"]
@@ -320,8 +320,8 @@ async def test_locators_select_option_should_work(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_focus_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_locators_focus_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = page.locator("button")
     assert await button.evaluate("button => document.activeElement === button") is False
     await button.focus()
@@ -329,16 +329,16 @@ async def test_locators_focus_should_work(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_dispatch_event_should_work(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_locators_dispatch_event_should_work(page: Page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = page.locator("button")
     await button.dispatch_event("click")
     assert await page.evaluate("result") == "Clicked"
 
 
 @pytest.mark.asyncio
-async def test_locators_should_upload_a_file(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/fileupload.html")
+async def test_locators_should_upload_a_file(page: Page, server):
+    await page.goto(server.PREFIX + "/input/fileupload.html")
     input = page.locator("input[type=file]")
 
     file_path = os.path.relpath(FILE_TO_UPLOAD, os.getcwd())
@@ -357,8 +357,8 @@ async def test_locators_should_press(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_should_scroll_into_view(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/offscreenbuttons.html")
+async def test_locators_should_scroll_into_view(page: Page, server):
+    await page.goto(server.PREFIX + "/offscreenbuttons.html")
     for i in range(11):
         button = page.locator(f"#btn{i}")
         before = await button.evaluate(
@@ -374,10 +374,8 @@ async def test_locators_should_scroll_into_view(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_should_select_textarea(
-    page: Page
-):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_locators_should_select_textarea(page: Page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     textarea = page.locator("textarea")
     await textarea.evaluate("textarea => textarea.value = 'some value'")
     await textarea.select_text()
@@ -400,16 +398,14 @@ async def test_locators_should_press_sequentially(page: Page):
 
 @pytest.mark.asyncio
 @pytest.mark.skip(reason="Golden Screenshots currently not supported")
-async def test_locators_should_screenshot(
-    page: Page, assert_to_be_golden
-):
+async def test_locators_should_screenshot(page: Page, assert_to_be_golden, server):
     await page.set_viewport_size(
         {
             "width": 500,
             "height": 500,
         }
     )
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/grid.html")
+    await page.goto(server.PREFIX + "/grid.html")
     await page.evaluate("window.scrollBy(50, 100)")
     element = page.locator(".box:nth-of-type(3)")
     assert_to_be_golden(
@@ -418,14 +414,14 @@ async def test_locators_should_screenshot(
 
 
 @pytest.mark.asyncio
-async def test_locators_should_return_bounding_box(page: Page):
+async def test_locators_should_return_bounding_box(page: Page, server):
     await page.set_viewport_size(
         {
             "width": 500,
             "height": 500,
         }
     )
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/grid.html")
+    await page.goto(server.PREFIX + "/grid.html")
     element = page.locator(".box:nth-of-type(13)")
     box = await element.bounding_box()
     assert box == {
@@ -622,11 +618,9 @@ async def route_iframe(page: Page) -> None:
 
 
 @pytest.mark.asyncio
-async def test_locators_frame_should_work_with_iframe(
-    page: Page
-) -> None:
+async def test_locators_frame_should_work_with_iframe(page: Page, server) -> None:
     await route_iframe(page)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     button = page.frame_locator("iframe").locator("button")
     await button.wait_for()
     assert await button.inner_text() == "Hello iframe"
@@ -634,11 +628,9 @@ async def test_locators_frame_should_work_with_iframe(
 
 
 @pytest.mark.asyncio
-async def test_locators_frame_should_work_for_nested_iframe(
-    page: Page
-) -> None:
+async def test_locators_frame_should_work_for_nested_iframe(page: Page, server) -> None:
     await route_iframe(page)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     button = page.frame_locator("iframe").frame_locator("iframe").locator("button")
     await button.wait_for()
     assert await button.inner_text() == "Hello nested iframe"
@@ -646,11 +638,9 @@ async def test_locators_frame_should_work_for_nested_iframe(
 
 
 @pytest.mark.asyncio
-async def test_locators_frame_should_work_with_locator_frame_locator(
-    page: Page
-) -> None:
+async def test_locators_frame_should_work_with_locator_frame_locator(page: Page, server) -> None:
     await route_iframe(page)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     button = page.locator("body").frame_locator("iframe").locator("button")
     await button.wait_for()
     assert await button.inner_text() == "Hello iframe"
@@ -679,11 +669,9 @@ async def route_ambiguous(page: Page) -> None:
 
 
 @pytest.mark.asyncio
-async def test_locator_frame_locator_should_throw_on_ambiguity(
-    page: Page
-) -> None:
+async def test_locator_frame_locator_should_throw_on_ambiguity(page: Page, server) -> None:
     await route_ambiguous(page)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     button = page.locator("body").frame_locator("iframe").locator("button")
     with pytest.raises(
         Error,
@@ -693,11 +681,9 @@ async def test_locator_frame_locator_should_throw_on_ambiguity(
 
 
 @pytest.mark.asyncio
-async def test_locator_frame_locator_should_not_throw_on_first_last_nth(
-    page: Page
-) -> None:
+async def test_locator_frame_locator_should_not_throw_on_first_last_nth(page: Page, server) -> None:
     await route_ambiguous(page)
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+    await page.goto(server.EMPTY_PAGE)
     button1 = page.locator("body").frame_locator("iframe").first.locator("button")
     assert await button1.text_content() == "Hello from microsoft/playwright-python/main/tests/assets/iframe-1.html"
     button2 = page.locator("body").frame_locator("iframe").nth(1).locator("button")
@@ -707,8 +693,8 @@ async def test_locator_frame_locator_should_not_throw_on_first_last_nth(
 
 
 @pytest.mark.asyncio
-async def test_drag_to(page: Page) -> None:
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/drag-n-drop.html")
+async def test_drag_to(page: Page, server) -> None:
+    await page.goto(server.PREFIX + "/drag-n-drop.html")
     await page.locator("#source").drag_to(page.locator("#target"))
     assert (
         await page.eval_on_selector(
@@ -719,8 +705,8 @@ async def test_drag_to(page: Page) -> None:
 
 
 @pytest.mark.asyncio
-async def test_drag_to_with_position(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_drag_to_with_position(page: Page, server):
+    await page.goto(server.EMPTY_PAGE)
     await page.set_content(
         """
       <div style="width:100px;height:100px;background:red;" id="red">
@@ -817,8 +803,8 @@ async def test_locator_query_should_filter_by_regex_and_regexp_flags(
 
 
 @pytest.mark.asyncio
-async def test_locator_should_return_page(page: Page) -> None:
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/frames/two-frames.html")
+async def test_locator_should_return_page(page: Page, server) -> None:
+    await page.goto(server.PREFIX + "/frames/two-frames.html")
     outer = page.locator("#outer")
     assert outer.page == page
 
@@ -867,10 +853,8 @@ async def test_locator_should_support_has_locator(page: Page) -> None:
 
 
 @pytest.mark.asyncio
-async def test_locator_should_enforce_same_frame_for_has_locator(
-    page: Page
-) -> None:
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/frames/two-frames.html")
+async def test_locator_should_enforce_same_frame_for_has_locator(page: Page, server) -> None:
+    await page.goto(server.PREFIX + "/frames/two-frames.html")
     child = page.frames[1]
     with pytest.raises(Error) as exc_info:
         page.locator("div", has=child.locator("span"))
@@ -931,8 +915,8 @@ async def test_locator_should_support_locator_locator_with_and_or(page: Page) ->
 
 
 @pytest.mark.asyncio
-async def test_locator_highlight_should_work(page: Page) -> None:
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/grid.html")
+async def test_locator_highlight_should_work(page: Page, server) -> None:
+    await page.goto(server.PREFIX + "/grid.html")
     await page.locator(".box").nth(3).highlight()
     assert await page.locator("x-pw-glass").is_visible()
 
@@ -1066,8 +1050,8 @@ async def test_locators_should_support_locator_and(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_has_does_not_encode_unicode(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_locators_has_does_not_encode_unicode(page: Page, server):
+    await page.goto(server.EMPTY_PAGE)
     locators = [
         page.locator("button", has_text="Драматург"),
         page.locator("button", has_text=re.compile("Драматург")),
@@ -1080,10 +1064,8 @@ async def test_locators_has_does_not_encode_unicode(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_locators_should_focus_and_blur_a_button(
-    page: Page
-) -> None:
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_locators_should_focus_and_blur_a_button(page: Page, server) -> None:
+    await page.goto(server.PREFIX + "/input/button.html")
     button = page.locator("button")
     assert not await button.evaluate("button => document.activeElement === button")
 

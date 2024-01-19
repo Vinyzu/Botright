@@ -7,18 +7,18 @@ from botright.extended_typing import Page
 
 
 @pytest.mark.asyncio
-async def test_bounding_box(page):
+async def test_bounding_box(page, server):
     await page.set_viewport_size({"width": 500, "height": 500})
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/grid.html")
+    await page.goto(server.PREFIX + "/grid.html")
     element_handle = await page.query_selector(".box:nth-of-type(13)")
     box = await element_handle.bounding_box()
     assert box == {"x": 100, "y": 50, "width": 50, "height": 50}
 
 
 @pytest.mark.asyncio
-async def test_bounding_box_handle_nested_frames(page):
+async def test_bounding_box_handle_nested_frames(page, server):
     await page.set_viewport_size({"width": 500, "height": 500})
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/frames/nested-frames.html")
+    await page.goto(server.PREFIX + "/frames/nested-frames.html")
     nested_frame = page.frame(name="dos")
     element_handle = await nested_frame.query_selector("div")
     box = await element_handle.bounding_box()
@@ -62,12 +62,12 @@ async def test_bounding_box_with_SVG_nodes(page):
 
 
 @pytest.mark.asyncio
-async def test_bounding_box_with_page_scale(botright_client):
+async def test_bounding_box_with_page_scale(botright_client, server):
     context = await botright_client.new_browser(
         viewport={"width": 400, "height": 400}, is_mobile=True
     )
     page = await context.new_page()
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+    await page.goto(server.PREFIX + "/input/button.html")
     button = await page.query_selector("button")
     await button.evaluate(
         """button => {
@@ -126,46 +126,46 @@ async def test_bounding_box_when_inline_box_child_is_outside_of_viewport(page):
 
 
 @pytest.mark.asyncio
-async def test_content_frame(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await utils.attach_frame(page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_content_frame(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
+    await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     element_handle = await page.query_selector("#frame1")
     frame = await element_handle.content_frame()
     assert frame == page.frames[1]
 
 
 @pytest.mark.asyncio
-async def test_content_frame_for_non_iframes(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await utils.attach_frame(page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_content_frame_for_non_iframes(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
+    await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     frame = page.frames[1]
     element_handle = await frame.evaluate_handle("document.body")
     assert await element_handle.content_frame() is None
 
 
 @pytest.mark.asyncio
-async def test_content_frame_for_document_element(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await utils.attach_frame(page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_content_frame_for_document_element(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
+    await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     frame = page.frames[1]
     element_handle = await frame.evaluate_handle("document.documentElement")
     assert await element_handle.content_frame() is None
 
 
 @pytest.mark.asyncio
-async def test_owner_frame(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await utils.attach_frame(page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_owner_frame(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
+    await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     frame = page.frames[1]
     element_handle = await frame.evaluate_handle("document.body")
     assert await element_handle.owner_frame() == frame
 
 
 @pytest.mark.asyncio
-async def test_owner_frame_for_cross_process_iframes(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_owner_frame_for_cross_process_iframes(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
     await utils.attach_frame(
-        page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"
+        page, "frame1", server.CROSS_PROCESS_PREFIX + "/empty.html"
     )
     frame = page.frames[1]
     element_handle = await frame.evaluate_handle("document.body")
@@ -173,27 +173,27 @@ async def test_owner_frame_for_cross_process_iframes(page, utils):
 
 
 @pytest.mark.asyncio
-async def test_owner_frame_for_document(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await utils.attach_frame(page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_owner_frame_for_document(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
+    await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     frame = page.frames[1]
     element_handle = await frame.evaluate_handle("document")
     assert await element_handle.owner_frame() == frame
 
 
 @pytest.mark.asyncio
-async def test_owner_frame_for_iframe_elements(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await utils.attach_frame(page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_owner_frame_for_iframe_elements(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
+    await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     frame = page.main_frame
     element_handle = await frame.evaluate_handle('document.querySelector("#frame1")')
     assert await element_handle.owner_frame() == frame
 
 
 @pytest.mark.asyncio
-async def test_owner_frame_for_cross_frame_evaluations(page, utils):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
-    await utils.attach_frame(page, "frame1", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_owner_frame_for_cross_frame_evaluations(page, utils, server):
+    await page.goto(server.EMPTY_PAGE)
+    await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     frame = page.main_frame
     element_handle = await frame.evaluate_handle(
         'document.querySelector("#frame1").contentWindow.document.body'
@@ -203,8 +203,8 @@ async def test_owner_frame_for_cross_frame_evaluations(page, utils):
 
 
 @pytest.mark.asyncio
-async def test_owner_frame_for_detached_elements(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_owner_frame_for_detached_elements(page, server):
+    await page.goto(server.EMPTY_PAGE)
     div_handle = await page.evaluate_handle(
         """() => {
             div = document.createElement('div');
@@ -224,11 +224,11 @@ async def test_owner_frame_for_detached_elements(page):
 
 
 @pytest.mark.asyncio
-async def test_owner_frame_for_adopted_elements(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html")
+async def test_owner_frame_for_adopted_elements(page: Page, server):
+    await page.goto(server.EMPTY_PAGE)
     async with page.expect_popup() as popup_info:
         await page.evaluate(
-            "url => window.__popup = window.open(url)", "https://raw.githack.com/microsoft/playwright-python/main/tests/assets/empty.html"
+            "url => window.__popup = window.open(url)", server.EMPTY_PAGE
         )
     popup = Page(await popup_info.value, page.browser, page.faker)
 
@@ -251,16 +251,16 @@ async def test_owner_frame_for_adopted_elements(page: Page):
 
 
 @pytest.mark.asyncio
-async def test_click(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_click(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = await page.query_selector("button")
     await button.click()
     assert await page.evaluate("result") == "Clicked"
 
 
 @pytest.mark.asyncio
-async def test_click_with_node_removed(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_click_with_node_removed(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     await page.evaluate('delete window["Node"]')
     button = await page.query_selector("button")
     await button.click()
@@ -268,16 +268,16 @@ async def test_click_with_node_removed(page):
 
 
 @pytest.mark.asyncio
-async def test_click_for_shadow_dom_v1(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/shadow.html")
+async def test_click_for_shadow_dom_v1(page, server):
+    await page.goto(server.PREFIX + "/shadow.html")
     button_handle = await page.evaluate_handle("button")
     await button_handle.click()
     assert await page.evaluate("clicked")
 
 
 @pytest.mark.asyncio
-async def test_click_for_TextNodes(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_click_for_TextNodes(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     buttonTextNode = await page.evaluate_handle(
         'document.querySelector("button").firstChild'
     )
@@ -286,8 +286,8 @@ async def test_click_for_TextNodes(page):
 
 
 @pytest.mark.asyncio
-async def test_click_throw_for_detached_nodes(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_click_throw_for_detached_nodes(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = await page.query_selector("button")
     await page.evaluate("button => button.remove()", button)
     with pytest.raises(Error) as exc_info:
@@ -296,8 +296,8 @@ async def test_click_throw_for_detached_nodes(page):
 
 
 @pytest.mark.asyncio
-async def test_click_throw_for_hidden_nodes_with_force(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_click_throw_for_hidden_nodes_with_force(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = await page.query_selector("button")
     await page.evaluate('button => button.style.display = "none"', button)
     with pytest.raises(Error) as exc_info:
@@ -306,8 +306,8 @@ async def test_click_throw_for_hidden_nodes_with_force(page):
 
 
 @pytest.mark.asyncio
-async def test_click_throw_for_recursively_hidden_nodes_with_force(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_click_throw_for_recursively_hidden_nodes_with_force(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = await page.query_selector("button")
     await page.evaluate('button => button.parentElement.style.display = "none"', button)
     with pytest.raises(Error) as exc_info:
@@ -316,7 +316,7 @@ async def test_click_throw_for_recursively_hidden_nodes_with_force(page):
 
 
 @pytest.mark.asyncio
-async def test_click_throw_for__br__elements_with_force(page):
+async def test_click_throw_for__br__elements_with_force(page, server):
     await page.set_content("hello<br>goodbye")
     br = await page.query_selector("br")
     with pytest.raises(Error) as exc_info:
@@ -325,8 +325,8 @@ async def test_click_throw_for__br__elements_with_force(page):
 
 
 @pytest.mark.asyncio
-async def test_double_click_the_button(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_double_click_the_button(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     await page.evaluate(
         """() => {
             window.double = false;
@@ -343,8 +343,8 @@ async def test_double_click_the_button(page):
 
 
 @pytest.mark.asyncio
-async def test_hover(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/scrollable.html")
+async def test_hover(page, server):
+    await page.goto(server.PREFIX + "/input/scrollable.html")
     button = await page.query_selector("#button-6")
     await button.hover()
     assert (
@@ -353,8 +353,8 @@ async def test_hover(page):
 
 
 @pytest.mark.asyncio
-async def test_hover_when_node_is_removed(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/scrollable.html")
+async def test_hover_when_node_is_removed(page, server):
+    await page.goto(server.PREFIX + "/input/scrollable.html")
     await page.evaluate('delete window["Node"]')
     button = await page.query_selector("#button-6")
     await button.hover()
@@ -364,8 +364,8 @@ async def test_hover_when_node_is_removed(page):
 
 
 @pytest.mark.asyncio
-async def test_scroll(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/offscreenbuttons.html")
+async def test_scroll(page, server):
+    await page.goto(server.PREFIX + "/offscreenbuttons.html")
     for i in range(11):
         button = await page.query_selector(f"#btn{i}")
         before = await button.evaluate(
@@ -451,16 +451,16 @@ async def test_should_timeout_waiting_for_visible(page):
 
 
 @pytest.mark.asyncio
-async def test_fill_input(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_input(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     handle = await page.query_selector("input")
     await handle.fill("some value")
     assert await page.evaluate("result") == "some value"
 
 
 @pytest.mark.asyncio
-async def test_fill_input_when_Node_is_removed(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_fill_input_when_Node_is_removed(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     await page.evaluate('delete window["Node"]')
     handle = await page.query_selector("input")
     await handle.fill("some value")
@@ -468,8 +468,8 @@ async def test_fill_input_when_Node_is_removed(page):
 
 
 @pytest.mark.asyncio
-async def test_select_textarea(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_select_textarea(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     textarea = await page.query_selector("textarea")
     await textarea.evaluate('textarea => textarea.value = "some value"')
     await textarea.select_text()
@@ -480,8 +480,8 @@ async def test_select_textarea(page):
 
 
 @pytest.mark.asyncio
-async def test_select_input(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_select_input(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     input = await page.query_selector("input")
     await input.evaluate('input => input.value = "some value"')
     await input.select_text()
@@ -492,16 +492,16 @@ async def test_select_input(page):
 
 
 @pytest.mark.asyncio
-async def test_select_text_select_plain_div(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_select_text_select_plain_div(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     div = await page.query_selector("div.plain")
     await div.select_text()
     assert await page.evaluate("() => window.getSelection().toString()") == "Plain div"
 
 
 @pytest.mark.asyncio
-async def test_select_text_timeout_waiting_for_invisible_element(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_select_text_timeout_waiting_for_invisible_element(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     textarea = await page.query_selector("textarea")
     await textarea.evaluate('e => e.style.display = "none"')
     with pytest.raises(Error) as exc_info:
@@ -510,8 +510,8 @@ async def test_select_text_timeout_waiting_for_invisible_element(page):
 
 
 @pytest.mark.asyncio
-async def test_select_text_wait_for_visible(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_select_text_wait_for_visible(page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     textarea = await page.query_selector("textarea")
     await textarea.evaluate('textarea => textarea.value = "some value"')
     await textarea.evaluate('e => e.style.display = "none"')
@@ -531,8 +531,8 @@ async def test_select_text_wait_for_visible(page):
 
 
 @pytest.mark.asyncio
-async def test_a_nice_preview(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_a_nice_preview(page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     outer = await page.query_selector("#outer")
     inner = await page.query_selector("#inner")
     check = await page.query_selector("#check")
@@ -547,24 +547,24 @@ async def test_a_nice_preview(page):
 
 
 @pytest.mark.asyncio
-async def test_get_attribute(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_get_attribute(page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     handle = await page.query_selector("#outer")
     assert await handle.get_attribute("name") == "value"
     assert await page.get_attribute("#outer", "name") == "value"
 
 
 @pytest.mark.asyncio
-async def test_inner_html(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_inner_html(page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     handle = await page.query_selector("#outer")
     assert await handle.inner_html() == '<div id="inner">Text,\nmore text</div>'
     assert await page.inner_html("#outer") == '<div id="inner">Text,\nmore text</div>'
 
 
 @pytest.mark.asyncio
-async def test_inner_text(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_inner_text(page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     handle = await page.query_selector("#inner")
     assert await handle.inner_text() == "Text, more text"
     assert await page.inner_text("#inner") == "Text, more text"
@@ -584,8 +584,8 @@ async def test_inner_text_should_throw(page):
 
 
 @pytest.mark.asyncio
-async def test_text_content(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/dom.html")
+async def test_text_content(page, server):
+    await page.goto(server.PREFIX + "/dom.html")
     handle = await page.query_selector("#inner")
     assert await handle.text_content() == "Text,\nmore text"
     assert await page.text_content("#inner") == "Text,\nmore text"
@@ -608,8 +608,8 @@ async def test_uncheck_the_box(page):
 
 
 @pytest.mark.asyncio
-async def test_select_single_option(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/select.html")
+async def test_select_single_option(page, server):
+    await page.goto(server.PREFIX + "/input/select.html")
     select = await page.query_selector("select")
     await select.select_option(value="blue")
     assert await page.evaluate("result.onInput") == ["blue"]
@@ -617,8 +617,8 @@ async def test_select_single_option(page):
 
 
 @pytest.mark.asyncio
-async def test_focus_a_button(page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/button.html")
+async def test_focus_a_button(page, server):
+    await page.goto(server.PREFIX + "/input/button.html")
     button = await page.query_selector("button")
     assert await button.evaluate("button => document.activeElement === button") is False
     await button.focus()
@@ -698,8 +698,8 @@ async def test_is_checked_should_work(page):
 
 
 @pytest.mark.asyncio
-async def test_input_value(page: Page):
-    await page.goto("https://raw.githack.com/microsoft/playwright-python/main/tests/assets/input/textarea.html")
+async def test_input_value(page: Page, server):
+    await page.goto(server.PREFIX + "/input/textarea.html")
     element = await page.query_selector("input")
     await element.fill("my-text-content")
     assert await element.input_value() == "my-text-content"

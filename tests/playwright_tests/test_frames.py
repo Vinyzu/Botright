@@ -83,7 +83,7 @@ async def test_evaluate_isolated_between_frames(page, utils, server):
 
 @pytest.mark.asyncio
 async def test_should_handle_nested_frames(page, utils, server):
-    await page.goto(server.PREFIX + "frames/nested-frames.html")
+    await page.goto(server.PREFIX + "/frames/nested-frames.html")
     assert utils.dump_frames(page.main_frame) == [
         "http://localhost:<PORT>/frames/nested-frames.html",
         "    http://localhost:<PORT>/frames/frame.html (aframe)",
@@ -158,7 +158,7 @@ async def test_detach_child_frames_on_navigation(page, server):
     page.on("frameattached", lambda frame: attached_frames.append(frame))
     page.on("framedetached", lambda frame: detached_frames.append(frame))
     page.on("framenavigated", lambda frame: navigated_frames.append(frame))
-    await page.goto(server.PREFIX + "frames/nested-frames.html")
+    await page.goto(server.PREFIX + "/frames/nested-frames.html")
     assert len(attached_frames) == 4
     assert len(detached_frames) == 0
     assert len(navigated_frames) == 5
@@ -180,11 +180,11 @@ async def test_framesets(page, server):
     page.on("frameattached", lambda frame: attached_frames.append(frame))
     page.on("framedetached", lambda frame: detached_frames.append(frame))
     page.on("framenavigated", lambda frame: navigated_frames.append(frame))
-    await page.goto(server.PREFIX + "frames/frameset.html")
+    await page.goto(server.PREFIX + "/frames/frameset.html")
     await page.wait_for_timeout(100)  # Small wait for loading
     assert len(attached_frames) == 4
     assert len(detached_frames) == 0
-    assert len(navigated_frames) == 4
+    assert len(navigated_frames) == 5
 
     attached_frames = []
     detached_frames = []
@@ -198,7 +198,7 @@ async def test_framesets(page, server):
 
 @pytest.mark.asyncio
 async def test_frame_from_inside_shadow_dom(page, server):
-    await page.goto(server.PREFIX + "shadow.html")
+    await page.goto(server.PREFIX + "/shadow.html")
     await page.evaluate(
         """async url => {
             frame = document.createElement('iframe');

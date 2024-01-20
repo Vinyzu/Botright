@@ -7,6 +7,7 @@ import pytest
 from playwright.async_api import Error
 from botright.extended_typing import Page
 
+
 @pytest.mark.asyncio
 async def test_pages_should_return_all_of_the_pages(browser):
     page = await browser.new_page()

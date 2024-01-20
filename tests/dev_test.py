@@ -15,7 +15,7 @@ async def main():
     #             "https://www.whatismybrowser.com/detect/client-hints/", "https://nopecha.com/demo/recaptcha#v3", "https://iphey.com/", "https://www.browserscan.net/", "https://pixelscan.net",
     #             "https://fingerprint.com/products/bot-detection/", "https://nowsecure.nl/#relax"]
     #
-    # for url in all_urls:
+    # for url in single_url:
     #     page = await browser.new_page()
     #     await page.goto(url)
 

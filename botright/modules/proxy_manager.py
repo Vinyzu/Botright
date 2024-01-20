@@ -110,30 +110,47 @@ class ProxyManager(AsyncObject):
         Args:
             httpx_client (httpx.AsyncClient): The HTTPX client to use for proxy checks.
         """
-        try:
-            ip_request = await httpx_client.get("http://jsonip.com", timeout=self.timeout)
-            ip = ip_request.json().get("ip")
-        except Exception:
+        get_ip_apis = [
+            "https://api.ipify.org/?format=json",
+            "https://api.myip.com/",
+            "https://get.geojs.io/v1/ip.json",
+            "https://api.ip.sb/jsonip",
+            "https://l2.io/ip.json"
+        ]
 
-            # Trying again on different site (jsonip.com is known to have downtimes)
+        for get_ip_api in get_ip_apis:
             try:
-                ip_request = await httpx_client.get("http://httpbin.org/ip", timeout=self.timeout)
-                ip = ip_request.json().get("origin")
+                ip_request = await httpx_client.get(get_ip_api, timeout=self.timeout)
+                ip = ip_request.json().get("ip")
+                break
             except Exception:
-                raise ProxyCheckError("Could not get IP-Address of Proxy (Proxy is Invalid/Timed Out)")
-        try:
-            r = await self._httpx.get(f"http://ip-api.com/json/{ip}", timeout=self.timeout)
-            data = r.json()
-            self.country = data.get("country")
-            self.country_code = data.get("countryCode")
-            self.region = data.get("regionName")
-            self.city = data.get("city")
-            self.zip = data.get("zip")
-            self.latitude = data.get("lat")
-            self.longitude = data.get("lon")
-            self.timezone = data.get("timezone")
+                pass
+        else:
+            raise ProxyCheckError("Could not get IP-Address of Proxy (Proxy is Invalid/Timed Out)")
 
-            if not self.country:
-                raise ProxyCheckError("Could not get GeoInformation from proxy (Proxy is probably not Indexed)")
-        except Exception:
+        get_geo_apis = {
+            "http://ip-api.com/json/<IP>": ["country", "countryCode", "lat", "lon", "timezone"],
+            "https://ipapi.co/<IP>/json": ["country_name", "country", "latitude", "longitude", "timezone"],
+            "https://api.techniknews.net/ipgeo/<IP>": ["country", "countryCode", "lat", "lon", "timezone"],
+            "https://get.geojs.io/v1/ip/geo/<IP>.json": ["country", "country_code", "latitude", "longitude", "timezone"],
+        }
+
+        for (get_geo_api, api_names) in get_geo_apis.items():
+            try:
+                api_url = get_geo_api.replace("<IP>", ip)
+                country, country_code, latitude, longitude, timezone = api_names
+                r = await self._httpx.get(api_url, timeout=self.timeout)
+                data = r.json()
+
+                self.country = data.get(country)
+                self.country_code = data.get(country_code)
+                self.latitude = data.get(latitude)
+                self.longitude = data.get(longitude)
+                self.timezone = data.get(timezone)
+
+                assert self.country
+                break
+            except Exception:
+                pass
+        else:
             raise ProxyCheckError("Could not get GeoInformation from proxy (Proxy is probably not Indexed)")

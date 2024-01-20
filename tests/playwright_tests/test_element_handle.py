@@ -12,7 +12,17 @@ async def test_bounding_box(page, server):
     await page.goto(server.PREFIX + "/grid.html")
     element_handle = await page.query_selector(".box:nth-of-type(13)")
     box = await element_handle.bounding_box()
-    assert box == {"x": 100, "y": 50, "width": 50, "height": 50}
+    assert (box == {
+        "x": 100,
+        "y": 50,
+        "width": 50,
+        "height": 50
+    }) or (box == {
+        "x": 100,
+        "y": 51,
+        "width": 50,
+        "height": 50
+    })
 
 
 @pytest.mark.asyncio

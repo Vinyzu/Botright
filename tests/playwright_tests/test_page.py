@@ -40,6 +40,7 @@ async def test_closed_should_not_visible_in_context_pages(browser):
     assert page not in browser.pages
 
 
+@pytest.mark.asyncio
 async def close_should_run_beforeunload_if_asked_for(browser, server):
     page = await browser.new_page()
     await page.goto(server.PREFIX + "/beforeunload.html")
@@ -552,13 +553,13 @@ async def test_set_content_should_respect_default_navigation_timeout(page):
 
 
 @pytest.mark.asyncio
-async def test_set_content_should_await_resources_to_load(page):
+async def test_set_content_should_await_resources_to_load(page, server):
     img_route = asyncio.Future()
     await page.route("**/img.png", lambda route, request: img_route.set_result(route))
     loaded = []
 
     async def load():
-        await page.set_content('<img src=server.PREFIX + "/img.png"></img>')
+        await page.set_content(f'<img src="{server.PREFIX}/img.png"></img>')
         loaded.append(True)
 
     content_promise = asyncio.create_task(load())
@@ -1110,9 +1111,9 @@ async def test_press_should_work(page, server):
 
 
 @pytest.mark.asyncio
-async def test_frame_press_should_work(page):
+async def test_frame_press_should_work(page, server):
     await page.set_content(
-        '<iframe name=inner src=server.PREFIX + "/input/textarea.html"></iframe>'
+        f'<iframe name=inner src="{server.PREFIX}/input/textarea.html"></iframe>'
     )
     frame = page.frame("inner")
     await frame.press("textarea", "a")

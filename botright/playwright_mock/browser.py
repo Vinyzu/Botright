@@ -11,6 +11,7 @@ from typing import Optional, Pattern, Callable, Any, List, Dict, Union, TYPE_CHE
 #     Request as PlaywrightRequest, \
 #     ConsoleMessage as PlaywrightConsoleMessage  # , \
 from playwright._impl._async_base import AsyncEventContextManager
+from playwright._impl._errors import TargetClosedError
 from playwright.async_api import BrowserContext as PlaywrightBrowserContext, \
     Page as PlaywrightPage, \
     Frame as PlaywrightFrame, \
@@ -189,7 +190,10 @@ class BrowserContext(PlaywrightBrowserContext):
 
     async def close(self, reason: Optional[str] = None):
         self._closed = True
-        return await self._origin_close(reason=reason)
+        try:
+            return await self._origin_close(reason=reason)
+        except TargetClosedError:
+            return
 
     async def route(self, url: Union[str, Pattern[str], Callable[[str], bool]], handler: Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]],
                     times: Optional[int] = None):

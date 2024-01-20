@@ -220,6 +220,7 @@ class HTTPServer(Server):
         except Exception:
             pass
 
+
 class TestServer:
     def __init__(self) -> None:
         self.server = HTTPServer()

@@ -7,7 +7,7 @@ pybrowsers==0.5.2
 chrome-fingerprints==1.1
 
 # Math and Others
-numpy==1.26.3
+numpy==1.26.4
 # scipy==1.11.4
 # Image Processing
 # Pillow==10.2.0

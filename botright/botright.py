@@ -102,7 +102,7 @@ class Botright(AsyncObject):
 
         # '--disable-gpu', '--incognito', '--disable-blink-features=AutomationControlled'
         # fmt: off
-        self.flags = ['--incognito', '--accept-lang=en-US', '--lang=en-US', '--no-pings', '--no-zygote', '--mute-audio', '--no-first-run', '--no-default-browser-check', '--disable-cloud-import',
+        self.flags = ['--incognito', '--accept-lang=en-US', '--lang=en-US', '--no-pings', '--mute-audio', '--no-first-run', '--no-default-browser-check', '--disable-cloud-import',
                       '--disable-gesture-typing', '--disable-offer-store-unmasked-wallet-cards', '--disable-offer-upload-credit-cards', '--disable-print-preview', '--disable-voice-input',
                       '--disable-wake-on-wifi', '--disable-cookie-encryption', '--ignore-gpu-blocklist', '--enable-async-dns', '--enable-simple-cache-backend', '--enable-tcp-fast-open',
                       '--prerender-from-omnibox=disabled', '--enable-web-bluetooth', '--disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process,TranslateUI,BlinkGenPropertyTrees',

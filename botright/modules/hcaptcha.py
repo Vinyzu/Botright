@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from hcaptcha_challenger.agents import AgentT
 
@@ -35,6 +35,7 @@ class hCaptcha:
 
         This method mocks the hCaptcha request and captures the generated hCaptcha token.
         """
+
         async def mock_json(route, request):
 
             payload = {**request.post_data_json, "rqdata": rq_data, "hl": "en"} if rq_data else request.post_data_json

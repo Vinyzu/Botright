@@ -3,9 +3,9 @@ import re
 from urllib.parse import urlparse
 
 import pytest
-
 from playwright._impl._path_utils import get_file_dirname
 from playwright.async_api import Error, expect
+
 from botright.extended_typing import Page
 
 _dirname = get_file_dirname()
@@ -52,10 +52,7 @@ async def test_locators_should_have_repr(page: Page, server):
     await page.goto(server.PREFIX + "/input/button.html")
     button = page.locator("button")
     await button.click()
-    assert (
-        str(button)
-        == f"<Locator frame=<Frame name= url='{server.PREFIX}/input/button.html'> selector='button'>"
-    )
+    assert str(button) == f"<Locator frame=<Frame name= url='{server.PREFIX}/input/button.html'> selector='button'>"
 
 
 @pytest.mark.asyncio
@@ -187,15 +184,11 @@ async def test_locators_all_inner_texts(page: Page):
 @pytest.mark.asyncio
 async def test_locators_should_query_existing_element(page: Page, server):
     await page.goto(server.PREFIX + "/playground.html")
-    await page.set_content(
-        """<html><body><div class="second"><div class="inner">A</div></div></body></html>"""
-    )
+    await page.set_content("""<html><body><div class="second"><div class="inner">A</div></div></body></html>""")
     html = page.locator("html")
     second = html.locator(".second")
     inner = second.locator(".inner")
-    assert (
-        await page.evaluate("e => e.textContent", await inner.element_handle()) == "A"
-    )
+    assert await page.evaluate("e => e.textContent", await inner.element_handle()) == "A"
 
 
 @pytest.mark.asyncio
@@ -206,26 +199,15 @@ async def test_locators_evaluate_handle_should_work(page: Page, server):
     check = inner.locator("#check")
     text = await inner.evaluate_handle("e => e.firstChild")
     await page.evaluate("1 + 1")
-    assert (
-        str(outer)
-        == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer'>"
-    )
-    assert (
-        str(inner)
-        == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer >> #inner'>"
-    )
+    assert str(outer) == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer'>"
+    assert str(inner) == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer >> #inner'>"
     assert str(text) == "JSHandle@#text=Text,↵more text"
-    assert (
-        str(check)
-        == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer >> #inner >> #check'>"
-    )
+    assert str(check) == f"<Locator frame=<Frame name= url='{server.PREFIX}/dom.html'> selector='#outer >> #inner >> #check'>"
 
 
 @pytest.mark.asyncio
 async def test_locators_should_query_existing_elements(page: Page):
-    await page.set_content(
-        """<html><body><div>A</div><br/><div>B</div></body></html>"""
-    )
+    await page.set_content("""<html><body><div>A</div><br/><div>B</div></body></html>""")
     html = page.locator("html")
     elements = await html.locator("div").element_handles()
     assert len(elements) == 2
@@ -237,9 +219,7 @@ async def test_locators_should_query_existing_elements(page: Page):
 
 @pytest.mark.asyncio
 async def test_locators_return_empty_array_for_non_existing_elements(page: Page):
-    await page.set_content(
-        """<html><body><div>A</div><br/><div>B</div></body></html>"""
-    )
+    await page.set_content("""<html><body><div>A</div><br/><div>B</div></body></html>""")
     html = page.locator("html")
     elements = await html.locator("abc").element_handles()
     assert len(elements) == 0
@@ -248,9 +228,7 @@ async def test_locators_return_empty_array_for_non_existing_elements(page: Page)
 
 @pytest.mark.asyncio
 async def test_locators_evaluate_all_should_work(page: Page):
-    await page.set_content(
-        """<html><body><div class="tweet"><div class="like">100</div><div class="like">10</div></div></body></html>"""
-    )
+    await page.set_content("""<html><body><div class="tweet"><div class="like">100</div><div class="like">10</div></div></body></html>""")
     tweet = page.locator(".tweet .like")
     content = await tweet.evaluate_all("nodes => nodes.map(n => n.innerText)")
     assert content == ["100", "10"]
@@ -258,9 +236,7 @@ async def test_locators_evaluate_all_should_work(page: Page):
 
 @pytest.mark.asyncio
 async def test_locators_evaluate_all_should_work_with_missing_selector(page: Page):
-    await page.set_content(
-        """<div class="a">not-a-child-div</div><div id="myId"></div"""
-    )
+    await page.set_content("""<div class="a">not-a-child-div</div><div id="myId"></div""")
     tweet = page.locator("#myId .a")
     nodes_length = await tweet.evaluate_all("nodes => nodes.length")
     assert nodes_length == 0
@@ -271,9 +247,7 @@ async def test_locators_hover_should_work(page: Page, server):
     await page.goto(server.PREFIX + "/input/scrollable.html")
     button = page.locator("#button-6")
     await button.hover()
-    assert (
-        await page.evaluate("document.querySelector('button:hover').id") == "button-6"
-    )
+    assert await page.evaluate("document.querySelector('button:hover').id") == "button-6"
 
 
 @pytest.mark.asyncio
@@ -343,10 +317,7 @@ async def test_locators_should_upload_a_file(page: Page, server):
 
     file_path = os.path.relpath(FILE_TO_UPLOAD, os.getcwd())
     await input.set_input_files(file_path)
-    assert (
-        await page.evaluate("e => e.files[0].name", await input.element_handle())
-        == "file-to-upload.txt"
-    )
+    assert await page.evaluate("e => e.files[0].name", await input.element_handle()) == "file-to-upload.txt"
 
 
 @pytest.mark.asyncio
@@ -361,14 +332,10 @@ async def test_locators_should_scroll_into_view(page: Page, server):
     await page.goto(server.PREFIX + "/offscreenbuttons.html")
     for i in range(11):
         button = page.locator(f"#btn{i}")
-        before = await button.evaluate(
-            "button => button.getBoundingClientRect().right - window.innerWidth"
-        )
+        before = await button.evaluate("button => button.getBoundingClientRect().right - window.innerWidth")
         assert before == 10 * i
         await button.scroll_into_view_if_needed()
-        after = await button.evaluate(
-            "button => button.getBoundingClientRect().right - window.innerWidth"
-        )
+        after = await button.evaluate("button => button.getBoundingClientRect().right - window.innerWidth")
         assert after <= 0
         await page.evaluate("window.scrollTo(0, 0)")
 
@@ -408,9 +375,7 @@ async def test_locators_should_screenshot(page: Page, assert_to_be_golden, serve
     await page.goto(server.PREFIX + "/grid.html")
     await page.evaluate("window.scrollBy(50, 100)")
     element = page.locator(".box:nth-of-type(3)")
-    assert_to_be_golden(
-        await element.screenshot(), "screenshot-element-bounding-box.png"
-    )
+    assert_to_be_golden(await element.screenshot(), "screenshot-element-bounding-box.png")
 
 
 @pytest.mark.asyncio
@@ -424,17 +389,23 @@ async def test_locators_should_return_bounding_box(page: Page, server):
     await page.goto(server.PREFIX + "/grid.html")
     element = page.locator(".box:nth-of-type(13)")
     box = await element.bounding_box()
-    assert (box == {
-        "x": 100,
-        "y": 50,
-        "width": 50,
-        "height": 50,
-    }) or (box == {
-        "x": 100,
-        "y": 51,
-        "width": 50,
-        "height": 50,
-    })  # Its a feature.
+    assert (
+        box
+        == {
+            "x": 100,
+            "y": 50,
+            "width": 50,
+            "height": 50,
+        }
+    ) or (
+        box
+        == {
+            "x": 100,
+            "y": 51,
+            "width": 50,
+            "height": 50,
+        }
+    )  # Its a feature.
 
 
 @pytest.mark.asyncio
@@ -545,9 +516,7 @@ async def test_should_combine_visible_with_other_selectors(page):
     )
     locator = page.locator(".item >> visible=true").nth(1)
     await expect(locator).to_have_text("visible data2")
-    await expect(page.locator(".item >> visible=true >> text=data3")).to_have_text(
-        "visible data3"
-    )
+    await expect(page.locator(".item >> visible=true >> text=data3")).to_have_text("visible data3")
 
 
 @pytest.mark.asyncio
@@ -569,35 +538,18 @@ async def test_locator_locator_and_framelocator_locator_should_accept_locator(pa
     input_locator = page.locator("input")
     assert await input_locator.input_value() == "outer"
     assert await page.locator("div").locator(input_locator).input_value() == "outer"
-    assert (
-        await page.frame_locator("iframe").locator(input_locator).input_value()
-        == "inner"
-    )
-    assert (
-        await page.frame_locator("iframe")
-        .locator("div")
-        .locator(input_locator)
-        .input_value()
-        == "inner"
-    )
+    assert await page.frame_locator("iframe").locator(input_locator).input_value() == "inner"
+    assert await page.frame_locator("iframe").locator("div").locator(input_locator).input_value() == "inner"
 
     div_locator = page.locator("div")
     assert await div_locator.locator("input").input_value() == "outer"
-    assert (
-        await page.frame_locator("iframe")
-        .locator(div_locator)
-        .locator("input")
-        .input_value()
-        == "inner"
-    )
+    assert await page.frame_locator("iframe").locator(div_locator).locator("input").input_value() == "inner"
 
 
 async def route_iframe(page: Page) -> None:
     await page.route(
         "**/empty.html",
-        lambda route: route.fulfill(
-            body='<iframe src="iframe.html"></iframe>', content_type="text/html"
-        ),
+        lambda route: route.fulfill(body='<iframe src="iframe.html"></iframe>', content_type="text/html"),
     )
     await page.route(
         "**/iframe.html",
@@ -701,12 +653,7 @@ async def test_locator_frame_locator_should_not_throw_on_first_last_nth(page: Pa
 async def test_drag_to(page: Page, server) -> None:
     await page.goto(server.PREFIX + "/drag-n-drop.html")
     await page.locator("#source").drag_to(page.locator("#target"))
-    assert (
-        await page.eval_on_selector(
-            "#target", "target => target.contains(document.querySelector('#source'))"
-        )
-        is True
-    )
+    assert await page.eval_on_selector("#target", "target => target.contains(document.querySelector('#source'))") is True
 
 
 @pytest.mark.asyncio
@@ -760,51 +707,33 @@ async def test_locator_query_should_filter_by_text(page: Page) -> None:
 
 
 @pytest.mark.asyncio
-async def test_locator_query_should_filter_by_text_2(
-    page: Page
-) -> None:
+async def test_locator_query_should_filter_by_text_2(page: Page) -> None:
     await page.set_content("<div>foo <span>hello world</span> bar</div>")
-    await expect(page.locator("div", has_text="hello world")).to_have_text(
-        "foo hello world bar"
-    )
+    await expect(page.locator("div", has_text="hello world")).to_have_text("foo hello world bar")
 
 
 @pytest.mark.asyncio
 async def test_locator_query_should_filter_by_regex(page: Page) -> None:
     await page.set_content("<div>Foobar</div><div>Bar</div>")
-    await expect(page.locator("div", has_text=re.compile(r"Foo.*"))).to_have_text(
-        "Foobar"
-    )
+    await expect(page.locator("div", has_text=re.compile(r"Foo.*"))).to_have_text("Foobar")
 
 
 @pytest.mark.asyncio
-async def test_locator_query_should_filter_by_text_with_quotes(
-    page: Page
-) -> None:
+async def test_locator_query_should_filter_by_text_with_quotes(page: Page) -> None:
     await page.set_content('<div>Hello "world"</div><div>Hello world</div>')
-    await expect(page.locator("div", has_text='Hello "world"')).to_have_text(
-        'Hello "world"'
-    )
+    await expect(page.locator("div", has_text='Hello "world"')).to_have_text('Hello "world"')
 
 
 @pytest.mark.asyncio
-async def test_locator_query_should_filter_by_regex_with_quotes(
-    page: Page
-) -> None:
+async def test_locator_query_should_filter_by_regex_with_quotes(page: Page) -> None:
     await page.set_content('<div>Hello "world"</div><div>Hello world</div>')
-    await expect(
-        page.locator("div", has_text=re.compile('Hello "world"'))
-    ).to_have_text('Hello "world"')
+    await expect(page.locator("div", has_text=re.compile('Hello "world"'))).to_have_text('Hello "world"')
 
 
 @pytest.mark.asyncio
-async def test_locator_query_should_filter_by_regex_and_regexp_flags(
-    page: Page
-) -> None:
+async def test_locator_query_should_filter_by_regex_and_regexp_flags(page: Page) -> None:
     await page.set_content('<div>Hello "world"</div><div>Hello world</div>')
-    await expect(
-        page.locator("div", has_text=re.compile('hElLo "world', re.IGNORECASE))
-    ).to_have_text('Hello "world"')
+    await expect(page.locator("div", has_text=re.compile('hElLo "world', re.IGNORECASE))).to_have_text('Hello "world"')
 
 
 @pytest.mark.asyncio
@@ -824,30 +753,13 @@ async def test_locator_should_return_page(page: Page, server) -> None:
 async def test_locator_should_support_has_locator(page: Page) -> None:
     await page.set_content("<div><span>hello</span></div><div><span>world</span></div>")
     await expect(page.locator("div", has=page.locator("text=world"))).to_have_count(1)
-    assert (
-        await page.locator("div", has=page.locator("text=world")).evaluate(
-            "e => e.outerHTML"
-        )
-        == "<div><span>world</span></div>"
-    )
+    assert await page.locator("div", has=page.locator("text=world")).evaluate("e => e.outerHTML") == "<div><span>world</span></div>"
     await expect(page.locator("div", has=page.locator('text="hello"'))).to_have_count(1)
-    assert (
-        await page.locator("div", has=page.locator('text="hello"')).evaluate(
-            "e => e.outerHTML"
-        )
-        == "<div><span>hello</span></div>"
-    )
+    assert await page.locator("div", has=page.locator('text="hello"')).evaluate("e => e.outerHTML") == "<div><span>hello</span></div>"
     await expect(page.locator("div", has=page.locator("xpath=./span"))).to_have_count(2)
     await expect(page.locator("div", has=page.locator("span"))).to_have_count(2)
-    await expect(
-        page.locator("div", has=page.locator("span", has_text="wor"))
-    ).to_have_count(1)
-    assert (
-        await page.locator("div", has=page.locator("span", has_text="wor")).evaluate(
-            "e => e.outerHTML"
-        )
-        == "<div><span>world</span></div>"
-    )
+    await expect(page.locator("div", has=page.locator("span", has_text="wor"))).to_have_count(1)
+    assert await page.locator("div", has=page.locator("span", has_text="wor")).evaluate("e => e.outerHTML") == "<div><span>world</span></div>"
     await expect(
         page.locator(
             "div",
@@ -863,30 +775,20 @@ async def test_locator_should_enforce_same_frame_for_has_locator(page: Page, ser
     child = page.frames[1]
     with pytest.raises(Error) as exc_info:
         page.locator("div", has=child.locator("span"))
-    assert (
-        'Inner "has" locator must belong to the same frame.' in exc_info.value.message
-    )
+    assert 'Inner "has" locator must belong to the same frame.' in exc_info.value.message
 
 
 @pytest.mark.asyncio
 async def test_locator_should_support_locator_or(page: Page) -> None:
     await page.set_content("<div>hello</div><span>world</span>")
     await expect(page.locator("div").or_(page.locator("span"))).to_have_count(2)
-    await expect(page.locator("div").or_(page.locator("span"))).to_have_text(
-        ["hello", "world"]
-    )
-    await expect(
-        page.locator("span").or_(page.locator("article")).or_(page.locator("div"))
-    ).to_have_text(["hello", "world"])
+    await expect(page.locator("div").or_(page.locator("span"))).to_have_text(["hello", "world"])
+    await expect(page.locator("span").or_(page.locator("article")).or_(page.locator("div"))).to_have_text(["hello", "world"])
     await expect(page.locator("article").or_(page.locator("someting"))).to_have_count(0)
     await expect(page.locator("article").or_(page.locator("div"))).to_have_text("hello")
-    await expect(page.locator("article").or_(page.locator("span"))).to_have_text(
-        "world"
-    )
+    await expect(page.locator("article").or_(page.locator("span"))).to_have_text("world")
     await expect(page.locator("div").or_(page.locator("article"))).to_have_text("hello")
-    await expect(page.locator("span").or_(page.locator("article"))).to_have_text(
-        "world"
-    )
+    await expect(page.locator("span").or_(page.locator("article"))).to_have_text("world")
 
 
 @pytest.mark.asyncio
@@ -899,24 +801,12 @@ async def test_locator_should_support_locator_locator_with_and_or(page: Page) ->
         """
     )
 
-    await expect(page.locator("div").locator(page.locator("button"))).to_have_text(
-        ["three"]
-    )
-    await expect(
-        page.locator("div").locator(page.locator("button").or_(page.locator("span")))
-    ).to_have_text(["two", "three"])
-    await expect(page.locator("button").or_(page.locator("span"))).to_have_text(
-        ["two", "three", "four", "five"]
-    )
+    await expect(page.locator("div").locator(page.locator("button"))).to_have_text(["three"])
+    await expect(page.locator("div").locator(page.locator("button").or_(page.locator("span")))).to_have_text(["two", "three"])
+    await expect(page.locator("button").or_(page.locator("span"))).to_have_text(["two", "three", "four", "five"])
 
-    await expect(
-        page.locator("div").locator(
-            page.locator("button").and_(page.get_by_role("button"))
-        )
-    ).to_have_text(["three"])
-    await expect(page.locator("button").and_(page.get_by_role("button"))).to_have_text(
-        ["three", "five"]
-    )
+    await expect(page.locator("div").locator(page.locator("button").and_(page.get_by_role("button")))).to_have_text(["three"])
+    await expect(page.locator("button").and_(page.get_by_role("button"))).to_have_text(["three", "five"])
 
 
 @pytest.mark.asyncio
@@ -928,26 +818,14 @@ async def test_locator_highlight_should_work(page: Page, server) -> None:
 
 @pytest.mark.asyncio
 async def test_should_support_locator_that(page: Page) -> None:
-    await page.set_content(
-        "<section><div><span>hello</span></div><div><span>world</span></div></section>"
-    )
+    await page.set_content("<section><div><span>hello</span></div><div><span>world</span></div></section>")
 
     await expect(page.locator("div").filter(has_text="hello")).to_have_count(1)
-    await expect(
-        page.locator("div", has_text="hello").filter(has_text="hello")
-    ).to_have_count(1)
-    await expect(
-        page.locator("div", has_text="hello").filter(has_text="world")
-    ).to_have_count(0)
-    await expect(
-        page.locator("section", has_text="hello").filter(has_text="world")
-    ).to_have_count(1)
-    await expect(
-        page.locator("div").filter(has_text="hello").locator("span")
-    ).to_have_count(1)
-    await expect(
-        page.locator("div").filter(has=page.locator("span", has_text="world"))
-    ).to_have_count(1)
+    await expect(page.locator("div", has_text="hello").filter(has_text="hello")).to_have_count(1)
+    await expect(page.locator("div", has_text="hello").filter(has_text="world")).to_have_count(0)
+    await expect(page.locator("section", has_text="hello").filter(has_text="world")).to_have_count(1)
+    await expect(page.locator("div").filter(has_text="hello").locator("span")).to_have_count(1)
+    await expect(page.locator("div").filter(has=page.locator("span", has_text="world"))).to_have_count(1)
     await expect(page.locator("div").filter(has=page.locator("span"))).to_have_count(2)
     await expect(
         page.locator("div").filter(
@@ -960,53 +838,31 @@ async def test_should_support_locator_that(page: Page) -> None:
 @pytest.mark.asyncio
 async def test_should_filter_by_case_insensitive_regex_in_a_child(page):
     await page.set_content('<div class="test"><h5>Title Text</h5></div>')
-    await expect(
-        page.locator("div", has_text=re.compile(r"^title text$", re.I))
-    ).to_have_text("Title Text")
+    await expect(page.locator("div", has_text=re.compile(r"^title text$", re.I))).to_have_text("Title Text")
 
 
 @pytest.mark.asyncio
 async def test_should_filter_by_case_insensitive_regex_in_multiple_children(page):
-    await page.set_content(
-        '<div class="test"><h5>Title</h5> <h2><i>Text</i></h2></div>'
-    )
-    await expect(
-        page.locator("div", has_text=re.compile(r"^title text$", re.I))
-    ).to_have_class("test")
+    await page.set_content('<div class="test"><h5>Title</h5> <h2><i>Text</i></h2></div>')
+    await expect(page.locator("div", has_text=re.compile(r"^title text$", re.I))).to_have_class("test")
 
 
 @pytest.mark.asyncio
 async def test_should_filter_by_regex_with_special_symbols(page):
-    await page.set_content(
-        '<div class="test"><h5>First/"and"</h5><h2><i>Second\\</i></h2></div>'
-    )
-    await expect(
-        page.locator("div", has_text=re.compile(r'^first\/".*"second\\$', re.S | re.I))
-    ).to_have_class("test")
+    await page.set_content('<div class="test"><h5>First/"and"</h5><h2><i>Second\\</i></h2></div>')
+    await expect(page.locator("div", has_text=re.compile(r'^first\/".*"second\\$', re.S | re.I))).to_have_class("test")
 
 
 @pytest.mark.asyncio
 async def test_should_support_locator_filter(page: Page) -> None:
-    await page.set_content(
-        "<section><div><span>hello</span></div><div><span>world</span></div></section>"
-    )
+    await page.set_content("<section><div><span>hello</span></div><div><span>world</span></div></section>")
 
     await expect(page.locator("div").filter(has_text="hello")).to_have_count(1)
-    await expect(
-        page.locator("div", has_text="hello").filter(has_text="hello")
-    ).to_have_count(1)
-    await expect(
-        page.locator("div", has_text="hello").filter(has_text="world")
-    ).to_have_count(0)
-    await expect(
-        page.locator("section", has_text="hello").filter(has_text="world")
-    ).to_have_count(1)
-    await expect(
-        page.locator("div").filter(has_text="hello").locator("span")
-    ).to_have_count(1)
-    await expect(
-        page.locator("div").filter(has=page.locator("span", has_text="world"))
-    ).to_have_count(1)
+    await expect(page.locator("div", has_text="hello").filter(has_text="hello")).to_have_count(1)
+    await expect(page.locator("div", has_text="hello").filter(has_text="world")).to_have_count(0)
+    await expect(page.locator("section", has_text="hello").filter(has_text="world")).to_have_count(1)
+    await expect(page.locator("div").filter(has_text="hello").locator("span")).to_have_count(1)
+    await expect(page.locator("div").filter(has=page.locator("span", has_text="world"))).to_have_count(1)
     await expect(page.locator("div").filter(has=page.locator("span"))).to_have_count(2)
     await expect(
         page.locator("div").filter(
@@ -1014,15 +870,9 @@ async def test_should_support_locator_filter(page: Page) -> None:
             has_text="world",
         )
     ).to_have_count(1)
-    await expect(
-        page.locator("div").filter(has_not=page.locator("span", has_text="world"))
-    ).to_have_count(1)
-    await expect(
-        page.locator("div").filter(has_not=page.locator("section"))
-    ).to_have_count(2)
-    await expect(
-        page.locator("div").filter(has_not=page.locator("span"))
-    ).to_have_count(0)
+    await expect(page.locator("div").filter(has_not=page.locator("span", has_text="world"))).to_have_count(1)
+    await expect(page.locator("div").filter(has_not=page.locator("section"))).to_have_count(2)
+    await expect(page.locator("div").filter(has_not=page.locator("span"))).to_have_count(0)
 
     await expect(page.locator("div").filter(has_not_text="hello")).to_have_count(1)
     await expect(page.locator("div").filter(has_not_text="foo")).to_have_count(2)
@@ -1037,21 +887,11 @@ async def test_locators_should_support_locator_and(page: Page):
     """
     )
     await expect(page.locator("div").and_(page.locator("div"))).to_have_count(2)
-    await expect(page.locator("div").and_(page.get_by_test_id("foo"))).to_have_text(
-        ["hello"]
-    )
-    await expect(page.locator("div").and_(page.get_by_test_id("bar"))).to_have_text(
-        ["world"]
-    )
-    await expect(page.get_by_test_id("foo").and_(page.locator("div"))).to_have_text(
-        ["hello"]
-    )
-    await expect(page.get_by_test_id("bar").and_(page.locator("span"))).to_have_text(
-        ["world2"]
-    )
-    await expect(
-        page.locator("span").and_(page.get_by_test_id(re.compile("bar|foo")))
-    ).to_have_count(2)
+    await expect(page.locator("div").and_(page.get_by_test_id("foo"))).to_have_text(["hello"])
+    await expect(page.locator("div").and_(page.get_by_test_id("bar"))).to_have_text(["world"])
+    await expect(page.get_by_test_id("foo").and_(page.locator("div"))).to_have_text(["hello"])
+    await expect(page.get_by_test_id("bar").and_(page.locator("span"))).to_have_text(["world2"])
+    await expect(page.locator("span").and_(page.get_by_test_id(re.compile("bar|foo")))).to_have_count(2)
 
 
 @pytest.mark.asyncio

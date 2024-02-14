@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import asyncio
 
-from chrome_fingerprints import ChromeFingerprint
 from async_class import AsyncObject, link
+from chrome_fingerprints import ChromeFingerprint
 
 from .proxy_manager import ProxyManager
 

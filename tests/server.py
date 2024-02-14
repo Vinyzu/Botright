@@ -7,25 +7,13 @@ import socket
 import threading
 from contextlib import closing
 from http import HTTPStatus
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generator,
-    Generic,
-    Optional,
-    Set,
-    Tuple,
-    TypeVar,
-    cast,
-)
+from typing import Any, Callable, Dict, Generator, Generic, Optional, Set, Tuple, TypeVar, cast
 from urllib.parse import urlparse
 
+from playwright._impl._path_utils import get_file_dirname
 from twisted.internet import reactor as _twisted_reactor
 from twisted.internet.selectreactor import SelectReactor
 from twisted.web import http
-
-from playwright._impl._path_utils import get_file_dirname
 
 _dirname = get_file_dirname()
 reactor = cast(SelectReactor, _twisted_reactor)
@@ -69,9 +57,7 @@ class TestServerRequest(http.Request):
 
         request_subscriber = server.request_subscribers.get(path)
         if request_subscriber:
-            request_subscriber._loop.call_soon_threadsafe(
-                request_subscriber.set_result, self
-            )
+            request_subscriber._loop.call_soon_threadsafe(request_subscriber.set_result, self)
             server.request_subscribers.pop(path)
 
         if server.auth.get(path):
@@ -168,9 +154,7 @@ class Server:
         return await future
 
     @contextlib.contextmanager
-    def expect_request(
-        self, path: str
-    ) -> Generator[ExpectResponse[TestServerRequest], None, None]:
+    def expect_request(self, path: str) -> Generator[ExpectResponse[TestServerRequest], None, None]:
         future = asyncio.create_task(self.wait_for_request(path))
 
         cb_wrapper: ExpectResponse[TestServerRequest] = ExpectResponse()
@@ -195,9 +179,7 @@ class Server:
         self.gzip_routes.clear()
         self.routes.clear()
 
-    def set_route(
-        self, path: str, callback: Callable[[TestServerRequest], Any]
-    ) -> None:
+    def set_route(self, path: str, callback: Callable[[TestServerRequest], Any]) -> None:
         self.routes[path] = callback
 
     def enable_gzip(self, path: str) -> None:
@@ -227,9 +209,7 @@ class TestServer:
 
     def start(self) -> None:
         self.server.start()
-        self.thread = threading.Thread(
-            target=lambda: reactor.run(installSignalHandlers=False)
-        )
+        self.thread = threading.Thread(target=lambda: reactor.run(installSignalHandlers=False))
         self.thread.start()
 
     def stop(self) -> None:

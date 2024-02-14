@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Optional, Tuple, List, Any, NoReturn, Literal, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Literal, NoReturn, Optional, Tuple, Union
 
+# fmt: off
 import numpy as np
-
 # from undetected_playwright.async_api import Mouse as PlaywrightMouse
 from playwright.async_api import Mouse as PlaywrightMouse
+
+# fmt: on
 
 if TYPE_CHECKING:
     from . import Page
@@ -22,7 +24,7 @@ class HumanizeMouseTrajectory:
 
     def easeOutQuad(self, n: float) -> float:
         if not 0.0 <= n <= 1.0:
-            raise ValueError('Argument must be between 0.0 and 1.0.')
+            raise ValueError("Argument must be between 0.0 and 1.0.")
         return -n * (n - 2)
 
     def generate_curve(self) -> List[Tuple[int, int]]:
@@ -38,15 +40,11 @@ class HumanizeMouseTrajectory:
         points = self.tween_points(points, 100)
         return points
 
-    def generate_internal_knots(self, l_boundary: Union[int, float], r_boundary: Union[int, float], d_boundary: Union[int, float],
-                                u_boundary: Union[int, float], knots_count: int) -> Union[List[Tuple[int, int]], NoReturn]:
+    def generate_internal_knots(
+        self, l_boundary: Union[int, float], r_boundary: Union[int, float], d_boundary: Union[int, float], u_boundary: Union[int, float], knots_count: int
+    ) -> Union[List[Tuple[int, int]], NoReturn]:
         """Generates the internal knots of the curve randomly"""
-        if not (
-            self.check_if_numeric(l_boundary)
-            and self.check_if_numeric(r_boundary)
-            and self.check_if_numeric(d_boundary)
-            and self.check_if_numeric(u_boundary)
-        ):
+        if not (self.check_if_numeric(l_boundary) and self.check_if_numeric(r_boundary) and self.check_if_numeric(d_boundary) and self.check_if_numeric(u_boundary)):
             raise ValueError("Boundaries must be numeric values")
         if not isinstance(knots_count, int) or knots_count < 0:
             knots_count = 0
@@ -76,11 +74,7 @@ class HumanizeMouseTrajectory:
 
     def distort_points(self, points: List[Tuple[int, int]], distortion_mean: int, distortion_st_dev: int, distortion_frequency: float) -> Union[List[Tuple[int, int]], NoReturn]:
         """Distorts points by parameters of mean, standard deviation and frequency"""
-        if not (
-            self.check_if_numeric(distortion_mean)
-            and self.check_if_numeric(distortion_st_dev)
-            and self.check_if_numeric(distortion_frequency)
-        ):
+        if not (self.check_if_numeric(distortion_mean) and self.check_if_numeric(distortion_st_dev) and self.check_if_numeric(distortion_frequency)):
             raise ValueError("Distortions must be numeric")
         if not self.check_if_list_of_points(points):
             raise ValueError("points must be valid list of points")
@@ -90,11 +84,7 @@ class HumanizeMouseTrajectory:
         distorted: List[Tuple[int, int]] = []
         for i in range(1, len(points) - 1):
             x, y = points[i]
-            delta = int(
-                np.random.normal(distortion_mean, distortion_st_dev)
-                if random.random() < distortion_frequency
-                else 0
-            )
+            delta = int(np.random.normal(distortion_mean, distortion_st_dev) if random.random() < distortion_frequency else 0)
             distorted.append((x, y + delta))
         distorted = [points[0]] + distorted + [points[-1]]
         return distorted
@@ -120,6 +110,7 @@ class HumanizeMouseTrajectory:
     def check_if_list_of_points(self, list_of_points: List[Tuple[int, int]]) -> bool:
         """Checks if list of points is valid"""
         try:
+
             def point(p):
                 return (len(p) == 2) and self.check_if_numeric(p[0]) and self.check_if_numeric(p[1])
 
@@ -187,8 +178,15 @@ class Mouse(PlaywrightMouse):
         self.last_x = 0
         self.last_y = 0
 
-    async def click(self, x: Union[int, float], y: Union[int, float], button: Optional[Literal['left', 'middle', 'right']] = "left", click_count: Optional[int] = 1, delay: Optional[float] = 20.0,
-                    humanly: Optional[bool] = True) -> None:
+    async def click(
+        self,
+        x: Union[int, float],
+        y: Union[int, float],
+        button: Optional[Literal["left", "middle", "right"]] = "left",
+        click_count: Optional[int] = 1,
+        delay: Optional[float] = 20.0,
+        humanly: Optional[bool] = True,
+    ) -> None:
         delay = delay or 20.0
         # Move mouse humanly to the Coordinates and wait some random time
         await self.move(x, y)  # , humanly
@@ -203,8 +201,9 @@ class Mouse(PlaywrightMouse):
         # Waiting random time
         await self._page.wait_for_timeout(random.randint(4, 8) * 50)
 
-    async def dblclick(self, x: Union[int, float], y: Union[int, float], button: Optional[Literal['left', 'middle', 'right']] = "left",
-                       delay: Optional[float] = 20.0, humanly: Optional[bool] = True) -> None:
+    async def dblclick(
+        self, x: Union[int, float], y: Union[int, float], button: Optional[Literal["left", "middle", "right"]] = "left", delay: Optional[float] = 20.0, humanly: Optional[bool] = True
+    ) -> None:
         delay = delay or 20.0
         # Move mouse humanly to the Coordinates and wait some random time
         await self.move(x, y, humanly)
@@ -238,10 +237,7 @@ class Mouse(PlaywrightMouse):
             await self._page.wait_for_timeout(random.randint(1, 10))
             return
 
-        humanized_points = HumanizeMouseTrajectory(
-            (int(self.last_x), int(self.last_y)),
-            (int(x), int(y))
-        )
+        humanized_points = HumanizeMouseTrajectory((int(self.last_x), int(self.last_y)), (int(x), int(y)))
 
         # Move Mouse to new random locations
         for x, y in humanized_points.points:

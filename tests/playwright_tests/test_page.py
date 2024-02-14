@@ -17,8 +17,8 @@ import os
 import re
 
 import pytest
-
 from playwright.async_api import Error, Route, TimeoutError
+
 from botright.extended_typing import BrowserContext, Page
 
 
@@ -26,9 +26,7 @@ from botright.extended_typing import BrowserContext, Page
 async def test_close_should_reject_all_promises(browser):
     new_page = await browser.new_page()
     with pytest.raises(Error) as exc_info:
-        await asyncio.gather(
-            new_page.evaluate("() => new Promise(r => {})"), new_page.close()
-        )
+        await asyncio.gather(new_page.evaluate("() => new Promise(r => {})"), new_page.close())
     assert " closed" in exc_info.value.message
 
 
@@ -102,9 +100,7 @@ async def test_close_should_terminate_network_waiters(browser, server):
                 pass
         return exc_info.value
 
-    results = await asyncio.gather(
-        wait_for_request(), wait_for_response(), page.close()
-    )
+    results = await asyncio.gather(wait_for_request(), wait_for_response(), page.close())
     for i in range(2):
         error = results[i]
         assert "Target page, context or browser has been closed" in error.message
@@ -129,9 +125,7 @@ async def test_load_should_fire_when_expected(page):
 
 @pytest.mark.asyncio
 async def test_async_stacks_should_work(page, server):
-    await page.route(
-        "**/empty.html", lambda route, response: asyncio.create_task(route.abort())
-    )
+    await page.route("**/empty.html", lambda route, response: asyncio.create_task(route.abort()))
     with pytest.raises(Error) as exc_info:
         await page.goto(server.EMPTY_PAGE)
     assert __file__ in exc_info.value.stack
@@ -182,9 +176,7 @@ async def test_wait_for_request(page, server):
 @pytest.mark.asyncio
 async def test_wait_for_request_should_work_with_predicate(page, server):
     await page.goto(server.EMPTY_PAGE)
-    async with page.expect_request(
-            lambda request: request.url == server.PREFIX + "/digits/2.png"
-    ) as request_info:
+    async with page.expect_request(lambda request: request.url == server.PREFIX + "/digits/2.png") as request_info:
         await page.evaluate(
             """() => {
                 fetch('/digits/1.png')
@@ -216,9 +208,7 @@ async def test_wait_for_request_should_respect_default_timeout(page):
 @pytest.mark.asyncio
 async def test_wait_for_request_should_work_with_no_timeout(page, server):
     await page.goto(server.EMPTY_PAGE)
-    async with page.expect_request(
-            server.PREFIX + "/digits/2.png", timeout=0
-    ) as request_info:
+    async with page.expect_request(server.PREFIX + "/digits/2.png", timeout=0) as request_info:
         await page.evaluate(
             """() => setTimeout(() => {
                 fetch('/digits/1.png')
@@ -282,9 +272,7 @@ async def test_wait_for_response_should_respect_default_timeout(page):
 @pytest.mark.asyncio
 async def test_wait_for_response_should_work_with_predicate(page, server):
     await page.goto(server.EMPTY_PAGE)
-    async with page.expect_response(
-            lambda response: response.url == server.PREFIX + "/digits/2.png"
-    ) as response_info:
+    async with page.expect_response(lambda response: response.url == server.PREFIX + "/digits/2.png") as response_info:
         await page.evaluate(
             """() => {
                 fetch('/digits/1.png')
@@ -312,9 +300,7 @@ async def test_wait_for_response_should_work_with_no_timeout(page, server):
 
 
 @pytest.mark.asyncio
-async def test_wait_for_response_should_use_context_timeout(
-        page: Page, browser: BrowserContext, server
-) -> None:
+async def test_wait_for_response_should_use_context_timeout(page: Page, browser: BrowserContext, server) -> None:
     await page.goto(server.EMPTY_PAGE)
 
     browser.set_default_timeout(1000)
@@ -327,7 +313,7 @@ async def test_wait_for_response_should_use_context_timeout(
 
 @pytest.mark.asyncio
 async def test_expect_response_should_not_hang_when_predicate_throws(
-        page: Page,
+    page: Page,
 ) -> None:
     with pytest.raises(Exception, match="Oops!"):
         async with page.expect_response("**/*"):
@@ -458,10 +444,7 @@ async def test_page_error_should_fire(page, server):
     assert error.name == "Error"
     assert error.message == "Fancy error!"
     # Note that WebKit reports the stack of the 'throw' statement instead of the Error constructor call.
-    assert (
-            error.stack
-            == """Error: Fancy error!\n    at c (myscript.js:14:11)\n    at b (myscript.js:10:5)\n    at a (myscript.js:6:5)\n    at myscript.js:3:1"""
-    )
+    assert error.stack == """Error: Fancy error!\n    at c (myscript.js:14:11)\n    at b (myscript.js:10:5)\n    at a (myscript.js:6:5)\n    at myscript.js:3:1"""
 
 
 @pytest.mark.asyncio
@@ -610,9 +593,7 @@ async def test_add_script_tag_should_work_with_a_url_and_type_module(page, serve
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_work_with_a_path_and_type_module(
-        page, assetdir, server
-):
+async def test_add_script_tag_should_work_with_a_path_and_type_module(page, assetdir, server):
     await page.goto(server.EMPTY_PAGE)
     await page.add_script_tag(path=assetdir / "es6" / "es6pathimport.js", type="module")
     await page.wait_for_function("window.__es6injected")
@@ -620,9 +601,7 @@ async def test_add_script_tag_should_work_with_a_path_and_type_module(
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_throw_an_error_if_loading_from_url_fail(
-        page, server
-):
+async def test_add_script_tag_should_throw_an_error_if_loading_from_url_fail(page, server):
     await page.goto(server.EMPTY_PAGE)
     with pytest.raises(Error) as exc_info:
         await page.add_script_tag(url=server.PREFIX + "/nonexistfile.js")
@@ -638,9 +617,7 @@ async def test_add_script_tag_should_work_with_a_path(page, assetdir, server):
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_include_source_url_when_path_is_provided(
-        page, assetdir, server
-):
+async def test_add_script_tag_should_include_source_url_when_path_is_provided(page, assetdir, server):
     # Lacking sourceURL support in WebKit
     await page.goto(server.EMPTY_PAGE)
     await page.add_script_tag(path=assetdir / "injectedfile.js")
@@ -657,9 +634,7 @@ async def test_add_script_tag_should_work_with_content(page, server):
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_throw_when_added_with_content_to_the_csp_page(
-        page, server
-):
+async def test_add_script_tag_should_throw_when_added_with_content_to_the_csp_page(page, server):
     # Firefox fires onload for blocked script before it issues the CSP console error.
     await page.goto(server.PREFIX + "/csp.html")
     with pytest.raises(Error) as exc_info:
@@ -668,9 +643,7 @@ async def test_add_script_tag_should_throw_when_added_with_content_to_the_csp_pa
 
 
 @pytest.mark.asyncio
-async def test_add_script_tag_should_throw_a_nice_error_when_the_request_fails(
-        page, server
-):
+async def test_add_script_tag_should_throw_a_nice_error_when_the_request_fails(page, server):
     await page.goto(server.EMPTY_PAGE)
     url = server.PREFIX + "/this_does_not_exist.js"
     with pytest.raises(Error) as exc_info:
@@ -683,18 +656,11 @@ async def test_add_style_tag_should_work_with_a_url(page, server):
     await page.goto(server.EMPTY_PAGE)
     style_handle = await page.add_style_tag(url=server.PREFIX + "/injectedstyle.css")
     assert style_handle.as_element()
-    assert (
-            await page.evaluate(
-                "window.getComputedStyle(document.querySelector('body')).getPropertyValue('background-color')"
-            )
-            == "rgb(255, 0, 0)"
-    )
+    assert await page.evaluate("window.getComputedStyle(document.querySelector('body')).getPropertyValue('background-color')") == "rgb(255, 0, 0)"
 
 
 @pytest.mark.asyncio
-async def test_add_style_tag_should_throw_an_error_if_loading_from_url_fail(
-        page, server
-):
+async def test_add_style_tag_should_throw_an_error_if_loading_from_url_fail(page, server):
     await page.goto(server.EMPTY_PAGE)
     with pytest.raises(Error) as exc_info:
         await page.add_style_tag(url=server.PREFIX + "/nonexistfile.js")
@@ -706,18 +672,11 @@ async def test_add_style_tag_should_work_with_a_path(page, assetdir, server):
     await page.goto(server.EMPTY_PAGE)
     style_handle = await page.add_style_tag(path=assetdir / "injectedstyle.css")
     assert style_handle.as_element()
-    assert (
-            await page.evaluate(
-                "window.getComputedStyle(document.querySelector('body')).getPropertyValue('background-color')"
-            )
-            == "rgb(255, 0, 0)"
-    )
+    assert await page.evaluate("window.getComputedStyle(document.querySelector('body')).getPropertyValue('background-color')") == "rgb(255, 0, 0)"
 
 
 @pytest.mark.asyncio
-async def test_add_style_tag_should_include_source_url_when_path_is_provided(
-        page, assetdir, server
-):
+async def test_add_style_tag_should_include_source_url_when_path_is_provided(page, assetdir, server):
     await page.goto(server.EMPTY_PAGE)
     await page.add_style_tag(path=assetdir / "injectedstyle.css")
     style_handle = await page.query_selector("style")
@@ -730,18 +689,11 @@ async def test_add_style_tag_should_work_with_content(page, server):
     await page.goto(server.EMPTY_PAGE)
     style_handle = await page.add_style_tag(content="body { background-color: green; }")
     assert style_handle.as_element()
-    assert (
-            await page.evaluate(
-                "window.getComputedStyle(document.querySelector('body')).getPropertyValue('background-color')"
-            )
-            == "rgb(0, 128, 0)"
-    )
+    assert await page.evaluate("window.getComputedStyle(document.querySelector('body')).getPropertyValue('background-color')") == "rgb(0, 128, 0)"
 
 
 @pytest.mark.asyncio
-async def test_add_style_tag_should_throw_when_added_with_content_to_the_CSP_page(
-        page, server
-):
+async def test_add_style_tag_should_throw_when_added_with_content_to_the_CSP_page(page, server):
     await page.goto(server.PREFIX + "/csp.html")
     with pytest.raises(Error) as exc_info:
         await page.add_style_tag(content="body { background-color: green; }")
@@ -771,9 +723,7 @@ async def test_title_should_return_the_page_title(page, server):
 
 async def give_it_a_chance_to_fill(page):
     for i in range(5):
-        await page.evaluate(
-            "() => new Promise(f => requestAnimationFrame(() => requestAnimationFrame(f)))"
-        )
+        await page.evaluate("() => new Promise(f => requestAnimationFrame(() => requestAnimationFrame(f)))")
 
 
 @pytest.mark.asyncio
@@ -802,9 +752,7 @@ async def test_fill_should_throw_on_unsupported_inputs(page, server):
         "reset",
         "submit",
     ]:
-        await page.eval_on_selector(
-            "input", "(input, type) => input.setAttribute('type', type)", type
-        )
+        await page.eval_on_selector("input", "(input, type) => input.setAttribute('type', type)", type)
         with pytest.raises(Error) as exc_info:
             await page.fill("input", "")
         assert f'Input of type "{type}" cannot be filled' in exc_info.value.message
@@ -814,9 +762,7 @@ async def test_fill_should_throw_on_unsupported_inputs(page, server):
 async def test_fill_should_fill_different_input_types(page, server):
     await page.goto(server.PREFIX + "/input/textarea.html")
     for type in ["password", "search", "tel", "text", "url"]:
-        await page.eval_on_selector(
-            "input", "(input, type) => input.setAttribute('type', type)", type
-        )
+        await page.eval_on_selector("input", "(input, type) => input.setAttribute('type', type)", type)
         await page.fill("input", "text " + type)
         assert await page.evaluate("result") == "text " + type
 
@@ -858,10 +804,7 @@ async def test_fill_should_throw_on_incorrect_time(page):
 async def test_fill_should_fill_datetime_local_input(page):
     await page.set_content("<input type=datetime-local>")
     await page.fill("input", "2020-03-02T05:15")
-    assert (
-            await page.eval_on_selector("input", "input => input.value")
-            == "2020-03-02T05:15"
-    )
+    assert await page.eval_on_selector("input", "input => input.value") == "2020-03-02T05:15"
 
 
 @pytest.mark.asyncio
@@ -876,16 +819,11 @@ async def test_fill_should_throw_on_incorrect_datetime_local(page):
 async def test_fill_should_fill_contenteditable(page, server):
     await page.goto(server.PREFIX + "/input/textarea.html")
     await page.fill("div[contenteditable]", "some value")
-    assert (
-            await page.eval_on_selector("div[contenteditable]", "div => div.textContent")
-            == "some value"
-    )
+    assert await page.eval_on_selector("div[contenteditable]", "div => div.textContent") == "some value"
 
 
 @pytest.mark.asyncio
-async def test_fill_should_fill_elements_with_existing_value_and_selection(
-        page, server
-):
+async def test_fill_should_fill_elements_with_existing_value_and_selection(page, server):
     await page.goto(server.PREFIX + "/input/textarea.html")
 
     await page.eval_on_selector("input", "input => input.value = 'value one'")
@@ -916,16 +854,11 @@ async def test_fill_should_fill_elements_with_existing_value_and_selection(
     )
 
     await page.fill("div[contenteditable]", "replace with this")
-    assert (
-            await page.eval_on_selector("div[contenteditable]", "div => div.textContent")
-            == "replace with this"
-    )
+    assert await page.eval_on_selector("div[contenteditable]", "div => div.textContent") == "replace with this"
 
 
 @pytest.mark.asyncio
-async def test_fill_should_throw_when_element_is_not_an_input_textarea_or_contenteditable(
-        page, server
-):
+async def test_fill_should_throw_when_element_is_not_an_input_textarea_or_contenteditable(page, server):
     await page.goto(server.PREFIX + "/input/textarea.html")
     with pytest.raises(Error) as exc_info:
         await page.fill("body", "")
@@ -1112,9 +1045,7 @@ async def test_press_should_work(page, server):
 
 @pytest.mark.asyncio
 async def test_frame_press_should_work(page, server):
-    await page.set_content(
-        f'<iframe name=inner src="{server.PREFIX}/input/textarea.html"></iframe>'
-    )
+    await page.set_content(f'<iframe name=inner src="{server.PREFIX}/input/textarea.html"></iframe>')
     frame = page.frame("inner")
     await frame.press("textarea", "a")
     assert await frame.evaluate("document.querySelector('textarea').value") == "a"
@@ -1122,21 +1053,13 @@ async def test_frame_press_should_work(page, server):
 
 @pytest.mark.asyncio
 async def test_should_emulate_reduced_motion(page):
-    assert await page.evaluate(
-        "matchMedia('(prefers-reduced-motion: no-preference)').matches"
-    )
+    assert await page.evaluate("matchMedia('(prefers-reduced-motion: no-preference)').matches")
     await page.emulate_media(reduced_motion="reduce")
     assert await page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
-    assert not await page.evaluate(
-        "matchMedia('(prefers-reduced-motion: no-preference)').matches"
-    )
+    assert not await page.evaluate("matchMedia('(prefers-reduced-motion: no-preference)').matches")
     await page.emulate_media(reduced_motion="no-preference")
-    assert not await page.evaluate(
-        "matchMedia('(prefers-reduced-motion: reduce)').matches"
-    )
-    assert await page.evaluate(
-        "matchMedia('(prefers-reduced-motion: no-preference)').matches"
-    )
+    assert not await page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
+    assert await page.evaluate("matchMedia('(prefers-reduced-motion: no-preference)').matches")
 
 
 @pytest.mark.asyncio
@@ -1154,12 +1077,7 @@ async def test_input_value(page: Page, server):
 async def test_drag_and_drop_helper_method(page: Page, server):
     await page.goto(server.PREFIX + "/drag-n-drop.html")
     await page.drag_and_drop("#source", "#target")
-    assert (
-            await page.eval_on_selector(
-                "#target", "target => target.contains(document.querySelector('#source'))"
-            )
-            is True
-    )
+    assert await page.eval_on_selector("#target", "target => target.contains(document.querySelector('#source'))") is True
 
 
 @pytest.mark.asyncio
@@ -1220,9 +1138,7 @@ async def test_should_check_box_using_set_checked(page: Page):
 async def test_should_set_bodysize_and_headersize(page: Page, server):
     await page.goto(server.EMPTY_PAGE)
     async with page.expect_request("*/**") as request_info:
-        await page.evaluate(
-            "() => fetch('./get', { method: 'POST', body: '12345'}).then(r => r.text())"
-        )
+        await page.evaluate("() => fetch('./get', { method: 'POST', body: '12345'}).then(r => r.text())")
     request = await request_info.value
     sizes = await request.sizes()
     assert sizes["requestBodySize"] == 5
@@ -1252,9 +1168,7 @@ async def test_should_emulate_forced_colors(page):
 
 
 @pytest.mark.asyncio
-async def test_should_not_throw_when_continuing_while_page_is_closing(
-        page: Page, server
-):
+async def test_should_not_throw_when_continuing_while_page_is_closing(page: Page, server):
     done = None
 
     def handle_route(route: Route) -> None:
@@ -1268,9 +1182,7 @@ async def test_should_not_throw_when_continuing_while_page_is_closing(
 
 
 @pytest.mark.asyncio
-async def test_should_not_throw_when_continuing_after_page_is_closed(
-        page: Page, server
-):
+async def test_should_not_throw_when_continuing_after_page_is_closed(page: Page, server):
     done = asyncio.Future()
 
     async def handle_route(route: Route) -> None:

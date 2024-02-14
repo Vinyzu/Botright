@@ -1,20 +1,21 @@
 from __future__ import annotations
 
+import logging
 import os
 import shutil
-import logging
 from tempfile import TemporaryDirectory, gettempdir
-from typing import Optional, Dict, List, Any
+from typing import Any, Dict, List, Optional
 
-import loguru
 import browsers
 import hcaptcha_challenger as solver
+import loguru
 from async_class import AsyncObject
-from undetected_playwright.async_api import async_playwright as undetected_async_playwright
-from playwright.async_api import async_playwright, Playwright, APIResponse
 from chrome_fingerprints import AsyncFingerprintGenerator
+from playwright.async_api import APIResponse, Playwright, async_playwright
+from undetected_playwright.async_api import async_playwright as undetected_async_playwright
 
 from botright.playwright_mock import browser
+
 from .modules import Faker, ProxyManager
 from .playwright_mock import BrowserContext
 
@@ -24,15 +25,17 @@ loguru.logger.disable("hcaptcha_challenger")
 
 
 class Botright(AsyncObject):
-    def __init__(self,
-                 headless: Optional[bool] = False,
-                 block_images: Optional[bool] = False,
-                 cache_responses: Optional[bool] = False,
-                 user_action_layer: Optional[bool] = False,
-                 scroll_into_view: Optional[bool] = True,
-                 spoof_canvas: Optional[bool] = True,
-                 mask_fingerprint: Optional[bool] = True,
-                 use_undetected_playwright: Optional[bool] = False) -> None:
+    def __init__(
+        self,
+        headless: Optional[bool] = False,
+        block_images: Optional[bool] = False,
+        cache_responses: Optional[bool] = False,
+        user_action_layer: Optional[bool] = False,
+        scroll_into_view: Optional[bool] = True,
+        spoof_canvas: Optional[bool] = True,
+        mask_fingerprint: Optional[bool] = True,
+        use_undetected_playwright: Optional[bool] = False,
+    ) -> None:
         """
         Initialize a Botright instance with specified configurations.
 
@@ -49,15 +52,17 @@ class Botright(AsyncObject):
         # This Init Function is only for intellisense.
         super().__init__()
 
-    async def __ainit__(self,
-                        headless: Optional[bool] = False,
-                        block_images: Optional[bool] = False,
-                        cache_responses: Optional[bool] = False,
-                        user_action_layer: Optional[bool] = False,
-                        scroll_into_view: Optional[bool] = True,
-                        spoof_canvas: Optional[bool] = True,
-                        mask_fingerprint: Optional[bool] = True,
-                        use_undetected_playwright: Optional[bool] = False) -> None:
+    async def __ainit__(
+        self,
+        headless: Optional[bool] = False,
+        block_images: Optional[bool] = False,
+        cache_responses: Optional[bool] = False,
+        user_action_layer: Optional[bool] = False,
+        scroll_into_view: Optional[bool] = True,
+        spoof_canvas: Optional[bool] = True,
+        mask_fingerprint: Optional[bool] = True,
+        use_undetected_playwright: Optional[bool] = False,
+    ) -> None:
         """
         Initialize a Botright instance with specified configurations.
 
@@ -95,12 +100,13 @@ class Botright(AsyncObject):
         self.use_undetected_playwright = use_undetected_playwright
         self.cache: Dict[str, APIResponse] = {}
 
-        # '--disable-gpu', '--incognito'
+        # '--disable-gpu', '--incognito', '--disable-blink-features=AutomationControlled'
+        # fmt: off
         self.flags = ['--incognito', '--accept-lang=en-US', '--lang=en-US', '--no-pings', '--no-zygote', '--mute-audio', '--no-first-run', '--no-default-browser-check', '--disable-cloud-import',
                       '--disable-gesture-typing', '--disable-offer-store-unmasked-wallet-cards', '--disable-offer-upload-credit-cards', '--disable-print-preview', '--disable-voice-input',
                       '--disable-wake-on-wifi', '--disable-cookie-encryption', '--ignore-gpu-blocklist', '--enable-async-dns', '--enable-simple-cache-backend', '--enable-tcp-fast-open',
                       '--prerender-from-omnibox=disabled', '--enable-web-bluetooth', '--disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process,TranslateUI,BlinkGenPropertyTrees',
-                      '--aggressive-cache-discard', '--disable-extensions', '--disable-blink-features', '--disable-blink-features=AutomationControlled', '--disable-ipc-flooding-protection',
+                      '--aggressive-cache-discard', '--disable-extensions', '--disable-ipc-flooding-protection', '--disable-blink-features=AutomationControlled', '--test-type',
                       '--enable-features=NetworkService,NetworkServiceInProcess,TrustTokens,TrustTokensAlwaysAllowIssuance', '--disable-component-extensions-with-background-pages',
                       '--disable-default-apps', '--disable-breakpad', '--disable-component-update', '--disable-domain-reliability', '--disable-sync', '--disable-client-side-phishing-detection',
                       '--disable-hang-monitor', '--disable-popup-blocking', '--disable-prompt-on-repost', '--metrics-recording-only', '--safebrowsing-disable-auto-update', '--password-store=basic',
@@ -111,6 +117,7 @@ class Botright(AsyncObject):
                       '--run-all-compositor-stages-before-draw', '--disable-threaded-animation', '--disable-threaded-scrolling', '--disable-checker-imaging',
                       '--disable-new-content-rendering-timeout', '--disable-image-animation-resync', '--disable-partial-raster', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,'
                       'primaryPointerType=4,availablePointerTypes=4', '--disable-layer-tree-host-memory-pressure']
+        # fmt: on
 
         # Collecting items that can be stopped
         self.stoppable: List[Any] = []
@@ -118,15 +125,13 @@ class Botright(AsyncObject):
 
         if spoof_canvas and self.mask_fingerprint:
             if self.browser["browser_type"] != "chromium":
-                self.flags.append('--disable-reading-from-canvas')
+                self.flags.append("--disable-reading-from-canvas")
             else:
-                self.flags.append('--fingerprinting-canvas-image-data-noise')
+                self.flags.append("--fingerprinting-canvas-image-data-noise")
 
         self.fingerprint_generator = AsyncFingerprintGenerator()
 
-    async def new_browser(self,
-                          proxy: Optional[str] = None,
-                          **launch_arguments) -> BrowserContext:
+    async def new_browser(self, proxy: Optional[str] = None, **launch_arguments) -> BrowserContext:
         """
         Create a new Botright browser instance with specified configurations.
 
@@ -177,10 +182,11 @@ class Botright(AsyncObject):
             pass
 
         for temp_dir in self.temp_dirs:
-            try:
-                temp_dir.cleanup()
-            except Exception:
-                pass
+            if os.path.exists(temp_dir.name):
+                try:
+                    temp_dir.cleanup()
+                except Exception:
+                    pass
 
     @staticmethod
     def get_browser_engine() -> browsers.Browser:
@@ -194,8 +200,8 @@ class Botright(AsyncObject):
             EnvironmentError: If no Chromium based browser is found on the system.
         """
         # Ungoogled Chromium preferred (most stealthy)
-        if chromium := browsers.get("chromium"):
-            return chromium
+        # if chromium := browsers.get("chromium"):
+        #     return chromium
         print("\033[1;33;48m[WARNING] Ungoogled Chromium not found. Recommended for Canvas Manipulation. Download at https://ungoogled-software.github.io/ungoogled-chromium-binaries/ \033[0m")
 
         # Chrome preferred (much stealthier)
@@ -215,6 +221,6 @@ class Botright(AsyncObject):
 
         for temp_dir in os.listdir(temp_path):
             # Check if the item is a directory and starts with 'botright-'
-            if os.path.isdir(os.path.join(temp_path, temp_dir)) and temp_dir.startswith('botright-'):
+            if os.path.isdir(os.path.join(temp_path, temp_dir)) and temp_dir.startswith("botright-"):
                 # If it matches, delete the folder and its contents
                 shutil.rmtree(os.path.join(temp_path, temp_dir))

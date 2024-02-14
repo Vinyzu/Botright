@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import sys
 import inspect
+import sys
 from tempfile import TemporaryDirectory
-from typing import Optional, Pattern, Callable, Any, List, Dict, Union, TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Pattern, TypedDict, Union
 
 # from undetected_playwright._impl._async_base import AsyncEventContextManager
 # from undetected_playwright.async_api import BrowserContext as PlaywrightBrowserContext, \
@@ -12,18 +12,17 @@ from typing import Optional, Pattern, Callable, Any, List, Dict, Union, TYPE_CHE
 #     ConsoleMessage as PlaywrightConsoleMessage  # , \
 from playwright._impl._async_base import AsyncEventContextManager
 from playwright._impl._errors import TargetClosedError
-from playwright.async_api import BrowserContext as PlaywrightBrowserContext, \
-    Page as PlaywrightPage, \
-    Frame as PlaywrightFrame, \
-    ElementHandle as PlaywrightElementHandle, \
-    Route as PlaywrightRoute, \
-    Request as PlaywrightRequest, \
-    ConsoleMessage as PlaywrightConsoleMessage, \
-    APIResponse
+from playwright.async_api import APIResponse
+from playwright.async_api import BrowserContext as PlaywrightBrowserContext
+from playwright.async_api import ConsoleMessage as PlaywrightConsoleMessage
+from playwright.async_api import ElementHandle as PlaywrightElementHandle
+from playwright.async_api import Frame as PlaywrightFrame
+from playwright.async_api import Page as PlaywrightPage
+from playwright.async_api import Request as PlaywrightRequest
+from playwright.async_api import Route as PlaywrightRoute
 
-
-from ..modules import ProxyManager, Faker
-from . import new_page, Page, Route, Request, Frame, JSHandle, ElementHandle
+from ..modules import Faker, ProxyManager
+from . import ElementHandle, Frame, JSHandle, Page, Request, Route, new_page
 
 if TYPE_CHECKING:
     from botright import Botright
@@ -50,23 +49,33 @@ async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, fla
     """
     if botright.mask_fingerprint:
         fingerprint = faker.fingerprint
-        parsed_launch_arguments = {"locale": "en-US",  "user_agent": fingerprint.navigator.user_agent,
-                                   "timezone_id": proxy.timezone, "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7},
-                                   "permissions": ["geolocation"], "ignore_https_errors": True,
-                                   "screen": {"width": fingerprint.screen.width, "height": fingerprint.screen.height},
-                                   "viewport": {"width": fingerprint.screen.avail_width, "height": fingerprint.screen.avail_height},
-                                   "color_scheme": "dark",
-                                   "proxy": proxy.browser_proxy,
-                                   "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None,
-                                   **launch_arguments}  # self.faker.locale
+        parsed_launch_arguments = {
+            "locale": "en-US",
+            "user_agent": fingerprint.navigator.user_agent,
+            "timezone_id": proxy.timezone,
+            "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7},
+            "permissions": ["geolocation"],
+            "ignore_https_errors": True,
+            "screen": {"width": fingerprint.screen.width, "height": fingerprint.screen.height},
+            "viewport": {"width": fingerprint.screen.avail_width, "height": fingerprint.screen.avail_height},
+            "color_scheme": "dark",
+            "proxy": proxy.browser_proxy,
+            "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None,
+            "ignore_default_args": ["--enable-automation"],
+            **launch_arguments,
+        }  # self.faker.locale
     else:
-        parsed_launch_arguments = {"locale": "en-US",
-                                   "timezone_id": proxy.timezone, "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7},
-                                   "ignore_https_errors": True,
-                                   "color_scheme": "dark",
-                                   "proxy": proxy.browser_proxy,
-                                   "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None,
-                                   **launch_arguments}  # self.faker.locale
+        parsed_launch_arguments = {
+            "locale": "en-US",
+            "timezone_id": proxy.timezone,
+            "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7},
+            "ignore_https_errors": True,
+            "color_scheme": "dark",
+            "proxy": proxy.browser_proxy,
+            "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None,
+            "ignore_default_args": ["--enable-automation"],
+            **launch_arguments,
+        }  # self.faker.locale
 
     if sys.version_info.minor >= 10:
         temp_dir = TemporaryDirectory(prefix="botright-", ignore_cleanup_errors=True)
@@ -77,14 +86,24 @@ async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, fla
 
     # Spawning a new Context for more options
     if proxy.browser_proxy:
-        _browser = await botright.playwright.chromium.launch_persistent_context(user_data_dir=temp_dir_path, headless=botright.headless, executable_path=botright.browser["path"], args=flags,
-                                                                                **parsed_launch_arguments)
+        _browser = await botright.playwright.chromium.launch_persistent_context(
+            user_data_dir=temp_dir_path, headless=botright.headless, executable_path=botright.browser["path"], args=flags, chromium_sandbox=True, **parsed_launch_arguments
+        )
     else:
-        _browser = await botright.playwright.chromium.launch_persistent_context(user_data_dir=temp_dir_path, headless=botright.headless, executable_path=botright.browser["path"], args=flags,
-                                                                                **parsed_launch_arguments)
+        _browser = await botright.playwright.chromium.launch_persistent_context(
+            user_data_dir=temp_dir_path, headless=botright.headless, executable_path=botright.browser["path"], args=flags, chromium_sandbox=True, **parsed_launch_arguments
+        )
 
-    browser = BrowserContext(_browser, proxy, faker, use_undetected_playwright=botright.use_undetected_playwright, cache=botright.cache,
-                             user_action_layer=botright.user_action_layer, mask_fingerprint=botright.mask_fingerprint, scroll_into_view=botright.scroll_into_view)
+    browser = BrowserContext(
+        _browser,
+        proxy,
+        faker,
+        use_undetected_playwright=botright.use_undetected_playwright,
+        cache=botright.cache,
+        user_action_layer=botright.user_action_layer,
+        mask_fingerprint=botright.mask_fingerprint,
+        scroll_into_view=botright.scroll_into_view,
+    )
 
     # Preprocessing to save computing resources
     if botright.block_images:
@@ -97,14 +116,24 @@ async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, fla
 
 
 class BrowserContext(PlaywrightBrowserContext):
-    def __init__(self, browser: PlaywrightBrowserContext, proxy: ProxyManager, faker: Faker, use_undetected_playwright: Optional[bool], cache: Dict[str, APIResponse],
-                 user_action_layer: Optional[bool], scroll_into_view: Optional[bool], mask_fingerprint: Optional[bool]):
+    def __init__(
+        self,
+        browser: PlaywrightBrowserContext,
+        proxy: ProxyManager,
+        faker: Faker,
+        use_undetected_playwright: Optional[bool],
+        cache: Dict[str, APIResponse],
+        user_action_layer: Optional[bool],
+        scroll_into_view: Optional[bool],
+        mask_fingerprint: Optional[bool],
+    ):
         super().__init__(browser)
         self._impl_obj = browser._impl_obj
         self._browser = browser
         self._closed = False
-        self._route_proxies: Dict[Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]],
-                                  Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]]] = {}
+        self._route_proxies: Dict[
+            Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]], Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]]
+        ] = {}
 
         self.proxy = proxy
         self.faker = faker
@@ -195,9 +224,11 @@ class BrowserContext(PlaywrightBrowserContext):
         except TargetClosedError:
             return
 
-    async def route(self, url: Union[str, Pattern[str], Callable[[str], bool]], handler: Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]],
-                    times: Optional[int] = None):
+    async def route(
+        self, url: Union[str, Pattern[str], Callable[[str], bool]], handler: Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]], times: Optional[int] = None
+    ):
         if len(inspect.signature(handler).parameters) == 2:  # Checking how many parameters the callable expects
+
             def handler_proxy(route: PlaywrightRoute, request: PlaywrightRequest):
                 page = request.frame.page
 
@@ -208,6 +239,7 @@ class BrowserContext(PlaywrightBrowserContext):
             self._route_proxies[handler] = handler_proxy
             await self._origin_route(url=url, handler=handler_proxy, times=times)
         else:
+
             def handler_proxy_no_request(route: PlaywrightRoute):
                 page = route.request.frame.page
 
@@ -217,8 +249,9 @@ class BrowserContext(PlaywrightBrowserContext):
             self._route_proxies[handler] = handler_proxy_no_request
             await self._origin_route(url=url, handler=handler_proxy_no_request, times=times)
 
-    async def unroute(self, url: Union[str, Pattern[str], Callable[[str], bool]],
-                      handler: Optional[Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]]] = None):
+    async def unroute(
+        self, url: Union[str, Pattern[str], Callable[[str], bool]], handler: Optional[Union[Callable[[PlaywrightRoute], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]]] = None
+    ):
         if handler:
             handler_proxy = self._route_proxies[handler]
             await self._origin_unroute(url=url, handler=handler_proxy)
@@ -228,6 +261,7 @@ class BrowserContext(PlaywrightBrowserContext):
     def expect_console_message(self, predicate: Optional[Callable[..., bool]] = None, timeout: Optional[float] = None) -> AsyncEventContextManager[PlaywrightConsoleMessage]:
         if self.use_undetected_playwright:
             from botright.extended_typing import NotSupportedError
+
             raise NotSupportedError("BrowserContext.expect_console_message is currently unsupported, due to CDP Runtime Patches.")
 
         return self._origin_expect_console_message(predicate=predicate, timeout=timeout)
@@ -235,6 +269,7 @@ class BrowserContext(PlaywrightBrowserContext):
     async def expose_function(self, name: str, callback: Callable[..., None]) -> None:
         if self.use_undetected_playwright:
             from botright.extended_typing import NotSupportedError
+
             raise NotSupportedError("BrowserContext.expose_function is currently unsupported, due to CDP Runtime Patches.")
 
         return await self._origin_expose_function(name=name, callback=callback)
@@ -242,6 +277,7 @@ class BrowserContext(PlaywrightBrowserContext):
     async def expose_binding(self, name: str, callback: Callable[..., None], handle: Optional[bool] = None):
         if self.use_undetected_playwright:
             from botright.extended_typing import NotSupportedError
+
             raise NotSupportedError("BrowserContext.expose_binding is currently unsupported, due to CDP Runtime Patches.")
 
         class SourceDict(TypedDict):
@@ -250,13 +286,22 @@ class BrowserContext(PlaywrightBrowserContext):
             frame: PlaywrightFrame
 
         if handle:
+
             def callback_proxy_handle(source: SourceDict, element: Any):
                 _context: PlaywrightBrowserContext = source["context"]
                 _page: PlaywrightPage = source["page"]
                 _frame: PlaywrightFrame = source["frame"]
 
-                context = BrowserContext(_context, self.proxy, self.faker, use_undetected_playwright=self.use_undetected_playwright, cache=self.cache,
-                                         user_action_layer=self.user_action_layer, scroll_into_view=self.scroll_into_view, mask_fingerprint=self.mask_fingerprint)
+                context = BrowserContext(
+                    _context,
+                    self.proxy,
+                    self.faker,
+                    use_undetected_playwright=self.use_undetected_playwright,
+                    cache=self.cache,
+                    user_action_layer=self.user_action_layer,
+                    scroll_into_view=self.scroll_into_view,
+                    mask_fingerprint=self.mask_fingerprint,
+                )
                 page = Page(_page, self, self.faker)
                 frame = Frame(_frame, page)
 
@@ -272,13 +317,22 @@ class BrowserContext(PlaywrightBrowserContext):
             await self._origin_expose_binding(name, callback_proxy_handle, handle=handle)
 
         else:
+
             def callback_proxy(source: SourceDict, *args, **kwargs):
                 _context: PlaywrightBrowserContext = source["context"]
                 _page: PlaywrightPage = source["page"]
                 _frame: PlaywrightFrame = source["frame"]
 
-                context = BrowserContext(_context, self.proxy, self.faker, use_undetected_playwright=self.use_undetected_playwright, cache=self.cache,
-                                         user_action_layer=self.user_action_layer, scroll_into_view=self.scroll_into_view, mask_fingerprint=self.mask_fingerprint)
+                context = BrowserContext(
+                    _context,
+                    self.proxy,
+                    self.faker,
+                    use_undetected_playwright=self.use_undetected_playwright,
+                    cache=self.cache,
+                    user_action_layer=self.user_action_layer,
+                    scroll_into_view=self.scroll_into_view,
+                    mask_fingerprint=self.mask_fingerprint,
+                )
                 page = Page(_page, self, self.faker)
                 frame = Frame(_frame, page)
 

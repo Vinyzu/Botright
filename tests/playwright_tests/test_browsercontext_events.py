@@ -91,9 +91,7 @@ async def test_dialog_event_should_work_in_popup(page: Page) -> None:
 
     async def open_dialog() -> None:
         nonlocal prompt_task
-        prompt_task = asyncio.create_task(
-            page.evaluate("() => window.open('').prompt('hey?')")
-        )
+        prompt_task = asyncio.create_task(page.evaluate("() => window.open('').prompt('hey?')"))
 
     [dialog, popup, _] = await asyncio.gather(
         page.context.wait_for_event("dialog"),
@@ -108,9 +106,7 @@ async def test_dialog_event_should_work_in_popup(page: Page) -> None:
 
 @pytest.mark.asyncio
 async def test_dialog_event_should_work_in_popup_2(page: Page) -> None:
-    promise = asyncio.create_task(
-        page.evaluate("() => window.open('javascript:prompt(\"hey?\")')")
-    )
+    promise = asyncio.create_task(page.evaluate("() => window.open('javascript:prompt(\"hey?\")')"))
     dialog = await page.context.wait_for_event("dialog")
     assert dialog.message == "hey?"
     assert dialog.page is None

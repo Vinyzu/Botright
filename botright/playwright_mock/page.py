@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import inspect
 from pathlib import Path
-from typing import Optional, Literal, List, Callable, Any, Union, Sequence, TYPE_CHECKING, TypedDict
 from re import Pattern
+from typing import TYPE_CHECKING, Any, Callable, List, Literal, Optional, Sequence, TypedDict, Union
 
+# fmt: off
+from playwright._impl._async_base import AsyncEventContextManager
 # from undetected_playwright._impl._impl_to_api_mapping import ImplToApiMapping
 # from undetected_playwright._impl._async_base import AsyncEventContextManager
 # from undetected_playwright.async_api import Position, \
@@ -18,44 +20,39 @@ from re import Pattern
 #     ConsoleMessage as PlaywrightConsoleMessage, \
 #     Worker as PlaywrightWorker
 from playwright._impl._impl_to_api_mapping import ImplToApiMapping
-from playwright._impl._async_base import AsyncEventContextManager
-from playwright.async_api import Position, \
-    Locator as PlaywrightLocator, \
-    Page as PlaywrightPage, \
-    BrowserContext as PlaywrightBrowserContext, \
-    Frame as PlaywrightFrame, \
-    CDPSession as PlaywrightCDPSession, \
-    ElementHandle as PlaywrightElementHandle, \
-    Error as PlaywrightError, \
-    Route as PlaywrightRoute, \
-    Request as PlaywrightRequest, \
-    ConsoleMessage as PlaywrightConsoleMessage, \
-    Worker as PlaywrightWorker
-
+from playwright.async_api import BrowserContext as PlaywrightBrowserContext
+from playwright.async_api import CDPSession as PlaywrightCDPSession
+from playwright.async_api import ConsoleMessage as PlaywrightConsoleMessage
+from playwright.async_api import ElementHandle as PlaywrightElementHandle
+from playwright.async_api import Error as PlaywrightError
+from playwright.async_api import Frame as PlaywrightFrame
+from playwright.async_api import Locator as PlaywrightLocator
+from playwright.async_api import Page as PlaywrightPage
+from playwright.async_api import Position
+from playwright.async_api import Request as PlaywrightRequest
+from playwright.async_api import Route as PlaywrightRoute
+from playwright.async_api import Worker as PlaywrightWorker
 from recognizer.agents.playwright import AsyncChallenger
-from botright.modules import hcaptcha, Faker  # , geetest
+
+from botright.modules import Faker, hcaptcha  # , geetest
+
+# fmt: on
 
 if TYPE_CHECKING:
     from .browser import BrowserContext
 
-from . import ElementHandle
-from . import Frame
-from . import FrameLocator
-from . import JSHandle
-from . import Locator
-from . import Mouse
-from . import Keyboard
-from . import Route
-from . import Request
+from . import ElementHandle, Frame, FrameLocator, JSHandle, Keyboard, Locator, Mouse, Request, Route
 
 mapping = ImplToApiMapping()
 
+# fmt: off
 role_type = Literal['alert', 'alertdialog', 'application', 'article', 'banner', 'blockquote', 'button', 'caption', 'cell', 'checkbox', 'code', 'columnheader', 'combobox', 'complementary',
                     'contentinfo', 'definition', 'deletion', 'dialog', 'directory', 'document', 'emphasis', 'feed', 'figure', 'form', 'generic', 'grid', 'gridcell', 'group', 'heading', 'img',
                     'insertion', 'link', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee', 'math', 'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'meter', 'navigation',
                     'none', 'note', 'option', 'paragraph', 'presentation', 'progressbar', 'radio', 'radiogroup', 'region', 'row', 'rowgroup', 'rowheader', 'scrollbar', 'search', 'searchbox',
                     'separator', 'slider', 'spinbutton', 'status', 'strong', 'subscript', 'superscript', 'switch', 'tab', 'table', 'tablist', 'tabpanel', 'term', 'textbox', 'time', 'timer', 'toolbar',
                     'tooltip', 'tree', 'treegrid', 'treeitem']
+# fmt: on
 
 
 async def new_page(browser: BrowserContext, faker: Faker) -> Page:
@@ -178,16 +175,28 @@ class Page(PlaywrightPage):
                 "bitness": self.fingerprint.navigator.platform.bitness,
                 "platformVersion": self.fingerprint.navigator.platform.version,
                 "model": self.fingerprint.navigator.platform.model,
-                "mobile": False
+                "mobile": False,
             }
 
-            await self.cdp.send("Emulation.setUserAgentOverride", {"userAgent": self.fingerprint.navigator.user_agent, "acceptLanguage": "en-US",
-                                                                   "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform.name, self.fingerprint.navigator.platform.name),
-                                                                   "userAgentMetadata": user_agent_metadata})
+            await self.cdp.send(
+                "Emulation.setUserAgentOverride",
+                {
+                    "userAgent": self.fingerprint.navigator.user_agent,
+                    "acceptLanguage": "en-US",
+                    "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform.name, self.fingerprint.navigator.platform.name),
+                    "userAgentMetadata": user_agent_metadata,
+                },
+            )
 
-            await self.cdp.send("Network.setUserAgentOverride", {"userAgent": self.fingerprint.navigator.user_agent, "acceptLanguage": "en-US",
-                                                                 "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform.name, self.fingerprint.navigator.platform.name),
-                                                                 "userAgentMetadata": user_agent_metadata})
+            await self.cdp.send(
+                "Network.setUserAgentOverride",
+                {
+                    "userAgent": self.fingerprint.navigator.user_agent,
+                    "acceptLanguage": "en-US",
+                    "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform.name, self.fingerprint.navigator.platform.name),
+                    "userAgentMetadata": user_agent_metadata,
+                },
+            )
 
         # Source: https://github.com/kkoooqq/fakebrowser/blob/main/src/plugins/user-action-layer/index.js
         if self.browser.user_action_layer:
@@ -290,8 +299,9 @@ class Page(PlaywrightPage):
             element_handles.append(element_handle)
         return element_handles
 
-    async def wait_for_selector(self, selector: str, state: Optional[Literal["attached", "detached", "hidden", "visible"]] = None,
-                                strict: Optional[bool] = False, timeout: Optional[float] = None) -> Optional[ElementHandle]:
+    async def wait_for_selector(
+        self, selector: str, state: Optional[Literal["attached", "detached", "hidden", "visible"]] = None, strict: Optional[bool] = False, timeout: Optional[float] = None
+    ) -> Optional[ElementHandle]:
         _element_handle = await self._origin_wait_for_selector(selector=selector, state=state, strict=strict, timeout=timeout)
         if not _element_handle:
             return None
@@ -310,8 +320,14 @@ class Page(PlaywrightPage):
         return element_handle
 
     # Locator
-    def locator(self, selector: str, has: Optional[PlaywrightLocator] = None, has_not: Optional[PlaywrightLocator] = None, has_text: Optional[Union[str, Pattern[str]]] = None,
-                has_not_text: Optional[Union[str, Pattern[str]]] = None) -> Locator:
+    def locator(
+        self,
+        selector: str,
+        has: Optional[PlaywrightLocator] = None,
+        has_not: Optional[PlaywrightLocator] = None,
+        has_text: Optional[Union[str, Pattern[str]]] = None,
+        has_not_text: Optional[Union[str, Pattern[str]]] = None,
+    ) -> Locator:
         _locator = self._origin_locator(selector=selector, has=has, has_not=has_not, has_text=has_text, has_not_text=has_not_text)
         locator = Locator(_locator, self)
         return locator
@@ -331,11 +347,22 @@ class Page(PlaywrightPage):
         locator = Locator(_locator, self)
         return locator
 
-    def get_by_role(self, role: role_type, checked: Optional[bool] = None, disabled: Optional[bool] = None, expanded: Optional[bool] = None, include_hidden: Optional[bool] = None,
-                    level: Optional[int] = None, name: Optional[Union[str, Pattern[str]]] = None, pressed: Optional[bool] = None, selected: Optional[bool] = None,
-                    exact: Optional[bool] = None) -> Locator:
-        _locator = self._origin_get_by_role(role=role, checked=checked, disabled=disabled, expanded=expanded, include_hidden=include_hidden,
-                                            level=level, name=name, pressed=pressed, selected=selected, exact=exact)
+    def get_by_role(
+        self,
+        role: role_type,
+        checked: Optional[bool] = None,
+        disabled: Optional[bool] = None,
+        expanded: Optional[bool] = None,
+        include_hidden: Optional[bool] = None,
+        level: Optional[int] = None,
+        name: Optional[Union[str, Pattern[str]]] = None,
+        pressed: Optional[bool] = None,
+        selected: Optional[bool] = None,
+        exact: Optional[bool] = None,
+    ) -> Locator:
+        _locator = self._origin_get_by_role(
+            role=role, checked=checked, disabled=disabled, expanded=expanded, include_hidden=include_hidden, level=level, name=name, pressed=pressed, selected=selected, exact=exact
+        )
 
         locator = Locator(_locator, self)
         return locator
@@ -384,6 +411,7 @@ class Page(PlaywrightPage):
     def expect_console_message(self, predicate: Optional[Callable[..., bool]] = None, timeout: Optional[float] = None) -> AsyncEventContextManager[PlaywrightConsoleMessage]:
         if self.browser.use_undetected_playwright:
             from botright.extended_typing import NotSupportedError
+
             raise NotSupportedError("Page.expect_console_message is currently unsupported, due to CDP Runtime Patches.")
 
         return self._origin_expect_console_message(predicate=predicate, timeout=timeout)
@@ -391,6 +419,7 @@ class Page(PlaywrightPage):
     def expect_worker(self, predicate: Optional[Callable[..., bool]] = None, timeout: Optional[float] = None) -> AsyncEventContextManager[PlaywrightWorker]:
         if self.browser.use_undetected_playwright:
             from botright.extended_typing import NotSupportedError
+
             raise NotSupportedError("Page.expect_worker is currently unsupported, due to CDP Runtime Patches.")
 
         return self._origin_expect_worker(predicate=predicate, timeout=timeout)
@@ -398,6 +427,7 @@ class Page(PlaywrightPage):
     async def expose_function(self, name: str, callback: Callable[..., None]) -> None:
         if self.browser.use_undetected_playwright:
             from botright.extended_typing import NotSupportedError
+
             raise NotSupportedError("Page.expose_function is currently unsupported, due to CDP Runtime Patches.")
 
         return await self._origin_expose_function(name=name, callback=callback)
@@ -405,6 +435,7 @@ class Page(PlaywrightPage):
     async def expose_binding(self, name: str, callback: Callable[..., None], handle: Optional[bool] = None):
         if self.browser.use_undetected_playwright:
             from botright.extended_typing import NotSupportedError
+
             raise NotSupportedError("Page.expose_binding is currently unsupported, due to CDP Runtime Patches.")
 
         from .browser import BrowserContext
@@ -415,13 +446,22 @@ class Page(PlaywrightPage):
             frame: PlaywrightFrame
 
         if handle:
+
             def callback_proxy_handle(source: SourceDict, element: Any):
                 _context: PlaywrightBrowserContext = source["context"]
                 _page: PlaywrightPage = source["page"]
                 _frame: PlaywrightFrame = source["frame"]
 
-                source["context"] = BrowserContext(_context, self.browser.proxy, self.browser.faker, use_undetected_playwright=self.browser.use_undetected_playwright, cache=self.browser.cache,
-                                                   user_action_layer=self.browser.user_action_layer, scroll_into_view=self.scroll_into_view, mask_fingerprint=self.browser.mask_fingerprint)
+                source["context"] = BrowserContext(
+                    _context,
+                    self.browser.proxy,
+                    self.browser.faker,
+                    use_undetected_playwright=self.browser.use_undetected_playwright,
+                    cache=self.browser.cache,
+                    user_action_layer=self.browser.user_action_layer,
+                    scroll_into_view=self.scroll_into_view,
+                    mask_fingerprint=self.browser.mask_fingerprint,
+                )
                 source["page"] = Page(_page, self.browser, self.faker)
                 source["frame"] = Frame(_frame, self)
 
@@ -435,13 +475,22 @@ class Page(PlaywrightPage):
             await self._origin_expose_binding(name, callback_proxy_handle, handle=handle)
 
         else:
+
             def callback_proxy(source: SourceDict, *args, **kwargs):
                 _context: PlaywrightBrowserContext = source["context"]
                 _page: PlaywrightPage = source["page"]
                 _frame: PlaywrightFrame = source["frame"]
 
-                source["context"] = BrowserContext(_context, self.browser.proxy, self.browser.faker, use_undetected_playwright=self.browser.use_undetected_playwright, cache=self.browser.cache,
-                                                   user_action_layer=self.browser.user_action_layer, scroll_into_view=self.scroll_into_view, mask_fingerprint=self.browser.mask_fingerprint)
+                source["context"] = BrowserContext(
+                    _context,
+                    self.browser.proxy,
+                    self.browser.faker,
+                    use_undetected_playwright=self.browser.use_undetected_playwright,
+                    cache=self.browser.cache,
+                    user_action_layer=self.browser.user_action_layer,
+                    scroll_into_view=self.scroll_into_view,
+                    mask_fingerprint=self.browser.mask_fingerprint,
+                )
                 source["page"] = Page(_page, self.browser, self.faker)
                 source["frame"] = Frame(_frame, self)
 
@@ -449,9 +498,11 @@ class Page(PlaywrightPage):
 
             await self._origin_expose_binding(name=name, callback=callback_proxy, handle=handle)
 
-    async def route(self, url: Union[str, Pattern[str], Callable[[str], bool]], handler: Union[Callable[[Route], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]],
-                    times: Optional[int] = None):
+    async def route(
+        self, url: Union[str, Pattern[str], Callable[[str], bool]], handler: Union[Callable[[Route], Any], Callable[[PlaywrightRoute, PlaywrightRequest], Any]], times: Optional[int] = None
+    ):
         if len(inspect.signature(handler).parameters) == 2:  # Checking how many parameters the callable expects
+
             def handler_proxy(route: PlaywrightRoute, request: PlaywrightRequest):
                 route = Route(route, Page(self, self.browser, self.faker))
                 request = Request(request, Page(self, self.browser, self.faker))
@@ -459,6 +510,7 @@ class Page(PlaywrightPage):
 
             await self._origin_route(url=url, handler=handler_proxy, times=times)
         else:
+
             def handler_proxy_no_request(route: PlaywrightRoute):
                 route = Route(route, Page(self, self.browser, self.faker))
                 return handler(route)  # type: ignore
@@ -466,9 +518,20 @@ class Page(PlaywrightPage):
             await self._origin_route(url=url, handler=handler_proxy_no_request, times=times)
 
     # Custom Methods
-    async def click(self, selector: str, button: Optional[Literal['left', 'middle', 'right']] = "left", click_count: Optional[int] = 1, strict: Optional[bool] = False, delay: Optional[float] = 20.0,
-                    force: Optional[bool] = False,  modifiers: Optional[Sequence[Literal['Alt', 'Control', 'Meta', 'Shift']]] = None, no_wait_after: Optional[bool] = False,
-                    position: Optional[Position] = None, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def click(
+        self,
+        selector: str,
+        button: Optional[Literal["left", "middle", "right"]] = "left",
+        click_count: Optional[int] = 1,
+        strict: Optional[bool] = False,
+        delay: Optional[float] = 20.0,
+        force: Optional[bool] = False,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        no_wait_after: Optional[bool] = False,
+        position: Optional[Position] = None,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 
@@ -488,7 +551,7 @@ class Page(PlaywrightPage):
 
             x, y, width, height = bounding_box["x"], bounding_box["y"], bounding_box["width"], bounding_box["height"]
             if not any(position.values()):
-                x, y = x + width//2, y + height//2
+                x, y = x + width // 2, y + height // 2
             else:
                 x, y = x + position["x"], y + position["y"]
 
@@ -500,10 +563,19 @@ class Page(PlaywrightPage):
             for modifier in modifiers:
                 await self.keyboard.up(modifier)
 
-    async def dblclick(self, selector: str, button: Optional[Literal['left', 'middle', 'right']] = "left", strict: Optional[bool] = False, delay: Optional[float] = 20.0,
-                       force: Optional[bool] = False,
-                       modifiers: Optional[Sequence[Literal['Alt', 'Control', 'Meta', 'Shift']]] = None, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
-                       timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def dblclick(
+        self,
+        selector: str,
+        button: Optional[Literal["left", "middle", "right"]] = "left",
+        strict: Optional[bool] = False,
+        delay: Optional[float] = 20.0,
+        force: Optional[bool] = False,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        no_wait_after: Optional[bool] = False,
+        position: Optional[Position] = None,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 
@@ -535,8 +607,16 @@ class Page(PlaywrightPage):
             for modifier in modifiers:
                 await self.keyboard.up(modifier)
 
-    async def check(self, selector: str, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
-                    strict: Optional[bool] = False, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def check(
+        self,
+        selector: str,
+        force: Optional[bool] = False,
+        no_wait_after: Optional[bool] = False,
+        position: Optional[Position] = None,
+        strict: Optional[bool] = False,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         element = await self.wait_for_selector(selector, state="visible" if not force else "hidden", strict=strict, timeout=timeout)
@@ -566,8 +646,16 @@ class Page(PlaywrightPage):
 
             assert await element.is_checked(), PlaywrightError
 
-    async def uncheck(self, selector: str, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
-                      strict: Optional[bool] = False, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def uncheck(
+        self,
+        selector: str,
+        force: Optional[bool] = False,
+        no_wait_after: Optional[bool] = False,
+        position: Optional[Position] = None,
+        strict: Optional[bool] = False,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         element = await self.wait_for_selector(selector, state="visible" if not force else "hidden", strict=strict, timeout=timeout)
@@ -597,8 +685,17 @@ class Page(PlaywrightPage):
 
             assert not await element.is_checked()
 
-    async def set_checked(self, selector: str, checked: Optional[bool] = False, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
-                          strict: Optional[bool] = False, timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def set_checked(
+        self,
+        selector: str,
+        checked: Optional[bool] = False,
+        force: Optional[bool] = False,
+        no_wait_after: Optional[bool] = False,
+        position: Optional[Position] = None,
+        strict: Optional[bool] = False,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         element = await self.wait_for_selector(selector, state="visible" if not force else "hidden", strict=strict, timeout=timeout)
@@ -628,8 +725,17 @@ class Page(PlaywrightPage):
 
             assert await element.is_checked() == checked
 
-    async def hover(self, selector: str, force: Optional[bool] = False, modifiers: Optional[Sequence[Literal['Alt', 'Control', 'Meta', 'Shift']]] = None, position: Optional[Position] = None,
-                    strict: Optional[bool] = False, timeout: Optional[float] = None, trial: Optional[bool] = False, no_wait_after: Optional[bool] = False) -> None:
+    async def hover(
+        self,
+        selector: str,
+        force: Optional[bool] = False,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        position: Optional[Position] = None,
+        strict: Optional[bool] = False,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+        no_wait_after: Optional[bool] = False,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 

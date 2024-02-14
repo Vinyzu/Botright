@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from typing import Optional, Any, Literal, Pattern, Union, Sequence, TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Any, Literal, Optional, Pattern, Sequence, Union
 
 # from undetected_playwright.async_api import Position, Locator as PlaywrightLocator, ElementHandle as PlaywrightElementHandle, Error as PlaywrightError
-from playwright.async_api import Position, Locator as PlaywrightLocator, ElementHandle as PlaywrightElementHandle, Error as PlaywrightError
+from playwright.async_api import ElementHandle as PlaywrightElementHandle
+from playwright.async_api import Error as PlaywrightError
+from playwright.async_api import Locator as PlaywrightLocator
+from playwright.async_api import Position
 
 if TYPE_CHECKING:
-    from . import Page
-    from . import JSHandle
-    from . import FrameLocator
-    from . import ElementHandle
+    from . import ElementHandle, FrameLocator, JSHandle, Page
 
 
 class Locator(PlaywrightLocator):
@@ -22,15 +21,10 @@ class Locator(PlaywrightLocator):
         self._origin_last = None
 
         self.origin_locator = locator.locator
-        locator.locator = self.locator
         self.origin_evaluate_handle = locator.evaluate_handle
-        locator.evaluate_handle = self.evaluate_handle
         self.origin_frame_locator = locator.frame_locator
-        locator.frame_locator = self.frame_locator
         self.origin_element_handle = locator.element_handle
-        locator.element_handle = self.element_handle
         self.origin_nth = locator.nth
-        locator.nth = self.nth
 
         self.origin_first = locator.first  # type: ignore
         self.origin_last = locator.last  # type: ignore
@@ -38,27 +32,25 @@ class Locator(PlaywrightLocator):
         # self._attach_dyn_prop(locator, "first", self.first)
         # self._attach_dyn_prop(locator, "last", self.last)
 
-        locator.click = self.click
-        locator.dblclick = self.dblclick
-        locator.check = self.check
-        locator.uncheck = self.uncheck
-        locator.set_checked = self.set_checked
-        locator.hover = self.hover
-        locator.type = self.type
-
     @property
     def page(self) -> Page:
         return self._page
 
-    def locator(self, selector_or_locator: Union[str, PlaywrightLocator], has_text: Optional[Union[str, Pattern[str]]] = None, has_not_text: Optional[Union[str, Pattern[str]]] = None,
-                has: Optional[PlaywrightLocator] = None, has_not: Optional[PlaywrightLocator] = None) -> Locator:
+    def locator(
+        self,
+        selector_or_locator: Union[str, PlaywrightLocator],
+        has_text: Optional[Union[str, Pattern[str]]] = None,
+        has_not_text: Optional[Union[str, Pattern[str]]] = None,
+        has: Optional[PlaywrightLocator] = None,
+        has_not: Optional[PlaywrightLocator] = None,
+    ) -> Locator:
         _locator = self.origin_locator(selector_or_locator, has=has, has_not=has_not, has_text=has_text, has_not_text=has_not_text)
         locator = Locator(_locator, self._page)
         return locator
 
     # JsHandle
     async def evaluate_handle(self, expression: str, arg: Optional[Any] = None, timeout: Optional[float] = None) -> Union[JSHandle, ElementHandle]:
-        from . import JSHandle, ElementHandle
+        from . import ElementHandle, JSHandle
 
         _js_handle = await self.origin_evaluate_handle(expression=expression, arg=arg, timeout=timeout)
         if isinstance(_js_handle, PlaywrightElementHandle):
@@ -119,9 +111,18 @@ class Locator(PlaywrightLocator):
     def origin_last(self, value):
         self._origin_last = value
 
-    async def click(self, button: Optional[Literal["left", "middle", "right"]] = "left", click_count: Optional[int] = 1, delay: Optional[float] = 20.0, force: Optional[bool] = False,
-                    modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
-                    timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def click(
+        self,
+        button: Optional[Literal["left", "middle", "right"]] = "left",
+        click_count: Optional[int] = 1,
+        delay: Optional[float] = 20.0,
+        force: Optional[bool] = False,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        no_wait_after: Optional[bool] = False,
+        position: Optional[Position] = None,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 
@@ -153,9 +154,17 @@ class Locator(PlaywrightLocator):
             for modifier in modifiers:
                 await self._page.keyboard.up(modifier)
 
-    async def dblclick(self, modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, position: Optional[Position] = None, delay: Optional[float] = 20.0,
-                       button: Optional[Literal["left", "middle", "right"]] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
-                       trial: Optional[bool] = None) -> None:
+    async def dblclick(
+        self,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        position: Optional[Position] = None,
+        delay: Optional[float] = 20.0,
+        button: Optional[Literal["left", "middle", "right"]] = None,
+        timeout: Optional[float] = None,
+        force: Optional[bool] = None,
+        no_wait_after: Optional[bool] = None,
+        trial: Optional[bool] = None,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 
@@ -187,8 +196,9 @@ class Locator(PlaywrightLocator):
             for modifier in modifiers:
                 await self._page.keyboard.up(modifier)
 
-    async def check(self, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
-                    trial: Optional[bool] = None) -> None:
+    async def check(
+        self, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None, trial: Optional[bool] = None
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         if not force:
@@ -218,8 +228,9 @@ class Locator(PlaywrightLocator):
 
             assert await self.is_checked()
 
-    async def uncheck(self, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
-                      timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def uncheck(
+        self, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None, timeout: Optional[float] = None, trial: Optional[bool] = False
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         if not force:
@@ -249,8 +260,9 @@ class Locator(PlaywrightLocator):
 
             assert not await self.is_checked()
 
-    async def set_checked(self, checked: bool, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None,
-                          timeout: Optional[float] = None, trial: Optional[bool] = False) -> None:
+    async def set_checked(
+        self, checked: bool, force: Optional[bool] = False, no_wait_after: Optional[bool] = False, position: Optional[Position] = None, timeout: Optional[float] = None, trial: Optional[bool] = False
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         if not force:
@@ -280,8 +292,15 @@ class Locator(PlaywrightLocator):
 
             assert await self.is_checked() == checked
 
-    async def hover(self, force: Optional[bool] = False, modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, position: Optional[Position] = None,
-                    timeout: Optional[float] = None, trial: Optional[bool] = False, no_wait_after: Optional[bool] = False) -> None:
+    async def hover(
+        self,
+        force: Optional[bool] = False,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        position: Optional[Position] = None,
+        timeout: Optional[float] = None,
+        trial: Optional[bool] = False,
+        no_wait_after: Optional[bool] = False,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 

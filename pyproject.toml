@@ -24,3 +24,11 @@ warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
 disable_error_code = "method-assign"
+
+[tool.black]
+line-length = 200
+
+[tool.isort]
+py_version = 310
+line_length = 200
+multi_line_output = 7

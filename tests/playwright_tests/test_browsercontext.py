@@ -3,8 +3,8 @@ import re
 import sys
 
 import pytest
-
 from playwright.async_api import Error
+
 from botright.extended_typing import Page
 
 
@@ -60,9 +60,7 @@ async def test_expose_function_should_work(browser):
 
 
 @pytest.mark.asyncio
-async def test_expose_function_should_throw_for_duplicate_registrations(
-    browser
-):
+async def test_expose_function_should_throw_for_duplicate_registrations(browser):
     await browser.expose_function("foo", lambda: None)
     await browser.expose_function("bar", lambda: None)
     with pytest.raises(Error) as exc_info:
@@ -71,23 +69,15 @@ async def test_expose_function_should_throw_for_duplicate_registrations(
     page = await browser.new_page()
     with pytest.raises(Error) as exc_info:
         await page.expose_function("foo", lambda: None)
-    assert (
-        exc_info.value.message
-        == 'Function "foo" has been already registered in the browser context'
-    )
+    assert exc_info.value.message == 'Function "foo" has been already registered in the browser context'
     await page.expose_function("baz", lambda: None)
     with pytest.raises(Error) as exc_info:
         await browser.expose_function("baz", lambda: None)
-    assert (
-        exc_info.value.message
-        == 'Function "baz" has been already registered in one of the pages'
-    )
+    assert exc_info.value.message == 'Function "baz" has been already registered in one of the pages'
 
 
 @pytest.mark.asyncio
-async def test_expose_function_should_be_callable_from_inside_add_init_script(
-    browser
-):
+async def test_expose_function_should_be_callable_from_inside_add_init_script(browser):
     args = []
     await browser.expose_function("woof", lambda arg: args.append(arg))
     await browser.add_init_script("woof('context')")
@@ -150,12 +140,8 @@ async def test_route_should_unroute(browser, server):
         asyncio.create_task(route.continue_())
 
     await browser.route("**/*", lambda route, request: handler(route, request, 1))
-    await browser.route(
-        "**/empty.html", lambda route, request: handler(route, request, 2)
-    )
-    await browser.route(
-        "**/empty.html", lambda route, request: handler(route, request, 3)
-    )
+    await browser.route("**/empty.html", lambda route, request: handler(route, request, 2))
+    await browser.route("**/empty.html", lambda route, request: handler(route, request, 3))
 
     def handler4(route, request):
         handler(route, request, 4)
@@ -180,17 +166,13 @@ async def test_route_should_unroute(browser, server):
 async def test_route_should_yield_to_page_route(browser, server):
     await browser.route(
         "**/empty.html",
-        lambda route, request: asyncio.create_task(
-            route.fulfill(status=200, body="context")
-        ),
+        lambda route, request: asyncio.create_task(route.fulfill(status=200, body="context")),
     )
 
     page = await browser.new_page()
     await page.route(
         "**/empty.html",
-        lambda route, request: asyncio.create_task(
-            route.fulfill(status=200, body="page")
-        ),
+        lambda route, request: asyncio.create_task(route.fulfill(status=200, body="page")),
     )
 
     response = await page.goto(server.EMPTY_PAGE)
@@ -202,17 +184,13 @@ async def test_route_should_yield_to_page_route(browser, server):
 async def test_route_should_fall_back_to_context_route(browser, server):
     await browser.route(
         "**/empty.html",
-        lambda route, request: asyncio.create_task(
-            route.fulfill(status=200, body="context")
-        ),
+        lambda route, request: asyncio.create_task(route.fulfill(status=200, body="context")),
     )
 
     page = await browser.new_page()
     await page.route(
         "**/non-empty.html",
-        lambda route, request: asyncio.create_task(
-            route.fulfill(status=200, body="page")
-        ),
+        lambda route, request: asyncio.create_task(route.fulfill(status=200, body="page")),
     )
 
     response = await page.goto(server.EMPTY_PAGE)
@@ -273,9 +251,7 @@ async def test_page_event_should_have_about_blank_for_empty_url_with_domcontentl
 async def test_page_event_should_report_when_a_new_page_is_created_and_closed(browser, server):
     page = await browser.new_page()
     async with browser.expect_page() as page_info:
-        await page.evaluate(
-            "url => window.open(url)", server.CROSS_PROCESS_PREFIX + "/empty.html"
-        )
+        await page.evaluate("url => window.open(url)", server.CROSS_PROCESS_PREFIX + "/empty.html")
     other_page = Page(await page_info.value, browser, browser.faker)
 
     # The url is about:blank in FF when 'page' event is fired.

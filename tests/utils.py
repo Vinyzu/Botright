@@ -1,12 +1,9 @@
 import re
 from typing import List, cast
 
-from undetected_playwright.async_api import (
-    Error,
-    Selectors,
-    ViewportSize,
-)
-from botright.extended_typing import Page, ElementHandle, Frame
+from undetected_playwright.async_api import Error, Selectors, ViewportSize
+
+from botright.extended_typing import ElementHandle, Frame, Page
 
 
 class Utils:
@@ -25,9 +22,7 @@ class Utils:
         return await cast(ElementHandle, handle.as_element()).content_frame()
 
     async def detach_frame(self, page: Page, frame_id: str):
-        await page.evaluate(
-            "frame_id => document.getElementById(frame_id).remove()", frame_id
-        )
+        await page.evaluate("frame_id => document.getElementById(frame_id).remove()", frame_id)
 
     def dump_frames(self, frame: Frame, indentation: str = "") -> List[str]:
         indentation = indentation or ""
@@ -35,9 +30,7 @@ class Utils:
         if frame.name:
             description += " (" + frame.name + ")"
         result = [indentation + description]
-        sorted_frames = sorted(
-            frame.child_frames, key=lambda frame: frame.url + frame.name
-        )
+        sorted_frames = sorted(frame.child_frames, key=lambda frame: frame.url + frame.name)
         for child in sorted_frames:
             result = result + utils.dump_frames(child, "    " + indentation)
         return result
@@ -48,9 +41,7 @@ class Utils:
         assert await page.evaluate("window.innerWidth") == width
         assert await page.evaluate("window.innerHeight") == height
 
-    async def register_selector_engine(
-        self, selectors: Selectors, *args, **kwargs
-    ) -> None:
+    async def register_selector_engine(self, selectors: Selectors, *args, **kwargs) -> None:
         try:
             await selectors.register(*args, **kwargs)
         except Error as exc:

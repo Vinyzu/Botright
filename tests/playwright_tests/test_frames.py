@@ -1,7 +1,6 @@
 import asyncio
 
 import pytest
-
 from playwright.async_api import Error, Page
 
 
@@ -71,12 +70,8 @@ async def test_evaluate_isolated_between_frames(page, utils, server):
     [frame1, frame2] = page.frames
     assert frame1 != frame2
 
-    await asyncio.gather(
-        frame1.evaluate("window.a = 1"), frame2.evaluate("window.a = 2")
-    )
-    [a1, a2] = await asyncio.gather(
-        frame1.evaluate("window.a"), frame2.evaluate("window.a")
-    )
+    await asyncio.gather(frame1.evaluate("window.a = 1"), frame2.evaluate("window.a = 2"))
+    [a1, a2] = await asyncio.gather(frame1.evaluate("window.a"), frame2.evaluate("window.a"))
     assert a1 == 1
     assert a2 == 2
 

@@ -1,8 +1,8 @@
 import asyncio
 
 import pytest
-
 from playwright.async_api import Error
+
 from botright.extended_typing import Page
 
 
@@ -12,17 +12,7 @@ async def test_bounding_box(page, server):
     await page.goto(server.PREFIX + "/grid.html")
     element_handle = await page.query_selector(".box:nth-of-type(13)")
     box = await element_handle.bounding_box()
-    assert (box == {
-        "x": 100,
-        "y": 50,
-        "width": 50,
-        "height": 50
-    }) or (box == {
-        "x": 100,
-        "y": 51,
-        "width": 50,
-        "height": 50
-    })
+    assert (box == {"x": 100, "y": 50, "width": 50, "height": 50}) or (box == {"x": 100, "y": 51, "width": 50, "height": 50})
 
 
 @pytest.mark.asyncio
@@ -73,9 +63,7 @@ async def test_bounding_box_with_SVG_nodes(page):
 
 @pytest.mark.asyncio
 async def test_bounding_box_with_page_scale(botright_client, server):
-    context = await botright_client.new_browser(
-        viewport={"width": 400, "height": 400}, is_mobile=True
-    )
+    context = await botright_client.new_browser(viewport={"width": 400, "height": 400}, is_mobile=True)
     page = await context.new_page()
     await page.goto(server.PREFIX + "/input/button.html")
     button = await page.query_selector("button")
@@ -174,9 +162,7 @@ async def test_owner_frame(page, utils, server):
 @pytest.mark.asyncio
 async def test_owner_frame_for_cross_process_iframes(page, utils, server):
     await page.goto(server.EMPTY_PAGE)
-    await utils.attach_frame(
-        page, "frame1", server.CROSS_PROCESS_PREFIX + "/empty.html"
-    )
+    await utils.attach_frame(page, "frame1", server.CROSS_PROCESS_PREFIX + "/empty.html")
     frame = page.frames[1]
     element_handle = await frame.evaluate_handle("document.body")
     assert await element_handle.owner_frame() == frame
@@ -205,9 +191,7 @@ async def test_owner_frame_for_cross_frame_evaluations(page, utils, server):
     await page.goto(server.EMPTY_PAGE)
     await utils.attach_frame(page, "frame1", server.EMPTY_PAGE)
     frame = page.main_frame
-    element_handle = await frame.evaluate_handle(
-        'document.querySelector("#frame1").contentWindow.document.body'
-    )
+    element_handle = await frame.evaluate_handle('document.querySelector("#frame1").contentWindow.document.body')
     assert await element_handle.owner_frame() == frame.child_frames[0]
     assert await element_handle.owner_frame() == frame.child_frames[0]
 
@@ -237,9 +221,7 @@ async def test_owner_frame_for_detached_elements(page, server):
 async def test_owner_frame_for_adopted_elements(page: Page, server):
     await page.goto(server.EMPTY_PAGE)
     async with page.expect_popup() as popup_info:
-        await page.evaluate(
-            "url => window.__popup = window.open(url)", server.EMPTY_PAGE
-        )
+        await page.evaluate("url => window.__popup = window.open(url)", server.EMPTY_PAGE)
     popup = Page(await popup_info.value, page.browser, page.faker)
 
     div_handle = await page.evaluate_handle(
@@ -288,9 +270,7 @@ async def test_click_for_shadow_dom_v1(page, server):
 @pytest.mark.asyncio
 async def test_click_for_TextNodes(page, server):
     await page.goto(server.PREFIX + "/input/button.html")
-    buttonTextNode = await page.evaluate_handle(
-        'document.querySelector("button").firstChild'
-    )
+    buttonTextNode = await page.evaluate_handle('document.querySelector("button").firstChild')
     await buttonTextNode.click()
     assert await page.evaluate("result") == "Clicked"
 
@@ -357,9 +337,7 @@ async def test_hover(page, server):
     await page.goto(server.PREFIX + "/input/scrollable.html")
     button = await page.query_selector("#button-6")
     await button.hover()
-    assert (
-        await page.evaluate('document.querySelector("button:hover").id') == "button-6"
-    )
+    assert await page.evaluate('document.querySelector("button:hover").id') == "button-6"
 
 
 @pytest.mark.asyncio
@@ -368,9 +346,7 @@ async def test_hover_when_node_is_removed(page, server):
     await page.evaluate('delete window["Node"]')
     button = await page.query_selector("#button-6")
     await button.hover()
-    assert (
-        await page.evaluate('document.querySelector("button:hover").id') == "button-6"
-    )
+    assert await page.evaluate('document.querySelector("button:hover").id') == "button-6"
 
 
 @pytest.mark.asyncio
@@ -483,10 +459,7 @@ async def test_select_textarea(page, server):
     textarea = await page.query_selector("textarea")
     await textarea.evaluate('textarea => textarea.value = "some value"')
     await textarea.select_text()
-    assert (
-            await page.evaluate("() => window.getSelection().toString()")
-            == "some value"
-    )
+    assert await page.evaluate("() => window.getSelection().toString()") == "some value"
 
 
 @pytest.mark.asyncio
@@ -495,10 +468,7 @@ async def test_select_input(page, server):
     input = await page.query_selector("input")
     await input.evaluate('input => input.value = "some value"')
     await input.select_text()
-    assert (
-            await page.evaluate("() => window.getSelection().toString()")
-            == "some value"
-    )
+    assert await page.evaluate("() => window.getSelection().toString()") == "some value"
 
 
 @pytest.mark.asyncio
@@ -551,9 +521,7 @@ async def test_a_nice_preview(page, server):
     assert str(outer) == 'JSHandle@<div id="outer" name="value">…</div>'
     assert str(inner) == 'JSHandle@<div id="inner">Text,↵more text</div>'
     assert str(text) == "JSHandle@#text=Text,↵more text"
-    assert (
-        str(check) == 'JSHandle@<input checked id="check" foo="bar"" type="checkbox"/>'
-    )
+    assert str(check) == 'JSHandle@<input checked id="check" foo="bar"" type="checkbox"/>'
 
 
 @pytest.mark.asyncio
@@ -678,9 +646,7 @@ async def test_is_enabled_and_is_disabled_should_work(page):
 
 @pytest.mark.asyncio
 async def test_is_editable_should_work(page):
-    await page.set_content(
-        "<input id=input1 disabled><textarea></textarea><input id=input2>"
-    )
+    await page.set_content("<input id=input1 disabled><textarea></textarea><input id=input2>")
     await page.eval_on_selector("textarea", "t => t.readOnly = true")
     input1 = await page.query_selector("#input1")
     assert await input1.is_editable() is False

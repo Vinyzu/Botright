@@ -1,0 +1,58 @@
+name: reCognizer CI
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  Linting:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+      - name: (Linting) isort
+        run: isort . --check-only
+      - name: (Linting) Flake8
+        run: flake8 .
+      - name: (Linting) MyPy
+        run: mypy botright
+      - name: (Linting) Black
+        run: black . --check
+
+  Build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-test.txt
+        pip install -e .
+        python -c "import os; os.environ['TOKENIZERS_PARALLELISM'] = 'false'"
+    - name: Install Chrome Browser
+      uses: browser-actions/setup-chrome@v1
+    - name: Install Chromium Driver
+      run: python -m playwright install chromium
+    - name: Install HuggingFace Models
+      run: |
+        pip install -U "huggingface_hub[cli]"
+        huggingface-cli download flavour/CLIP-ViT-B-16-DataComp.XL-s13B-b90K
+        huggingface-cli download CIDAS/clipseg-rd64-refined
+    - name: Test with PyTest
+      run: pytest

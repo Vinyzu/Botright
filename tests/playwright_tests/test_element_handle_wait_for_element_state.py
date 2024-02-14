@@ -1,15 +1,12 @@
 import asyncio
 
 import pytest
-
 from playwright.async_api import Error
 
 
 async def give_it_a_chance_to_resolve(page):
     for i in range(5):
-        await page.evaluate(
-            "() => new Promise(f => requestAnimationFrame(() => requestAnimationFrame(f)))"
-        )
+        await page.evaluate("() => new Promise(f => requestAnimationFrame(() => requestAnimationFrame(f)))")
 
 
 async def wait_for_state(div, state, done):

@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Optional, List, Literal, Any, Union, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Literal, Optional, Sequence, Union
 
 # from undetected_playwright.async_api import Position, ElementHandle as PlaywrightElementHandle, JSHandle as PlaywrightJSHandle, Error as PlaywrightError
-from playwright.async_api import Position, ElementHandle as PlaywrightElementHandle, JSHandle as PlaywrightJSHandle, Error as PlaywrightError
+from playwright.async_api import ElementHandle as PlaywrightElementHandle
+from playwright.async_api import Error as PlaywrightError
+from playwright.async_api import JSHandle as PlaywrightJSHandle
+from playwright.async_api import Position
 
 if TYPE_CHECKING:
-    from . import Page
-    from . import Frame
+    from . import Frame, Page
 
 
 class JSHandle(PlaywrightJSHandle):
@@ -93,8 +95,9 @@ class ElementHandle(JSHandle, PlaywrightElementHandle):
 
         return element_handles
 
-    async def wait_for_selector(self, selector: str, state: Optional[Literal["attached", "detached", "hidden", "visible"]] = None,
-                                timeout: Optional[float] = None, strict: Optional[bool] = False) -> Optional[ElementHandle]:
+    async def wait_for_selector(
+        self, selector: str, state: Optional[Literal["attached", "detached", "hidden", "visible"]] = None, timeout: Optional[float] = None, strict: Optional[bool] = False
+    ) -> Optional[ElementHandle]:
         from . import ElementHandle
 
         _element_handle = await self._origin_wait_for_selector(selector=selector, state=state, strict=strict, timeout=timeout)
@@ -115,9 +118,18 @@ class ElementHandle(JSHandle, PlaywrightElementHandle):
             js_handle = JSHandle(_js_handle, self._page)
             return js_handle
 
-    async def click(self, modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, position: Optional[Position] = None, delay: Optional[float] = None,
-                    button: Optional[Literal["left", "middle", "right"]] = None, click_count: Optional[int] = None, timeout: Optional[float] = None, force: Optional[bool] = None,
-                    no_wait_after: Optional[bool] = None, trial: Optional[bool] = None) -> None:
+    async def click(
+        self,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        position: Optional[Position] = None,
+        delay: Optional[float] = None,
+        button: Optional[Literal["left", "middle", "right"]] = None,
+        click_count: Optional[int] = None,
+        timeout: Optional[float] = None,
+        force: Optional[bool] = None,
+        no_wait_after: Optional[bool] = None,
+        trial: Optional[bool] = None,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 
@@ -154,9 +166,17 @@ class ElementHandle(JSHandle, PlaywrightElementHandle):
             for modifier in modifiers:
                 await self._page.keyboard.up(modifier)
 
-    async def dblclick(self, modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, position: Optional[Position] = None, delay: Optional[float] = None,
-                       button: Optional[Literal["left", "middle", "right"]] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
-                       trial: Optional[bool] = None) -> None:
+    async def dblclick(
+        self,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        position: Optional[Position] = None,
+        delay: Optional[float] = None,
+        button: Optional[Literal["left", "middle", "right"]] = None,
+        timeout: Optional[float] = None,
+        force: Optional[bool] = None,
+        no_wait_after: Optional[bool] = None,
+        trial: Optional[bool] = None,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 
@@ -188,8 +208,9 @@ class ElementHandle(JSHandle, PlaywrightElementHandle):
             for modifier in modifiers:
                 await self._page.keyboard.up(modifier)
 
-    async def check(self, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
-                    trial: Optional[bool] = None) -> None:
+    async def check(
+        self, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None, trial: Optional[bool] = None
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         if not force:
@@ -219,8 +240,9 @@ class ElementHandle(JSHandle, PlaywrightElementHandle):
 
             assert await self.is_checked(), PlaywrightError
 
-    async def uncheck(self, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
-                      trial: Optional[bool] = None) -> None:
+    async def uncheck(
+        self, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None, trial: Optional[bool] = None
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         if not force:
@@ -250,8 +272,9 @@ class ElementHandle(JSHandle, PlaywrightElementHandle):
 
             assert not await self.is_checked()
 
-    async def set_checked(self, checked: bool, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None,
-                          trial: Optional[bool] = None) -> None:
+    async def set_checked(
+        self, checked: bool, position: Optional[Position] = None, timeout: Optional[float] = None, force: Optional[bool] = None, no_wait_after: Optional[bool] = None, trial: Optional[bool] = None
+    ) -> None:
         position = position or Position(x=0, y=0)
 
         if not force:
@@ -281,8 +304,15 @@ class ElementHandle(JSHandle, PlaywrightElementHandle):
 
             assert await self.is_checked() == checked
 
-    async def hover(self, modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None, position: Optional[Position] = None, timeout: Optional[float] = None,
-                    no_wait_after: Optional[bool] = None, force: Optional[bool] = None, trial: Optional[bool] = None) -> None:
+    async def hover(
+        self,
+        modifiers: Optional[Sequence[Literal["Alt", "Control", "Meta", "Shift"]]] = None,
+        position: Optional[Position] = None,
+        timeout: Optional[float] = None,
+        no_wait_after: Optional[bool] = None,
+        force: Optional[bool] = None,
+        trial: Optional[bool] = None,
+    ) -> None:
         modifiers = modifiers or []
         position = position or Position(x=0, y=0)
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import httpx
 from async_class import AsyncObject, link
@@ -110,13 +110,7 @@ class ProxyManager(AsyncObject):
         Args:
             httpx_client (httpx.AsyncClient): The HTTPX client to use for proxy checks.
         """
-        get_ip_apis = [
-            "https://api.ipify.org/?format=json",
-            "https://api.myip.com/",
-            "https://get.geojs.io/v1/ip.json",
-            "https://api.ip.sb/jsonip",
-            "https://l2.io/ip.json"
-        ]
+        get_ip_apis = ["https://api.ipify.org/?format=json", "https://api.myip.com/", "https://get.geojs.io/v1/ip.json", "https://api.ip.sb/jsonip", "https://l2.io/ip.json"]
 
         for get_ip_api in get_ip_apis:
             try:
@@ -135,7 +129,7 @@ class ProxyManager(AsyncObject):
             "https://get.geojs.io/v1/ip/geo/<IP>.json": ["country", "country_code", "latitude", "longitude", "timezone"],
         }
 
-        for (get_geo_api, api_names) in get_geo_apis.items():
+        for get_geo_api, api_names in get_geo_apis.items():
             try:
                 api_url = get_geo_api.replace("<IP>", ip)
                 country, country_code, latitude, longitude, timezone = api_names

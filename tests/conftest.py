@@ -4,8 +4,9 @@ import pytest_asyncio
 from playwright._impl._path_utils import get_file_dirname
 
 import botright
+
+from .server import Server, test_server
 from .utils import utils as utils_object
-from .server import test_server, Server
 
 _dirname = get_file_dirname()
 

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Pattern, Any, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Pattern, Union
 
 # from undetected_playwright.async_api import Locator as PlaywrightLocator, FrameLocator as PlaywrightFrameLocator
-from playwright.async_api import Locator as PlaywrightLocator, FrameLocator as PlaywrightFrameLocator
+from playwright.async_api import FrameLocator as PlaywrightFrameLocator
+from playwright.async_api import Locator as PlaywrightLocator
 
 if TYPE_CHECKING:
-    from . import Locator
-    from . import Page
+    from . import Locator, Page
 
 
 class FrameLocator(PlaywrightFrameLocator):
@@ -21,11 +21,14 @@ class FrameLocator(PlaywrightFrameLocator):
         self._origin_locator = frame_locator.locator
         self._origin_nth = frame_locator.nth
 
-    def locator(self, selector_or_locator: Union[PlaywrightLocator, str],
-                has_text: Optional[Union[str, Pattern[str]]] = None,
-                has_not_text: Optional[Union[str, Pattern[str]]] = None,
-                has: Optional[PlaywrightLocator] = None,
-                has_not: Optional[PlaywrightLocator] = None) -> Locator:
+    def locator(
+        self,
+        selector_or_locator: Union[PlaywrightLocator, str],
+        has_text: Optional[Union[str, Pattern[str]]] = None,
+        has_not_text: Optional[Union[str, Pattern[str]]] = None,
+        has: Optional[PlaywrightLocator] = None,
+        has_not: Optional[PlaywrightLocator] = None,
+    ) -> Locator:
         from . import Locator
 
         _locator = self._origin_locator(selector_or_locator=selector_or_locator, has=has, has_text=has_text, has_not=has_not, has_not_text=has_not_text)

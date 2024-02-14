@@ -3,7 +3,6 @@ import math
 from datetime import datetime
 
 import pytest
-
 from playwright.async_api import Page
 
 
@@ -11,9 +10,7 @@ from playwright.async_api import Page
 async def test_jshandle_evaluate_work(page: Page):
     window_handle = await page.evaluate_handle("window")
     assert window_handle
-    assert (
-        repr(window_handle) == f"<JSHandle preview={window_handle._impl_obj._preview}>"
-    )
+    assert repr(window_handle) == f"<JSHandle preview={window_handle._impl_obj._preview}>"
 
 
 @pytest.mark.asyncio
@@ -72,9 +69,7 @@ async def test_jshandle_evaluate_should_work_for_circular_objects(page):
 @pytest.mark.asyncio
 async def test_jshandle_evaluate_accept_same_nested_object_multiple_times(page):
     foo = {"x": 1}
-    assert await page.evaluate(
-        "x => x", {"foo": foo, "bar": [foo], "baz": {"foo": foo}}
-    ) == {"foo": {"x": 1}, "bar": [{"x": 1}], "baz": {"foo": {"x": 1}}}
+    assert await page.evaluate("x => x", {"foo": foo, "bar": [foo], "baz": {"foo": foo}}) == {"foo": {"x": 1}, "bar": [{"x": 1}], "baz": {"foo": {"x": 1}}}
 
 
 @pytest.mark.asyncio

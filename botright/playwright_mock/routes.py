@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-
 # from undetected_playwright.async_api import Route as PlaywrightRoute, Request as PlaywrightRequest, Response as PlaywrightResponse
-from playwright.async_api import Route as PlaywrightRoute, Request as PlaywrightRequest, Response as PlaywrightResponse
+from playwright.async_api import Request as PlaywrightRequest
+from playwright.async_api import Response as PlaywrightResponse
+from playwright.async_api import Route as PlaywrightRoute
 
 if TYPE_CHECKING:
     from . import Page

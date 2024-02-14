@@ -1,25 +1,12 @@
-from .handles import ElementHandle, JSHandle
 from .frame import Frame
 from .frame_locator import FrameLocator
-from .routes import Route, Response, Request
+from .handles import ElementHandle, JSHandle
+from .keyboard import Keyboard
 from .locator import Locator
 from .mouse import Mouse
-from .keyboard import Keyboard
-from .page import Page, new_page
-from .browser import BrowserContext
+from .routes import Request, Response, Route
 
-__all__ = [
-    "ElementHandle",
-    "JSHandle",
-    "Frame",
-    "FrameLocator",
-    "Route",
-    "Response",
-    "Request",
-    "Locator",
-    "Mouse",
-    "Keyboard",
-    "Page",
-    "new_page",
-    "BrowserContext"
-]
+from .page import Page, new_page  # isort:skip
+from .browser import BrowserContext  # isort:skip
+
+__all__ = ["ElementHandle", "JSHandle", "Frame", "FrameLocator", "Route", "Response", "Request", "Locator", "Mouse", "Keyboard", "Page", "new_page", "BrowserContext"]

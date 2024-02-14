@@ -200,8 +200,8 @@ class Botright(AsyncObject):
             EnvironmentError: If no Chromium based browser is found on the system.
         """
         # Ungoogled Chromium preferred (most stealthy)
-        # if chromium := browsers.get("chromium"):
-        #     return chromium
+        if chromium := browsers.get("chromium"):
+            return chromium
         print("\033[1;33;48m[WARNING] Ungoogled Chromium not found. Recommended for Canvas Manipulation. Download at https://ungoogled-software.github.io/ungoogled-chromium-binaries/ \033[0m")
 
         # Chrome preferred (much stealthier)

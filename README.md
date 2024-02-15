@@ -1,6 +1,6 @@
-# Botright v0.5
-![Tests & Linting](https://github.com/Vinyzu/botright/actions/workflows/tests.yml/badge.svg)
-[![](https://img.shields.io/pypi/v/botright.svg?color=1182C3)](https://pypi.org/project/selenium-driverless/)
+# Botright v0.5.1
+![Tests & Linting](https://github.com/Vinyzu/botright/actions/workflows/ci.yml/badge.svg)
+[![](https://img.shields.io/pypi/v/botright.svg?color=1182C3)](https://pypi.org/project/botright/)
 [![Downloads](https://static.pepy.tech/badge/botright)](https://pepy.tech/project/botright)
 
 ## Install it from PyPI
@@ -91,20 +91,20 @@ Here all Captchas supported as of now:
 
 |             Captcha Type             | Supported |            Solved By            | Success Rate |
 |:------------------------------------:|:---------:|:-------------------------------:|--------------|
-|              `hCaptcha`              |    ✔️    |       hcaptcha-challenger       | up to 90%    |
-|             `reCaptcha`              |    ✔️    |           reCognizer            | 50%-80%      |
+|              `hCaptcha`              |    ✔️ ❓    | hcaptcha-challenger (outdated)  | up to 90%    |
+|             `reCaptcha`              |    ✔️     |           reCognizer            | 50%-80%      |
 | `geeTestv3` Currently Not Available! |
-|         v3 Intelligent Mode          |    ✔️    |     botrights stealthiness      | 100%         |
-|          v3 Slider Captcha           |    ✔️    |        cv2.matchTemplate        | 100%         |
-|           v3 Nine Captcha            |    ✔️    |         CLIP Detection          | 50%          |
-|           v3 Icon Captcha            |    ✔️    | cv2.matchTemplate / SSIM / CLIP | 70%          |
-|           v3 Space Captcha           |    ❌    |          Not solvable           | 0%           |
+|         v3 Intelligent Mode          |    ✔️     |     botrights stealthiness      | 100%         |
+|          v3 Slider Captcha           |    ✔️     |        cv2.matchTemplate        | 100%         |
+|           v3 Nine Captcha            |    ✔️     |         CLIP Detection          | 50%          |
+|           v3 Icon Captcha            |    ✔️     | cv2.matchTemplate / SSIM / CLIP | 70%          |
+|           v3 Space Captcha           |     ❌     |          Not solvable           | 0%           |
 | `geeTestv4` Currently Not Available! |
-|         v4 Intelligent Mode          |    ✔️    |     botrights stealthiness      | 100%         |
-|          v4 Slider Captcha           |    ✔️    |        cv2.matchTemplate        | 100%         |
-|          v4 GoBang Captcha           |    ✔️    |        Math Calculations        | 100%         |
-|           v4 Icon Captcha            |    ✔️    | cv2.matchTemplate / SSIM / CLIP | 60%          |
-|         v4 IconCrush Captcha         |    ✔️    |        Math Calculations        | 100%         |
+|         v4 Intelligent Mode          |    ✔️     |     botrights stealthiness      | 100%         |
+|          v4 Slider Captcha           |    ✔️     |        cv2.matchTemplate        | 100%         |
+|          v4 GoBang Captcha           |    ✔️     |        Math Calculations        | 100%         |
+|           v4 Icon Captcha            |    ✔️     | cv2.matchTemplate / SSIM / CLIP | 60%          |
+|         v4 IconCrush Captcha         |    ✔️     |        Math Calculations        | 100%         |
 
 ## Development
 
@@ -135,7 +135,7 @@ Read the [CONTRIBUTING.md](https://github.com/Vinyzu/Botright/blob/main/docs/CON
 
 ---
 
-![Version](https://img.shields.io/badge/Botright-v0.5-blue)
+![Version](https://img.shields.io/badge/Botright-v0.5.1-blue)
 ![License](https://img.shields.io/badge/License-GNU%20GPL-green)
 ![Python](https://img.shields.io/badge/Python-v3.x-lightgrey)
 

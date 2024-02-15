@@ -42,6 +42,7 @@ async def test_hide_me(page: Page):
     assert "WebRTC is disabled" in leak_check
 
 
+@pytest.mark.skip(reason="Hidemyass is maight maight detect wrong / detect js instead of webrtc")
 @pytest.mark.asyncio
 async def test_hidemyass(page: Page):
     await page.goto("https://www.hidemyass.com/webrtc-leak-test?nogeoip")

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
-import shutil
-from tempfile import TemporaryDirectory, gettempdir
+from tempfile import TemporaryDirectory
 from typing import Any, Dict, List, Optional
 
 import browsers
@@ -88,7 +87,6 @@ class Botright(AsyncObject):
 
         # Getting Chromium based browser engine and deleting botright temp dirs
         self.browser = self.get_browser_engine()
-        self.delete_botright_temp_dirs()
 
         # Setting Values
         self.headless = headless
@@ -214,13 +212,3 @@ class Botright(AsyncObject):
                 return browser_engine
 
         raise EnvironmentError("No Chromium based browser found")
-
-    @staticmethod
-    def delete_botright_temp_dirs() -> None:
-        temp_path = gettempdir()
-
-        for temp_dir in os.listdir(temp_path):
-            # Check if the item is a directory and starts with 'botright-'
-            if os.path.isdir(os.path.join(temp_path, temp_dir)) and temp_dir.startswith("botright-"):
-                # If it matches, delete the folder and its contents
-                shutil.rmtree(os.path.join(temp_path, temp_dir))

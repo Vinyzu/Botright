@@ -47,13 +47,13 @@ class ProxyManager(AsyncObject):
         self.proxy = proxy.strip() if proxy else ""
 
         self.timeout = httpx.Timeout(20.0, read=None)
-        self._httpx = httpx.AsyncClient()
+        self._httpx = httpx.AsyncClient(verify=False)
 
         if self.proxy:
             self.split_proxy()
             self.proxy = f"{self.username}:{self.password}@{self.ip}:{self.port}" if self.username else f"{self.ip}:{self.port}"
             self.plain_proxy = f"http://{self.proxy}"
-            self._phttpx = httpx.AsyncClient(proxies={"all://": self.plain_proxy})
+            self._phttpx = httpx.AsyncClient(proxies={"all://": self.plain_proxy}, verify=False)
             self.http_proxy = {"http": self.plain_proxy, "https": self.plain_proxy}
 
             if self.username:

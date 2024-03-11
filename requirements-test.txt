@@ -1,6 +1,6 @@
 # This requirements are for development and testing only, not for production.
 flake8==7.0.0
-pytest==8.1.0
+pytest==8.1.1
 pytest_asyncio==0.23.5
 mypy==1.8.0
 types-setuptools==69.1.0.20240302

@@ -3,7 +3,7 @@ flake8==7.0.0
 pytest==8.1.1
 pytest_asyncio==0.23.5.post1
 mypy==1.9.0
-types-setuptools==69.1.0.20240310
+types-setuptools==69.2.0.20240317
 twisted==24.3.0
 playwright==1.42.0
 black==24.3.0

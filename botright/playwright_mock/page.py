@@ -179,7 +179,7 @@ class Page(PlaywrightPage):
             )
 
             await self.cdp.send(
-                "Emulation.setUserAgentOverride",
+                "Network.setUserAgentOverride",
                 {
                     "userAgent": self.fingerprint.navigator.userAgent,
                     "acceptLanguage": "en-US",

@@ -10,10 +10,11 @@ import browsers
 import hcaptcha_challenger as solver
 import loguru
 from async_class import AsyncObject
-from chrome_fingerprints import AsyncFingerprintGenerator
+from browserforge.fingerprints import FingerprintGenerator
 from playwright.async_api import APIResponse, Playwright, async_playwright
 from undetected_playwright.async_api import async_playwright as undetected_async_playwright
 
+#from playwright_mock import browser
 from botright.playwright_mock import browser
 
 from .modules import Faker, ProxyManager
@@ -102,9 +103,10 @@ class Botright(AsyncObject):
 
         # '--disable-gpu', '--incognito', '--disable-blink-features=AutomationControlled'
         # fmt: off
+
         self.flags = ['--incognito', '--accept-lang=en-US', '--lang=en-US', '--no-pings', '--mute-audio', '--no-first-run', '--no-default-browser-check', '--disable-cloud-import',
                       '--disable-gesture-typing', '--disable-offer-store-unmasked-wallet-cards', '--disable-offer-upload-credit-cards', '--disable-print-preview', '--disable-voice-input',
-                      '--disable-wake-on-wifi', '--disable-cookie-encryption', '--ignore-gpu-blocklist', '--enable-async-dns', '--enable-simple-cache-backend', '--enable-tcp-fast-open',
+                      '--disable-wake-on-wifi', '--disable-cookie-encryption', '--enable-async-dns', '--enable-simple-cache-backend', '--enable-tcp-fast-open',
                       '--prerender-from-omnibox=disabled', '--enable-web-bluetooth', '--disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process,TranslateUI,BlinkGenPropertyTrees',
                       '--aggressive-cache-discard', '--disable-extensions', '--disable-ipc-flooding-protection', '--disable-blink-features=AutomationControlled', '--test-type',
                       '--enable-features=NetworkService,NetworkServiceInProcess,TrustTokens,TrustTokensAlwaysAllowIssuance', '--disable-component-extensions-with-background-pages',
@@ -117,6 +119,7 @@ class Botright(AsyncObject):
                       '--run-all-compositor-stages-before-draw', '--disable-threaded-animation', '--disable-threaded-scrolling', '--disable-checker-imaging',
                       '--disable-new-content-rendering-timeout', '--disable-image-animation-resync', '--disable-partial-raster', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,'
                       'primaryPointerType=4,availablePointerTypes=4', '--disable-layer-tree-host-memory-pressure']
+        
         # fmt: on
 
         # Collecting items that can be stopped
@@ -129,7 +132,7 @@ class Botright(AsyncObject):
             else:
                 self.flags.append("--fingerprinting-canvas-image-data-noise")
 
-        self.fingerprint_generator = AsyncFingerprintGenerator()
+        self.fingerprint_generator = FingerprintGenerator()
 
     async def new_browser(self, proxy: Optional[str] = None, **launch_arguments) -> BrowserContext:
         """
@@ -149,7 +152,7 @@ class Botright(AsyncObject):
 
         # Launching Main Browser
         if self.mask_fingerprint:
-            flags = self.flags + [f"--user-agent={_faker.fingerprint.navigator.user_agent}"]
+            flags = self.flags + [f"--user-agent={_faker.fingerprint.navigator.userAgent}"]
         else:
             flags = self.flags
 

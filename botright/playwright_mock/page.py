@@ -34,6 +34,7 @@ from playwright.async_api import Route as PlaywrightRoute
 from playwright.async_api import Worker as PlaywrightWorker
 from recognizer.agents.playwright import AsyncChallenger
 
+#from modules import Faker, hcaptcha  # , geetest
 from botright.modules import Faker, hcaptcha  # , geetest
 
 # fmt: on
@@ -166,35 +167,24 @@ class Page(PlaywrightPage):
         nav_hints_platforms = {"Windows": "Win32", "macOS": "MacIntel", "Linux": "Linux x86_64"}
 
         if self.browser.mask_fingerprint:
-            user_agent_metadata = {
-                "brands": self.fingerprint.navigator.brands,
-                "fullVersionList": self.fingerprint.navigator.full_version_list,
-                "fullVersion": self.fingerprint.navigator.full_version,
-                "platform": self.fingerprint.navigator.platform.name,
-                "architecture": self.fingerprint.navigator.platform.architecture,
-                "bitness": self.fingerprint.navigator.platform.bitness,
-                "platformVersion": self.fingerprint.navigator.platform.version,
-                "model": self.fingerprint.navigator.platform.model,
-                "mobile": False,
-            }
 
             await self.cdp.send(
                 "Emulation.setUserAgentOverride",
                 {
-                    "userAgent": self.fingerprint.navigator.user_agent,
+                    "userAgent": self.fingerprint.navigator.userAgent,
                     "acceptLanguage": "en-US",
-                    "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform.name, self.fingerprint.navigator.platform.name),
-                    "userAgentMetadata": user_agent_metadata,
+                    "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform, self.fingerprint.navigator.platform),
+                    "userAgentMetadata": self.fingerprint.navigator.userAgentData,
                 },
             )
 
             await self.cdp.send(
-                "Network.setUserAgentOverride",
+                "Emulation.setUserAgentOverride",
                 {
-                    "userAgent": self.fingerprint.navigator.user_agent,
+                    "userAgent": self.fingerprint.navigator.userAgent,
                     "acceptLanguage": "en-US",
-                    "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform.name, self.fingerprint.navigator.platform.name),
-                    "userAgentMetadata": user_agent_metadata,
+                    "platform": nav_hints_platforms.get(self.fingerprint.navigator.platform, self.fingerprint.navigator.platform),
+                    "userAgentMetadata": self.fingerprint.navigator.userAgentData,
                 },
             )
 

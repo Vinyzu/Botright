@@ -103,10 +103,9 @@ class Botright(AsyncObject):
 
         # '--disable-gpu', '--incognito', '--disable-blink-features=AutomationControlled'
         # fmt: off
-
         self.flags = ['--incognito', '--accept-lang=en-US', '--lang=en-US', '--no-pings', '--mute-audio', '--no-first-run', '--no-default-browser-check', '--disable-cloud-import',
                       '--disable-gesture-typing', '--disable-offer-store-unmasked-wallet-cards', '--disable-offer-upload-credit-cards', '--disable-print-preview', '--disable-voice-input',
-                      '--disable-wake-on-wifi', '--disable-cookie-encryption', '--enable-async-dns', '--enable-simple-cache-backend', '--enable-tcp-fast-open',
+                      '--disable-wake-on-wifi', '--disable-cookie-encryption', '--ignore-gpu-blocklist', '--enable-async-dns', '--enable-simple-cache-backend', '--enable-tcp-fast-open',
                       '--prerender-from-omnibox=disabled', '--enable-web-bluetooth', '--disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process,TranslateUI,BlinkGenPropertyTrees',
                       '--aggressive-cache-discard', '--disable-extensions', '--disable-ipc-flooding-protection', '--disable-blink-features=AutomationControlled', '--test-type',
                       '--enable-features=NetworkService,NetworkServiceInProcess,TrustTokens,TrustTokensAlwaysAllowIssuance', '--disable-component-extensions-with-background-pages',
@@ -119,7 +118,6 @@ class Botright(AsyncObject):
                       '--run-all-compositor-stages-before-draw', '--disable-threaded-animation', '--disable-threaded-scrolling', '--disable-checker-imaging',
                       '--disable-new-content-rendering-timeout', '--disable-image-animation-resync', '--disable-partial-raster', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,'
                       'primaryPointerType=4,availablePointerTypes=4', '--disable-layer-tree-host-memory-pressure']
-        
         # fmt: on
 
         # Collecting items that can be stopped

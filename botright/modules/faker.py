@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 
 from async_class import AsyncObject, link
-from chrome_fingerprints import ChromeFingerprint
+from browserforge.fingerprints import FingerprintGenerator
 
 from .proxy_manager import ProxyManager
 
@@ -11,7 +11,7 @@ from .proxy_manager import ProxyManager
 class Faker(AsyncObject):
     locale: str = ""
     language_code: str = ""
-    fingerprint: ChromeFingerprint
+    fingerprint: FingerprintGenerator
 
     async def __ainit__(self, botright, proxy):
         """
@@ -23,6 +23,7 @@ class Faker(AsyncObject):
         """
         self.botright = botright
         link(self, botright)
+        self.fingerprint = FingerprintGenerator()
 
         threads = [self.get_computer(), self.get_locale(proxy)]
         await asyncio.gather(*threads)
@@ -49,7 +50,7 @@ class Faker(AsyncObject):
         """
         Generate fake computer-related data such as user agent, vendor, GPU information, screen dimensions, etc.
         """
-        self.fingerprint = await self.botright.fingerprint_generator.get_fingerprint()
+        self.fingerprint = self.fingerprint.generate(browser='chrome', os='windows')
 
     async def get_locale(self, proxy: ProxyManager) -> None:
         """

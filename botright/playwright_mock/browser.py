@@ -51,13 +51,13 @@ async def new_browser(botright: Botright, proxy: ProxyManager, faker: Faker, fla
         fingerprint = faker.fingerprint
         parsed_launch_arguments = {
             "locale": "en-US",
-            "user_agent": fingerprint.navigator.user_agent,
+            "user_agent": fingerprint.navigator.userAgent,
             "timezone_id": proxy.timezone,
             "geolocation": {"longitude": proxy.longitude, "latitude": proxy.latitude, "accuracy": 0.7},
             "permissions": ["geolocation"],
             "ignore_https_errors": True,
             "screen": {"width": fingerprint.screen.width, "height": fingerprint.screen.height},
-            "viewport": {"width": fingerprint.screen.avail_width, "height": fingerprint.screen.avail_height},
+            "viewport": {"width": fingerprint.screen.availWidth, "height": fingerprint.screen.availHeight},
             "color_scheme": "dark",
             "proxy": proxy.browser_proxy,
             "http_credentials": {"username": proxy.username, "password": proxy.password} if proxy.username else None,

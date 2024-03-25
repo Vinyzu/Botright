@@ -10,10 +10,11 @@ import browsers
 import hcaptcha_challenger as solver
 import loguru
 from async_class import AsyncObject
-from chrome_fingerprints import AsyncFingerprintGenerator
+from browserforge.fingerprints import FingerprintGenerator
 from playwright.async_api import APIResponse, Playwright, async_playwright
 from undetected_playwright.async_api import async_playwright as undetected_async_playwright
 
+#from playwright_mock import browser
 from botright.playwright_mock import browser
 
 from .modules import Faker, ProxyManager
@@ -129,7 +130,7 @@ class Botright(AsyncObject):
             else:
                 self.flags.append("--fingerprinting-canvas-image-data-noise")
 
-        self.fingerprint_generator = AsyncFingerprintGenerator()
+        self.fingerprint_generator = FingerprintGenerator()
 
     async def new_browser(self, proxy: Optional[str] = None, **launch_arguments) -> BrowserContext:
         """
@@ -149,7 +150,7 @@ class Botright(AsyncObject):
 
         # Launching Main Browser
         if self.mask_fingerprint:
-            flags = self.flags + [f"--user-agent={_faker.fingerprint.navigator.user_agent}"]
+            flags = self.flags + [f"--user-agent={_faker.fingerprint.navigator.userAgent}"]
         else:
             flags = self.flags
 

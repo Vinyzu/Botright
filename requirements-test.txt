@@ -6,5 +6,5 @@ mypy==1.9.0
 types-setuptools==69.2.0.20240317
 twisted==24.3.0
 playwright==1.42.0
-black==24.3.0
+black==24.4.0
 isort==5.13.2

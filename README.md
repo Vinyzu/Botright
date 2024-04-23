@@ -3,6 +3,20 @@
 [![](https://img.shields.io/pypi/v/botright.svg?color=1182C3)](https://pypi.org/project/botright/)
 [![Downloads](https://static.pepy.tech/badge/botright)](https://pepy.tech/project/botright)
 
+---
+
+## Sponsors
+If you need to solve a captcha which isn´t solvable with [Botright](https://github.com/Vinyzu/Botright) or you dont want to spend you´re own computer resources on AI solving, I can personally 
+recommend:
+
+[![Capsolver Banner](https://github.com/Vinyzu/chrome-fingerprints/assets/50874994/755281d9-d1fb-40d1-9420-85c0affb7920)](https://www.capsolver.com/?utm_source=github&utm_medium=banner_github&utm_campaign=botright)
+
+[Capsolver.com](https://www.capsolver.com/?utm_source=github&utm_medium=banner_github&utm_campaign=botright) is an AI-powered service that specializes in solving various types of captchas automatically. It supports captchas such as [reCAPTCHA V2](https://docs.capsolver.com/guide/captcha/ReCaptchaV2.html), [reCAPTCHA V3](https://docs.capsolver.com/guide/captcha/ReCaptchaV3.html), [hCaptcha](https://docs.capsolver.com/guide/captcha/HCaptcha.html), [FunCaptcha](https://docs.capsolver.com/guide/captcha/FunCaptcha.html), [DataDome](https://docs.capsolver.com/guide/captcha/DataDome.html), [AWS Captcha](https://docs.capsolver.com/guide/captcha/awsWaf.html), [Geetest](https://docs.capsolver.com/guide/captcha/Geetest.html) and Cloudflare [Captcha](https://docs.capsolver.com/guide/antibots/cloudflare_turnstile.html) / [Challenge 5s](https://docs.capsolver.com/guide/antibots/cloudflare_challenge.html), [Imperva / Incapsula](https://docs.capsolver.com/guide/antibots/imperva.html), among others.
+
+For developers, Capsolver offers API integration options detailed in their [documentation](https://docs.capsolver.com/), facilitating the integration of captcha solving into applications. They also provide browser extensions for both [Chrome](https://chromewebstore.google.com/detail/captcha-solver-auto-captc/pgojnojmmhpofjgdmaebadhbocahppod) and [Firefox](https://addons.mozilla.org/es/firefox/addon/capsolver-captcha-solver/), making it easy to use their service directly within a browser. Different pricing packages are available to accommodate varying needs, ensuring flexibility for users.
+
+---
+
 ## Install it from PyPI
 
 ```bash
@@ -109,18 +123,6 @@ Here all Captchas supported as of now:
 ## Development
 
 Read the [CONTRIBUTING.md](https://github.com/Vinyzu/Botright/blob/main/docs/CONTRIBUTING.md) file.
-
----
-
-## Sponsors
-If you need to solve a captcha which isn´t solvable with [Botright](https://github.com/Vinyzu/Botright) or you dont want to spend you´re own computer resources on AI solving, I can personally 
-recommend:
-
-[![Capsolver Banner](https://github.com/Vinyzu/chrome-fingerprints/assets/50874994/755281d9-d1fb-40d1-9420-85c0affb7920)](https://www.capsolver.com/?utm_source=github&utm_medium=banner_github&utm_campaign=botright)
-
-[Capsolver.com](https://www.capsolver.com/?utm_source=github&utm_medium=banner_github&utm_campaign=botright) is an AI-powered service that specializes in solving various types of captchas automatically. It supports captchas such as [reCAPTCHA V2](https://docs.capsolver.com/guide/captcha/ReCaptchaV2.html), [reCAPTCHA V3](https://docs.capsolver.com/guide/captcha/ReCaptchaV3.html), [hCaptcha](https://docs.capsolver.com/guide/captcha/HCaptcha.html), [FunCaptcha](https://docs.capsolver.com/guide/captcha/FunCaptcha.html), [DataDome](https://docs.capsolver.com/guide/captcha/DataDome.html), [AWS Captcha](https://docs.capsolver.com/guide/captcha/awsWaf.html), [Geetest](https://docs.capsolver.com/guide/captcha/Geetest.html) and Cloudflare [Captcha](https://docs.capsolver.com/guide/antibots/cloudflare_turnstile.html) / [Challenge 5s](https://docs.capsolver.com/guide/antibots/cloudflare_challenge.html), [Imperva / Incapsula](https://docs.capsolver.com/guide/antibots/imperva.html), among others.
-
-For developers, Capsolver offers API integration options detailed in their [documentation](https://docs.capsolver.com/), facilitating the integration of captcha solving into applications. They also provide browser extensions for both [Chrome](https://chromewebstore.google.com/detail/captcha-solver-auto-captc/pgojnojmmhpofjgdmaebadhbocahppod) and [Firefox](https://addons.mozilla.org/es/firefox/addon/capsolver-captcha-solver/), making it easy to use their service directly within a browser. Different pricing packages are available to accommodate varying needs, ensuring flexibility for users.
 
 ---
 

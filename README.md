@@ -17,6 +17,20 @@ For developers, Capsolver offers API integration options detailed in their [docu
 
 ---
 
+[![Evomi Banner](https://my.evomi.com/images/brand/cta.png)](https://evomi.com?utm_source=github&utm_medium=banner&utm_campaign=Vinyzu-Botright)
+
+**Evomi** is your Swiss Quality, affordable Proxy Provider. I can personally recommend them for their High Quality Residential Proxies.
+
+- 🌍 **Global Presence**: Available in 150+ Countries
+- ⚡ **Guaranteed Low Latency**
+- 🔒 **Swiss Quality and Privacy**
+- 🎁 **Free Trial**: No Credit Card Required
+- 🛡️ **99.9% Uptime**
+- 🤝 **Special IP Pool selection**: Optimize for fast, quality or quantity of ips
+- 🔧 **Easy Integration**: Compatible with most software and programming languages
+
+---
+
 ## Install it from PyPI
 
 ```bash

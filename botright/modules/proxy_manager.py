@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional
 
 import httpx
+import ipaddress
 from async_class import AsyncObject, link
 
 
@@ -116,7 +117,9 @@ class ProxyManager(AsyncObject):
             try:
                 ip_request = await httpx_client.get(get_ip_api, timeout=self.timeout)
                 ip = ip_request.json().get("ip")
-                break
+                ip_addr = ipaddress.ip_address(ip)
+                if isinstance(ip_addr, (ipaddress.IPv6Address, ipaddress.IPv4Address)):
+                    break
             except Exception:
                 pass
         else:

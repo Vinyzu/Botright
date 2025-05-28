@@ -5,15 +5,26 @@
 
 ---
 
-## Sponsors
-If you need to solve a captcha which isn´t solvable with [Botright](https://github.com/Vinyzu/Botright) or you dont want to spend you´re own computer resources on AI solving, I can personally 
-recommend:
+<details open>
+    <summary><h3>Sponsors</h1></summary>
 
-[![Capsolver Banner](https://camo.githubusercontent.com/ea2183be9dcdaa43d47a39d67609bf8fbb6430ce5400a39ce6a4cdd7b08e0a89/68747470733a2f2f732e76796a6176612e78797a2f66696c65732f323032342f31322d446563656d6265722f31372f35346531646230652f636170736f6c7665722e6a7067)](https://www.capsolver.com/?utm_source=github&utm_medium=banner_github&utm_campaign=botright)
+ <a href="https://www.scrapeless.com/en/product/scraping-browser?utm_medium=github&utm_campaign=vinyzu"><img src="https://github.com/user-attachments/assets/7ca41a89-95db-4213-9b91-bf4720e778c2" alt="Scrapeless Banner" width="80%"/></a>
 
-[Capsolver.com](https://www.capsolver.com/?utm_source=github&utm_medium=banner_github&utm_campaign=botright) is an AI-powered service that specializes in solving various types of captchas automatically. It supports captchas such as [reCAPTCHA V2](https://docs.capsolver.com/guide/captcha/ReCaptchaV2.html), [reCAPTCHA V3](https://docs.capsolver.com/guide/captcha/ReCaptchaV3.html), [DataDome](https://docs.capsolver.com/guide/captcha/DataDome.html), [AWS Captcha](https://docs.capsolver.com/guide/captcha/awsWaf.html), [Geetest](https://docs.capsolver.com/guide/captcha/Geetest.html) and Cloudflare [Captcha](https://docs.capsolver.com/guide/antibots/cloudflare_turnstile.html) / [Challenge 5s](https://docs.capsolver.com/guide/antibots/cloudflare_challenge.html), [Imperva / Incapsula](https://docs.capsolver.com/guide/antibots/imperva.html), among others.
+If you're looking for an automated browser tool focused on bypassing website bot detection mechanisms, I can personally recommend [**Scrapeless Scraping Browser**](https://www.scrapeless.com/en/product/scraping-browser?utm_medium=github&utm_campaign=vinyzu). It's suitable for tasks like web scraping, automated testing, and data collection — especially in scenarios that involve complex anti-bot systems.  </br>
+[**Scraping Browser**](https://app.scrapeless.com/passport/login?utm_medium=github&utm_campaign=vinyzu) is a cloud-based browser platform built for high-concurrency web scraping and AI automation. It features advanced stealth modes and powerful anti-blocking capabilities, making it easy to handle dynamic websites, anti-bot mechanisms, and CAPTCHA challenges. It supports one-click scraping of single pages or entire websites, and can extract content based on prompts. It offers an efficient, stable, and cost-effective solution for large-scale data collection.   </br>  </br>
+**Key Features:**
 
-For developers, Capsolver offers API integration options detailed in their [documentation](https://docs.capsolver.com/), facilitating the integration of captcha solving into applications. They also provide browser extensions for both [Chrome](https://chromewebstore.google.com/detail/captcha-solver-auto-captc/pgojnojmmhpofjgdmaebadhbocahppod) and [Firefox](https://addons.mozilla.org/es/firefox/addon/capsolver-captcha-solver/), making it easy to use their service directly within a browser. Different pricing packages are available to accommodate varying needs, ensuring flexibility for users.
+* **High-concurrency scraping support**: Instantly launch 50–10,000+ browser instances with no server restrictions  
+* **Bypass anti-bot mechanisms**: Automatically handles reCAPTCHA, Cloudflare, WAF, DataDome, and more  
+* **Highly human-like browsing environment**: Dynamic fingerprint spoofing and simulation of real user behavior  
+* **70M+ residential IP proxies**: Global coverage with geo-targeting and automatic rotation  
+* **Real-time debugging and session replay**: Built-in Session Inspector and Live View for real-time browser session monitoring and control  
+* **Low operating costs**: Proxy usage costs just $1.26–$1.80/GB
+* **Plug-and-play**: Compatible with Puppeteer / Playwright / Python / Node.js for easy integration  
+* **Multiple scraping modes supported**: Single-page extraction / full-site scraping / prompt-based content extraction
+
+[**Scrapeless**](https://www.scrapeless.com/en?utm_medium=github&utm_campaign=vinyzu) is an all-in-one, highly scalable data scraping tool designed for enterprises and developers. In addition to the Scraping Browser, it also offers [**Scraping API**](https://www.scrapeless.com/en/product/scraping-api?utm_medium=github&utm_campaign=vinyzu), [**Deep SerpAPI**](https://www.scrapeless.com/en/product/deep-serp-api?utm_medium=github&utm_campaign=vinyzu), and [**Proxies**](https://www.scrapeless.com/en/product/proxies?utm_medium=github&utm_campaign=vinyzu) services.  
+👉 Learn more: [Scrapeless Scraping Browser Playground](https://app.scrapeless.com/passport/login?utm_medium=github&utm_campaign=vinyzu) | [Scrapeless Scraping Browser Docs](https://docs.scrapeless.com/en/scraping-browser/quickstart/introduction/?utm_medium=github&utm_campaign=vinyzu) 
 
 ---
 
@@ -28,6 +39,7 @@ For developers, Capsolver offers API integration options detailed in their [docu
 - 🛡️ **99.9% Uptime**
 - 🤝 **Special IP Pool selection**: Optimize for fast, quality or quantity of ips
 - 🔧 **Easy Integration**: Compatible with most software and programming languages
+</details>
 
 ---
 

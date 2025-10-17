@@ -8,23 +8,25 @@
 <details open>
     <summary><h3>Sponsors</h1></summary>
 
- <a href="https://www.scrapeless.com/en/product/scraping-browser?utm_medium=github&utm_campaign=vinyzu"><img src="https://github.com/user-attachments/assets/7ca41a89-95db-4213-9b91-bf4720e778c2" alt="Scrapeless Banner" width="80%"/></a>
+ <a href="https://www.scrapeless.com/en/product/scraping-browser?utm_medium=github&utm_campaign=vinyzu-botright"><img src="https://github.com/user-attachments/assets/7ca41a89-95db-4213-9b91-bf4720e778c2" alt="Scrapeless Banner" width="80%"/></a>
 
-If you're looking for an automated browser tool focused on bypassing website bot detection mechanisms, I can personally recommend [**Scrapeless Scraping Browser**](https://www.scrapeless.com/en/product/scraping-browser?utm_medium=github&utm_campaign=vinyzu). It's suitable for tasks like web scraping, automated testing, and data collection — especially in scenarios that involve complex anti-bot systems.  </br>
-[**Scraping Browser**](https://app.scrapeless.com/passport/login?utm_medium=github&utm_campaign=vinyzu) is a cloud-based browser platform built for high-concurrency web scraping and AI automation. It features advanced stealth modes and powerful anti-blocking capabilities, making it easy to handle dynamic websites, anti-bot mechanisms, and CAPTCHA challenges. It supports one-click scraping of single pages or entire websites, and can extract content based on prompts. It offers an efficient, stable, and cost-effective solution for large-scale data collection.   </br>  </br>
-**Key Features:**
+If you are looking for a tool focused on **browser automation and anti-detection mechanisms**, I can recommend [**Scrapeless Scraping Browser**](https://www.scrapeless.com/en/product/scraping-browser?utm_medium=github&utm_campaign=vinyzu-botright). It is a cloud-based, Chromium-powered headless browser cluster that enables developers to run **large-scale concurrent browser instances** and handle complex interactions on protected pages. Perfectly suited for **AI infrastructure, web automation, data scraping, page rendering, and automated testing**.
 
-* **High-concurrency scraping support**: Instantly launch 50–10,000+ browser instances with no server restrictions  
-* **Bypass anti-bot mechanisms**: Automatically handles reCAPTCHA, Cloudflare, WAF, DataDome, and more  
-* **Highly human-like browsing environment**: Dynamic fingerprint spoofing and simulation of real user behavior  
-* **70M+ residential IP proxies**: Global coverage with geo-targeting and automatic rotation  
-* **Real-time debugging and session replay**: Built-in Session Inspector and Live View for real-time browser session monitoring and control  
-* **Low operating costs**: Proxy usage costs just $1.26–$1.80/GB
-* **Plug-and-play**: Compatible with Puppeteer / Playwright / Python / Node.js for easy integration  
-* **Multiple scraping modes supported**: Single-page extraction / full-site scraping / prompt-based content extraction
+The [**Scrapeless Browser**](https://www.scrapeless.com/en/product/scraping-browser?utm_medium=github&utm_campaign=vinyzu-botright) provides a secure, isolated browser environment that allows you to interact with web applications while minimizing potential risks to your system.  
+Key Features
 
-[**Scrapeless**](https://www.scrapeless.com/en?utm_medium=github&utm_campaign=vinyzu) is an all-in-one, highly scalable data scraping tool designed for enterprises and developers. In addition to the Scraping Browser, it also offers [**Scraping API**](https://www.scrapeless.com/en/product/scraping-api?utm_medium=github&utm_campaign=vinyzu), [**Deep SerpAPI**](https://www.scrapeless.com/en/product/deep-serp-api?utm_medium=github&utm_campaign=vinyzu), and [**Proxies**](https://www.scrapeless.com/en/product/proxies?utm_medium=github&utm_campaign=vinyzu) services.  
-👉 Learn more: [Scrapeless Scraping Browser Playground](https://app.scrapeless.com/passport/login?utm_medium=github&utm_campaign=vinyzu) | [Scrapeless Scraping Browser Docs](https://docs.scrapeless.com/en/scraping-browser/quickstart/introduction/?utm_medium=github&utm_campaign=vinyzu) 
+* **Out-of-the-Box Ready**: Natively compatible with [Puppeteer](https://docs.scrapeless.com/en/scraping-browser/libraries/puppeteer/) and [Playwright](https://docs.scrapeless.com/en/scraping-browser/libraries/playwright/), supporting CDP connections. Migrate your projects with just one line of code.  
+* **Global IP Resources**: Covers residential IPs, static ISP IPs, and unlimited IPs across 195 countries. Transparent costs **($0.6–$1.8/GB)** with support for custom browser proxies.  
+* **Isolated Environment Creation**: Each profile uses an exclusive browser environment, enabling persistent login and identity isolation.  
+* **Unlimited Concurrent Scaling**: A single task supports second-level launch of 50 to 1000+ browser instances. Auto-scaling is available with no server resource limits.  
+* **Edge Node Service (ENS)** – Multiple nodes worldwide, offering 2–3× faster launch speed and higher stability than other browsers.  
+* **Flexible Fingerprint Customization**: Generate random fingerprints or customize fingerprint parameters as needed.  
+* **Visual Debugging:** Perform interactive debugging and real-time monitoring of proxy traffic through **Live View**, and quickly pinpoint issues and optimize actions by replaying sessions page by page with **Session Recordings**.  
+* **Enterprise Customization**: Undertake customization of enterprise-level automation projects and AI Agent customization.
+
+
+👉 Learn more: [Scrapeless Scraping Browser Playground](https://app.scrapeless.com/passport/login?utm_medium=github&utm_campaign=vinyzu-botright) | [Scrapeless Scraping Browser Docs](https://docs.scrapeless.com/en/scraping-browser/quickstart/introduction/?utm_medium=github&utm_campaign=vinyzu-botright)
+
 
 ---
 

@@ -70,7 +70,7 @@ class hCaptcha:
                 captcha_token: str = cr.generated_pass_UUID
                 return captcha_token
 
-        return f"Failed HCaptcha solving with {result}"
+        return None
 
     async def get_hcaptcha(self, site_key: Optional[str] = "00000000-0000-0000-0000-000000000000", rq_data: Optional[str] = None) -> Optional[str]:
         """

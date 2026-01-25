@@ -21,4 +21,4 @@ recognizer==1.4
 # easyocr==1.7.1
 # opencv-python~=4.9.0.80
 setuptools~=69.5.1
-loguru==0.7.2
+loguru==0.7.3

@@ -8,6 +8,10 @@
 <details open>
     <summary><h3>Sponsors</h1></summary>
 
+<sup>Want to Sponsor this Project? [Contact Me](https://discordapp.com/users/935224495126487150)!</sup>
+
+</br>
+
 [![Evomi Banner](https://my.evomi.com/images/brand/cta.png)](https://evomi.com?utm_source=github&utm_medium=banner&utm_campaign=Vinyzu-Botright)
 
 [**Evomi**](https://evomi.com?utm_source=github&utm_medium=banner&utm_campaign=Vinyzu-Botright) is your Swiss Quality, affordable Proxy Provider. I can personally recommend them for their High Quality Residential Proxies.

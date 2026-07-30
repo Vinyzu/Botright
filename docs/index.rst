@@ -50,7 +50,7 @@ Captchas
 --------
 
 Botright is able to solve a wide variety of Captchas. For Documentation
-of these functions visit `BotrightDocumentation <botright.md>`__.
+of these functions visit `BotrightDocumentation <botright.rst>`__.
 
 Here all Captchas supported as of now
 

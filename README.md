@@ -26,21 +26,21 @@
 
 ---
 
-[<img width="60%" alt="NodeMaven Banner" src="https://github.com/user-attachments/assets/8125db5d-efe5-432a-aca4-fda912f78119" />](https://go.nodemaven.com/Botright)
+[<img width="50%" alt="NodeMaven Banner" src="https://github.com/user-attachments/assets/a7cd2301-393e-4c41-8714-abc258a6194e" />](https://go.nodemaven.com/Botrightaugust)
 </br>
-#### [NodeMaven](https://go.nodemaven.com/Botright): Your reliable proxy provider with High Quality IPs. </br> Superb solution for automation, web scraping, SEO research, and social media management.
+#### [NodeMaven](https://go.nodemaven.com/Botrightaugust): Your efficient proxy provider for Web Scraping and Automation with High Quality IPs. 
 
-Why [NodeMaven](https://go.nodemaven.com/Botright)?
+Why [NodeMaven](https://go.nodemaven.com/Botrightaugust)?
 
+🎯 ZIP targeting
+</br>
 ✅ 99.9% Uptime
-</br>
-🎯 Sticky sessions up to 7 days
 </br>
 🔍 IP Filtering: Proxies are guaranteed to have fraud score <97%
 </br>
 🔰 No KYC required
 </br>
-💸 Cashback on Traffic - Burn GB and earn up to 10% back
+🎉 Unique free tools: Proxy Bandwidth Checker, Meta Tag Checker, IP Lookup and others!
 
 **Special codes** for Botright users:
 </br>
@@ -48,7 +48,9 @@ Why [NodeMaven](https://go.nodemaven.com/Botright)?
 </br>
 🔥 **BOTRIGHT40** - **40% off** to ISP (Static) Proxies
 
-<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botright).</sup>
+<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botrightaugust).</sup>
+
+---
 
 </details>
 

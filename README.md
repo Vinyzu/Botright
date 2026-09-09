@@ -26,11 +26,11 @@
 
 ---
 
-[<img width="60%" alt="NodeMaven Banner" src="https://github.com/user-attachments/assets/2d193b6a-64ae-4f7e-b8dc-ab2f42356f45" />](https://go.nodemaven.com/Botrightaugust)
+[<img width="60%" alt="NodeMaven Banner" src="https://github.com/user-attachments/assets/96f89bc7-deb6-4693-aa98-78dd634f71d2" />](https://go.nodemaven.com/Botrightseptember)
 </br>
-#### [NodeMaven](https://go.nodemaven.com/Botrightaugust): Your efficient proxy provider for Web Scraping and Automation with High Quality IPs. 
+#### [NodeMaven](https://go.nodemaven.com/Botrightseptember): Your efficient proxy provider for Web Scraping and Automation with High Quality IPs. 
 
-Why [NodeMaven](https://go.nodemaven.com/Botrightaugust)?
+Why [NodeMaven](https://go.nodemaven.com/Botrightseptember)?
 
 🎯 ZIP targeting
 </br>
@@ -42,14 +42,13 @@ Why [NodeMaven](https://go.nodemaven.com/Botrightaugust)?
 </br>
 🎉 Unique free tools: Proxy Bandwidth Checker, Meta Tag Checker, IP Lookup and others!
 
-**Special codes** for Botright users:
+**Special codes** for Patchright users:
 </br>
-🔥 **BOTRIGHT35** - **35% off** to Mobile and Residential Proxies
+🔥 **PATCHRIGHT35** - **35% off** to Mobile and Residential Proxies
 </br>
-🔥 **BOTRIGHT40** - **40% off** to ISP (Static) Proxies
+🔥 **PATCHRIGHT40** - **40% off** to ISP (Static) Proxies
 
-<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botrightaugust).</sup>
-
+<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botrightseptember).</sup>
 ---
 
 </details>

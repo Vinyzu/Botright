@@ -3,12 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
-from hcaptcha_challenger.agents import AgentT
+from hcaptcha_challenger.agent import AgentV, AgentConfig
+from hcaptcha_challenger.models import ChallengeSignal
 
 if TYPE_CHECKING:
     from botright.extended_typing import BrowserContext, Page
-
-tmp_dir = Path(__file__).parent.joinpath("tmp_dir")
 
 
 class hCaptcha:
@@ -23,8 +22,7 @@ class hCaptcha:
         self.browser = browser
         self.page = page
 
-        self.retry_times = 8
-        self.hcaptcha_agent = AgentT.from_page(page=page, tmp_dir=tmp_dir, self_supervised=True)
+        self.hcaptcha_agent = AgentV(page=page, agent_config=AgentConfig())
 
     async def mock_captcha(self, rq_data: str) -> None:
         """
@@ -61,20 +59,18 @@ class hCaptcha:
         if rq_data:
             await self.mock_captcha(rq_data)
         # Clicking Captcha Checkbox
-        await self.hcaptcha_agent.handle_checkbox()
+        await self.hcaptcha_agent.robotic_arm.click_checkbox()
+        # Wait for the challenge to appear and be ready for solving
+        # This may involve waiting for images to load or instructions to appear
+        result = await self.hcaptcha_agent.wait_for_challenge()
 
-        for pth in range(1, self.retry_times):
-            result = await self.hcaptcha_agent.execute()
-            if result == self.hcaptcha_agent.status.CHALLENGE_BACKCALL:
-                await self.page.wait_for_timeout(500)
-                fl = self.page.frame_locator(self.hcaptcha_agent.HOOK_CHALLENGE)
-                await fl.locator("//div[@class='refresh button']").click()
-            elif result == self.hcaptcha_agent.status.CHALLENGE_SUCCESS:
-                if self.hcaptcha_agent.cr:
-                    captcha_token: str = self.hcaptcha_agent.cr.generated_pass_UUID
-                    return captcha_token
+        if result == ChallengeSignal.SUCCESS:
+            if self.hcaptcha_agent.cr_list:
+                cr = self.hcaptcha_agent.cr_list[-1]
+                captcha_token: str = cr.generated_pass_UUID
+                return captcha_token
 
-        return f"Exceeded maximum retry times of {self.retry_times}"
+        return None
 
     async def get_hcaptcha(self, site_key: Optional[str] = "00000000-0000-0000-0000-000000000000", rq_data: Optional[str] = None) -> Optional[str]:
         """

@@ -26,11 +26,11 @@
 
 ---
 
-[<img width="60%" alt="NodeMaven Banner" src="https://github.com/user-attachments/assets/96f89bc7-deb6-4693-aa98-78dd634f71d2" />](https://go.nodemaven.com/Botrightseptember)
+[<img width="60%" alt="NodeMaven Banner" src="https://github.com/user-attachments/assets/feecc63e-f564-40f6-b157-aa6b7542d223" />](https://go.nodemaven.com/Botrightoctober)
 </br>
-#### [NodeMaven](https://go.nodemaven.com/Botrightseptember): Your efficient proxy provider for Web Scraping and Automation with High Quality IPs. 
+#### [NodeMaven](https://go.nodemaven.com/Botrightoctober): Your efficient proxy provider for Web Scraping and Automation with High Quality IPs. 
 
-Why [NodeMaven](https://go.nodemaven.com/Botrightseptember)?
+Why [NodeMaven](https://go.nodemaven.com/Botrightoctober)?
 
 🎯 ZIP targeting
 </br>
@@ -48,7 +48,8 @@ Why [NodeMaven](https://go.nodemaven.com/Botrightseptember)?
 </br>
 🔥 **PATCHRIGHT40** - **40% off** to ISP (Static) Proxies
 
-<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botrightseptember).</sup>
+<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botrightoctober). </sup>
+
 ---
 
 </details>

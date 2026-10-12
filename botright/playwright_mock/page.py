@@ -198,6 +198,10 @@ class Page(PlaywrightPage):
                 },
             )
 
+            # JavaScript-level stealth injection
+            # Spoofs navigator.webdriver, window.chrome, navigator.plugins, permissions, WebGL
+            await self.add_init_script(self._build_stealth_script())
+
         # Source: https://github.com/kkoooqq/fakebrowser/blob/main/src/plugins/user-action-layer/index.js
         if self.browser.user_action_layer:
             await self.add_init_script(
@@ -208,6 +212,204 @@ class Page(PlaywrightPage):
                 'document.addEventListener("mousedown",e=>{t.beginPath(),t.arc(e.clientX,e.clientY,15,0,360,!1),t.fillStyle="black",t.fill(),t.closePath()}),'
                 'document.addEventListener("mouseup",e=>{t.beginPath(),t.arc(e.clientX,e.clientY,9,0,360,!1),t.fillStyle="blue",t.fill(),t.closePath()})});'
             )
+
+    def _build_stealth_script(self) -> str:
+        """
+        Build a JavaScript init script that spoofs browser fingerprinting vectors.
+
+        Covers: navigator.webdriver, window.chrome, navigator.plugins,
+        navigator.permissions, WebGL vendor/renderer, and notification permission.
+        """
+        fingerprint = self.fingerprint
+        ua = fingerprint.navigator.user_agent
+        platform = fingerprint.navigator.platform.name
+        brands = fingerprint.navigator.brands
+        full_version = fingerprint.navigator.full_version
+
+        # Build brands array for navigator.userAgentData
+        brands_js = ", ".join(
+            f'{{"brand": "{b.brand}", "version": "{b.version}"}}' for b in brands
+        )
+
+        return f"""
+        (() => {{
+            'use strict';
+
+            // --- navigator.webdriver ---
+            Object.defineProperty(navigator, 'webdriver', {{
+                get: () => undefined,
+                configurable: true
+            }});
+
+            // --- window.chrome ---
+            if (!window.chrome) {{
+                window.chrome = {{}};
+            }}
+            if (!window.chrome.runtime) {{
+                window.chrome.runtime = {{}};
+            }}
+            if (!window.chrome.csi) {{
+                window.chrome.csi = function() {{}};
+            }}
+            if (!window.chrome.loadTimes) {{
+                window.chrome.loadTimes = function() {{}};
+            }}
+
+            // --- navigator.plugins ---
+            if (!navigator.plugins || navigator.plugins.length === 0) {{
+                const plugins = [
+                    {{
+                        name: 'Chrome PDF Plugin',
+                        filename: 'internal-pdf-viewer',
+                        description: 'Portable Document Format',
+                        length: 1,
+                        item: () => null,
+                        namedItem: () => null
+                    }},
+                    {{
+                        name: 'Chrome PDF Viewer',
+                        filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai',
+                        description: '',
+                        length: 1,
+                        item: () => null,
+                        namedItem: () => null
+                    }},
+                    {{
+                        name: 'Native Client',
+                        filename: 'internal-nacl-plugin',
+                        description: '',
+                        length: 1,
+                        item: () => null,
+                        namedItem: () => null
+                    }}
+                ];
+                Object.defineProperty(navigator, 'plugins', {{
+                    get: () => plugins,
+                    configurable: true
+                }});
+            }}
+
+            // --- navigator.languages ---
+            Object.defineProperty(navigator, 'languages', {{
+                get: () => ['en-US', 'en'],
+                configurable: true
+            }});
+
+            // --- navigator.platform ---
+            Object.defineProperty(navigator, 'platform', {{
+                get: () => '{platform}',
+                configurable: true
+            }});
+
+            // --- navigator.userAgentData ---
+            if (!navigator.userAgentData) {{
+                Object.defineProperty(navigator, 'userAgentData', {{
+                    get: () => ({{
+                        brands: [{brands_js}],
+                        mobile: false,
+                        platform: '{platform}',
+                        getHighEntropyValues: (hints) => {{
+                            return new Promise((resolve) => {{
+                                resolve({{
+                                    architecture: '{fingerprint.navigator.platform.architecture}',
+                                    bitness: '{fingerprint.navigator.platform.bitness}',
+                                    brands: [{brands_js}],
+                                    fullVersionList: [{brands_js}],
+                                    mobile: false,
+                                    model: '{fingerprint.navigator.platform.model}',
+                                    platform: '{platform}',
+                                    platformVersion: '{fingerprint.navigator.platform.version}',
+                                    uaFullVersion: '{full_version}'
+                                }});
+                            }});
+                        }}
+                    }}),
+                    configurable: true
+                }});
+            }}
+
+            // --- WebGL vendor/renderer spoofing ---
+            const getParameterProxyHandler = {{
+                apply: function(target, ctx, args) {{
+                    const param = args[0];
+                    // UNMASKED_VENDOR_WEBGL (0x9245)
+                    if (param === 37445) return 'Google Inc. (NVIDIA)';
+                    // UNMASKED_RENDERER_WEBGL (0x9246)
+                    if (param === 37446) return 'ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 SUPER Direct3D11 vs_5_0 ps_5_0, D3D11)';
+                    return Reflect.apply(target, ctx, args);
+                }}
+            }};
+            const getParameter = WebGLRenderingContext.prototype.getParameter;
+            WebGLRenderingContext.prototype.getParameter = new Proxy(getParameter, getParameterProxyHandler);
+            if (window.WebGL2RenderingContext) {{
+                const getParameter2 = WebGL2RenderingContext.prototype.getParameter;
+                WebGL2RenderingContext.prototype.getParameter = new Proxy(getParameter2, getParameterProxyHandler);
+            }}
+
+            // --- Notification.permission ---
+            if (window.Notification) {{
+                Object.defineProperty(Notification, 'permission', {{
+                    get: () => 'default',
+                    configurable: true
+                }});
+            }}
+
+            // --- Permissions API spoofing ---
+            const originalQuery = window.Permissions.prototype.query;
+            window.Permissions.prototype.query = function(parameters) {{
+                if (parameters && parameters.name === 'notifications') {{
+                    return Promise.resolve({{ state: 'default' }});
+                }}
+                return originalQuery.call(this, parameters);
+            }};
+
+            // --- iframe contentWindow spoofing ---
+            const originalContentWindow = Object.getOwnPropertyDescriptor(
+                HTMLIFrameElement.prototype, 'contentWindow'
+            );
+            Object.defineProperty(HTMLIFrameElement.prototype, 'contentWindow', {{
+                get: function() {{
+                    const win = originalContentWindow.get.call(this);
+                    try {{
+                        Object.defineProperty(win.navigator, 'webdriver', {{
+                            get: () => undefined,
+                            configurable: true
+                        }});
+                    }} catch (e) {{}}
+                    return win;
+                }},
+                configurable: true
+            }});
+
+            // --- Headless detection evasion ---
+            Object.defineProperty(navigator, 'hardwareConcurrency', {{
+                get: () => 8,
+                configurable: true
+            }});
+            Object.defineProperty(navigator, 'deviceMemory', {{
+                get: () => 8,
+                configurable: true
+            }});
+
+            // --- CDP detection evasion ---
+            const originalFunction = Function.prototype.toString;
+            Function.prototype.toString = function() {{
+                if (this === Function.prototype.toString) {{
+                    return 'function toString() {{ [native code] }}';
+                }}
+                return originalFunction.call(this);
+            }};
+
+            // --- Runtime.enable detection evasion ---
+            const originalConsole = console.log;
+            console.log = function(...args) {{
+                if (args.length === 1 && typeof args[0] === 'string' && args[0].includes('Runtime.enable')) {{
+                    return;
+                }}
+                return originalConsole.apply(this, args);
+            }};
+        }})();
+        """
 
     async def solve_hcaptcha(self, rq_data: Optional[str] = None) -> Optional[str]:
         """

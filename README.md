@@ -48,7 +48,9 @@ Why [NodeMaven](https://go.nodemaven.com/Botrightoctober)?
 </br>
 🔥 **PATCHRIGHT40** - **40% off** to ISP (Static) Proxies
 
-<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botrightoctober). </sup>
+<sup>Choose quality and stability with [NodeMaven](https://go.nodemaven.com/Botrightoctober).</sup>
+</br>
+<sup>Check Nodemaven's new GitHub for more web scraping and automation solutions - https://github.com/nodemaven</sup>
 
 ---
 
